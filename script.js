@@ -1188,6 +1188,7 @@
   const xAxis = new THREE.Vector3(1, 0, 0);
   const fwd = new THREE.Vector3();
   const tmpV = new THREE.Vector3();
+  const tmpUp = new THREE.Vector3();
   const rocketCam = { radius: 2.4, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
@@ -1355,6 +1356,7 @@
       rocketCam.dPhi = 0;
       if (focused) resetView();
     } else {
+      camera.up.set(0, 1, 0);
       const off = tmpV.copy(camera.position).sub(orbit.target);
       const len = Math.max(0.001, off.length());
       orbit.radius = orbit.desiredRadius = Math.max(12, len);
@@ -1485,9 +1487,11 @@
       }
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
+      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       const speedK = Math.min(1, rocketVel.length() / 400);
       const camDist = rocketCam.radius * (1 + speedK * 0.15);
-      camera.position.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(upAxis, 0.35);
+      camera.up.copy(tmpUp);
+      camera.position.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.35);
       camera.lookAt(tmpV.copy(rocket.position).addScaledVector(fwd, 0.6));
     }
 
