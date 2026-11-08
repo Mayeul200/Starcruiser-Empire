@@ -207,7 +207,7 @@
       thinRings: [
         { inner: 1.08, outer: 1.18, opacity: 0.12, color: 0x8fa8c8 },
         { inner: 1.24, outer: 1.32, opacity: 0.10, color: 0x8fa8c8 },
-        { inner: 1.38, outer: 1.47, opacity: 0.18, color: 0xa8c0e0, arcs: 4, arcColor: 0xd8e8ff },
+        { inner: 1.38, outer: 1.47, opacity: 0.18, color: 0xa8c0e0 },
       ],
       texUrls: [...TEX2("2k_neptune.jpg")],
       proc: { type: "neptune", base: "#3d5bd0", bands: ["#4a68c9", "#3350b0", "#6d8ade"], spot: "#2a3f8f" },
@@ -751,14 +751,22 @@
     beltLayers.push({ group: rockSub, speed: 0.9 / Math.pow(2.7, 1.5) });
 
     const bigAsteroids = [
-      { au: 2.77, r: 0.6, color: 0x9a9188 },
-      { au: 2.36, r: 0.48, color: 0xb0a898 },
-      { au: 2.77, r: 0.42, color: 0x8a8378 },
-      { au: 3.14, r: 0.4, color: 0x6f6a62 },
-      { au: 2.5, r: 0.34, color: 0x7a7468 },
-      { au: 2.95, r: 0.3, color: 0x9a9188 },
-      { au: 2.2, r: 0.3, color: 0x6f6a60 },
-      { au: 3.3, r: 0.28, color: 0x8a8378 },
+      { au: 2.77, r: 0.30, color: 0x9a9188 },
+      { au: 2.36, r: 0.24, color: 0xb0a898 },
+      { au: 2.77, r: 0.21, color: 0x8a8378 },
+      { au: 3.14, r: 0.20, color: 0x6f6a62 },
+      { au: 2.5, r: 0.17, color: 0x7a7468 },
+      { au: 2.95, r: 0.15, color: 0x9a9188 },
+      { au: 2.2, r: 0.15, color: 0x6f6a60 },
+      { au: 3.3, r: 0.14, color: 0x8a8378 },
+      { au: 2.6, r: 0.18, color: 0xa39a88 },
+      { au: 2.9, r: 0.16, color: 0x8a8378 },
+      { au: 2.4, r: 0.14, color: 0x7a7468 },
+      { au: 3.05, r: 0.19, color: 0x9a9188 },
+      { au: 2.3, r: 0.13, color: 0x6f6a60 },
+      { au: 2.8, r: 0.17, color: 0xb0a898 },
+      { au: 3.2, r: 0.15, color: 0x8d8577 },
+      { au: 2.55, r: 0.12, color: 0x7a7468 },
     ];
     for (const b of bigAsteroids) {
       const pivot = new THREE.Group();
