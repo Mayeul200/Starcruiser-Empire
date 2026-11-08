@@ -1116,40 +1116,43 @@
 
   function buildRocket() {
     const rocket = new THREE.Group();
+    const inner = new THREE.Group();
+    inner.rotation.x = Math.PI / 2;
+    rocket.add(inner);
     const white = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35, metalness: 0.4 });
     const red = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.2 });
     const dark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.6 });
 
     const body = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.38, 1.8, 24), white);
     body.position.y = 0;
-    rocket.add(body);
+    inner.add(body);
 
     const nose = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 24), red);
     nose.position.y = 1.25;
-    rocket.add(nose);
+    inner.add(nose);
 
     const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.385, 0.39, 0.18, 24), red);
     stripe.position.y = 0.45;
-    rocket.add(stripe);
+    inner.add(stripe);
 
     const window = new THREE.Mesh(
       new THREE.SphereGeometry(0.13, 16, 16),
       new THREE.MeshStandardMaterial({ color: 0x7df9ff, emissive: 0x22d3ee, emissiveIntensity: 0.9, roughness: 0.2 })
     );
     window.position.set(0, 0.75, 0.26);
-    rocket.add(window);
+    inner.add(window);
 
     for (let i = 0; i < 3; i++) {
       const fin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 0.45), red);
       const a = (i / 3) * Math.PI * 2;
       fin.position.set(Math.cos(a) * 0.38, -0.75, Math.sin(a) * 0.38);
       fin.rotation.y = -a;
-      rocket.add(fin);
+      inner.add(fin);
     }
 
     const gimbal = new THREE.Group();
     gimbal.position.y = -1.05;
-    rocket.add(gimbal);
+    inner.add(gimbal);
 
     const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 0.3, 16), dark);
     gimbal.add(nozzle);
