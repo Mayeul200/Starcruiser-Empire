@@ -1174,6 +1174,8 @@
   rocket.position.set(40, 4, 0);
   scene.add(rocket);
 
+  const speedHud = document.getElementById("hud-speed");
+
   let rocketMode = false;
   const rocketVel = new THREE.Vector3();
   const keys = {};
@@ -1244,7 +1246,9 @@
   }, { passive: false });
 
   function applyOrbit() {
-    orbit.theta += (orbit.desiredTheta - orbit.theta) * 0.08;
+    let dTh = orbit.desiredTheta - orbit.theta;
+    dTh = Math.atan2(Math.sin(dTh), Math.cos(dTh));
+    orbit.theta += dTh * 0.08;
     orbit.phi += (orbit.desiredPhi - orbit.phi) * 0.08;
     orbit.radius += (orbit.desiredRadius - orbit.radius) * 0.08;
     orbit.target.lerp(orbit.desiredTarget, 0.08);
@@ -1355,7 +1359,7 @@
   document.getElementById("btn-rocket").addEventListener("click", toggleRocketMode);
 
   window.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "PageUp", "PageDown"].includes(e.code)) e.preventDefault();
     keys[e.code] = true;
     if (e.code === "KeyR") toggleRocketMode();
   });
@@ -1426,20 +1430,21 @@
         qYaw.setFromAxisAngle(upAxis, -1.9 * delta);
         rocket.quaternion.multiply(qYaw);
       }
-      if (keys.ArrowUp) {
+      if (keys.KeyZ || keys.PageUp) {
         qPitch.setFromAxisAngle(xAxis, -1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
-      if (keys.ArrowDown) {
+      if (keys.KeyS || keys.PageDown) {
         qPitch.setFromAxisAngle(xAxis, 1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
       const gimbalZ = keys.ArrowLeft ? 0.3 : keys.ArrowRight ? -0.3 : 0;
-      const gimbalX = keys.ArrowUp ? -0.3 : keys.ArrowDown ? 0.3 : 0;
+      const gimbalX = (keys.KeyZ || keys.PageUp) ? -0.3 : (keys.KeyS || keys.PageDown) ? 0.3 : 0;
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.Space) rocketVel.addScaledVector(fwd, 12 * delta);
+      if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 12 * delta);
+      if (keys.ArrowDown) rocketVel.addScaledVector(fwd, -9 * delta);
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
       if (rocketVel.length() > 400) rocketVel.setLength(400);
       rocket.position.addScaledVector(rocketVel, delta);
@@ -1461,7 +1466,7 @@
         rocketVel.multiplyScalar(0.3);
       }
 
-      flame.visible = !!keys.Space;
+      flame.visible = !!keys.ArrowUp;
       if (flame.visible) {
         const f = 0.9 + Math.random() * 0.3;
         flame.scale.set(f, 0.9 + Math.random() * 0.5, f);
@@ -1469,10 +1474,14 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 3);
+      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 1.1);
+      const offLen = tmpV.length();
       orbit.desiredRadius = rocketCam.radius;
-      orbit.desiredTheta = Math.atan2(fwd.x, fwd.z) + Math.PI + rocketCam.dTheta;
-      orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, 1.32 + rocketCam.dPhi));
+      orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z) + rocketCam.dTheta;
+      orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, Math.acos(tmpV.y / offLen) + rocketCam.dPhi));
     }
+
+    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
 
     applyOrbit();
     renderer.render(scene, camera);

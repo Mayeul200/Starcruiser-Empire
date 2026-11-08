@@ -394,3 +394,22 @@ body {
     display: none;
   }
 }
+
+.hud-speed {
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  padding: 0.45rem 1.1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  z-index: 10;
+  position: fixed;
+}
