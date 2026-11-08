@@ -221,11 +221,14 @@
     },
   ];
 
+  const MU = { Mercure: 1.5, Vénus: 6, Terre: 8, Mars: 2.5, Jupiter: 60, Saturne: 45, Uranus: 15, Neptune: 16 };
+  const SUN_MU = 800;
   for (const p of PLANETS) {
     p.orbit = orbitFromAU(p.au);
     p.radius = radiusFromKm(p.rKm);
     p.b = p.orbit * Math.sqrt(1 - p.e * p.e);
     p.omegaRad = THREE.MathUtils.degToRad(p.omega);
+    p.mu = MU[p.name] || 5;
   }
 
 
@@ -1166,7 +1169,7 @@
     flame.visible = false;
     gimbal.add(flame);
 
-    rocket.scale.setScalar(0.35);
+    rocket.scale.setScalar(0.0875);
     return { group: rocket, flame, gimbal };
   }
 
@@ -1211,7 +1214,7 @@
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
-  const rocketCam = { radius: 2.4, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 0.6, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1264,7 +1267,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(1.6, Math.min(25, rocketCam.radius));
+      rocketCam.radius = Math.max(0.4, Math.min(8, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1373,7 +1376,7 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 2.4;
+      rocketCam.radius = 0.6;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       camSmooth.copy(camera.position);
@@ -1517,23 +1520,38 @@
       if (keys.Space) rocketVel.y += 12 * delta;
       if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 12 * delta;
       if (keys.KeyA) {
-        tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, 12 * delta);
-      }
-      if (keys.KeyD) {
         tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
         rocketVel.addScaledVector(tmpV, 12 * delta);
       }
+      if (keys.KeyD) {
+        tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
+        rocketVel.addScaledVector(tmpV, 12 * delta);
+      }
+      if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
       if (rocketVel.length() > 400) rocketVel.setLength(400);
+
+      for (const p of planetObjects) {
+        p.mesh.getWorldPosition(tmpV);
+        const d2 = Math.max(0.01, rocket.position.distanceToSquared(tmpV));
+        const d = Math.sqrt(d2);
+        if (d > p.data.radius + 0.3) {
+          tmpV2.subVectors(tmpV, rocket.position).normalize();
+          rocketVel.addScaledVector(tmpV2, (p.data.mu / d2) * delta);
+        }
+      }
+      const dSun2 = Math.max(0.01, rocket.position.lengthSq());
+      tmpV.copy(rocket.position).normalize();
+      rocketVel.addScaledVector(tmpV, (-SUN_MU / dSun2) * delta);
+
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpV);
-        collideSegment(tmpV, p.data.radius + 0.25);
+        collideSegment(tmpV, p.data.radius + 0.08);
       }
-      collideSegment(ORIGIN, SUN_RADIUS + 0.3);
+      collideSegment(ORIGIN, SUN_RADIUS + 0.15);
 
       flame.visible = !!keys.KeyW;
       if (flame.visible) {
@@ -1546,10 +1564,10 @@
       const speedK = Math.min(1, rocketVel.length() / 400);
       const camDist = rocketCam.radius * (1 + speedK * 0.15);
       camera.up.copy(tmpUp);
-      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.35);
+      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.09);
       camSmooth.lerp(tmpV, 0.25);
       camera.position.copy(camSmooth);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.6));
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.15));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 3)} km/s`;
