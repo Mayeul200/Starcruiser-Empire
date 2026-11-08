@@ -61,10 +61,25 @@
 
   const TJ = "https://threejs.org/examples/textures/planets/";
   const JDS = (repo, branch, file) => `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${file}`;
-  const TEX8 = (n) => [
-    JDS("Shriisoot/Planets-texture", "main", `8k_${n}.jpg`),
-    JDS("Shriisoot/Planets-texture", "master", `8k_${n}.jpg`),
-  ];
+  const UW = (hash, file, width) =>
+    width
+      ? `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${file}/${width}px-${file}`
+      : `https://upload.wikimedia.org/wikipedia/commons/${hash}/${file}`;
+  const UW8K = {
+    jupiter: ["5/5e", "Solarsystemscope_texture_8k_jupiter.jpg"],
+    saturn: ["1/1e", "Solarsystemscope_texture_8k_saturn.jpg"],
+    mars: ["7/70", "Solarsystemscope_texture_8k_mars.jpg"],
+    earth_daymap: ["0/04", "Solarsystemscope_texture_8k_earth_daymap.jpg"],
+    earth_nightmap: ["b/b3", "Solarsystemscope_texture_8k_earth_nightmap.jpg"],
+  };
+  const TEX8 = (n) => {
+    const uw = UW8K[n] ? [UW(UW8K[n][0], UW8K[n][1], 4096), UW(UW8K[n][0], UW8K[n][1])] : [];
+    return [
+      ...uw,
+      JDS("Shriisoot/Planets-texture", "main", `8k_${n}.jpg`),
+      JDS("Shriisoot/Planets-texture", "master", `8k_${n}.jpg`),
+    ];
+  };
   const TEX2 = (f) => [
     JDS("Shrey1803/Solar-system", "main", `textures/${f}`),
     JDS("Shrey1803/Solar-system", "master", `textures/${f}`),
@@ -150,7 +165,10 @@
       name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, inc: 2.489, node: 113.666, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
       thinRings: [{ inner: 2.32, outer: 2.37, opacity: 0.45, color: 0xe0d4b0 }],
       texUrls: [...TEX8("saturn"), ...TEX2("2k_saturn.jpg")],
-      ringUrls: TEX2("2k_saturn_ring_alpha.png"),
+      ringUrls: [
+        UW("2/29", "Solarsystemscope_texture_8k_saturn_ring_alpha.png", 2048),
+        UW("7/7d", "Solarsystemscope_texture_2k_saturn_ring_alpha.png"),
+      ],
       proc: { type: "saturn" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km (9,5 UA)",
@@ -620,7 +638,7 @@
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
   scene.add(sunLabel);
 
-  tryLoadTexture([...TEX2("2k_stars_milky_way.jpg")], (tex) => {
+  tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg", 2048), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = tex;
   });
