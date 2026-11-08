@@ -1211,6 +1211,7 @@
   const tmpUp = new THREE.Vector3();
   const tmpV2 = new THREE.Vector3();
   const tmpPrev = new THREE.Vector3();
+  const tmpC = new THREE.Vector3();
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
@@ -1529,7 +1530,6 @@
       }
       if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
-      if (rocketVel.length() > 400) rocketVel.setLength(400);
 
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpV);
@@ -1544,12 +1544,13 @@
       tmpV.copy(rocket.position).normalize();
       rocketVel.addScaledVector(tmpV, (-SUN_MU / dSun2) * delta);
 
+      if (rocketVel.length() > 10) rocketVel.setLength(10);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
-        p.mesh.getWorldPosition(tmpV);
-        collideSegment(tmpV, p.data.radius + 0.08);
+        p.mesh.getWorldPosition(tmpC);
+        collideSegment(tmpC, p.data.radius + 0.08);
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.15);
 
@@ -1561,8 +1562,8 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      const speedK = Math.min(1, rocketVel.length() / 400);
-      const camDist = rocketCam.radius * (1 + speedK * 0.15);
+      const speedK = Math.min(1, rocketVel.length() / 10);
+      const camDist = rocketCam.radius * (1 + speedK * 0.05);
       camera.up.copy(tmpUp);
       tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.09);
       camSmooth.lerp(tmpV, 0.25);
@@ -1570,7 +1571,7 @@
       camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.15));
     }
 
-    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 3)} km/s`;
+    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
 
     if (!rocketMode) applyOrbit();
     renderer.render(scene, camera);
