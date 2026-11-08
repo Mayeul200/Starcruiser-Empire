@@ -104,65 +104,6 @@ body {
   color: var(--gold);
 }
 
-/* ---------- Intro ---------- */
-
-.intro {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(ellipse at center, rgba(10, 10, 10, 0.55), rgba(10, 10, 10, 0.97));
-  cursor: pointer;
-  transition: opacity 0.8s ease;
-}
-
-.intro.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.intro-box {
-  text-align: center;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.intro-brand {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: clamp(1.2rem, 4vw, 2.2rem);
-  letter-spacing: 0.35em;
-  background: linear-gradient(90deg, var(--blue-soft), #ffffff 45%, var(--gold));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.boot-line {
-  font-family: var(--font-mono);
-  font-size: clamp(0.85rem, 2.4vw, 1.05rem);
-  color: var(--gold);
-  letter-spacing: 0.08em;
-  min-height: 1.6em;
-}
-
-.boot-line .prompt {
-  color: var(--violet);
-}
-
-.cursor {
-  animation: blink 1s steps(1) infinite;
-}
-
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
 /* ---------- HUD ---------- */
 
 .hud {

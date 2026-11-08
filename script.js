@@ -7,8 +7,6 @@
   function showFatal(message) {
     fatalMessage.textContent = message;
     fatalError.classList.remove("hidden");
-    const intro = document.getElementById("intro");
-    if (intro) intro.classList.add("hidden");
   }
 
   if (!window.THREE) {
@@ -948,60 +946,6 @@
     }
   });
 
-  /* ---------- Intro ---------- */
-
-  const intro = document.getElementById("intro");
-  const bootLine = document.getElementById("boot-line");
-  const introSkip = document.getElementById("intro-skip");
-  const bootMessages = [
-    "Initialisation du système STARCRUISER EMPIRE",
-    "Chargement du noyau solaire... OK",
-    "8 planètes détectées... OK",
-    "Ceinture d'astéroïdes cartographiée... OK",
-    "Bienvenue dans l'Empire Starcruiser",
-  ];
-
-  let bootIndex = 0;
-  let introDone = false;
-  let introFlight = null;
-
-  function typeMessage() {
-    if (bootIndex >= bootMessages.length) {
-      bootLine.innerHTML = `<span class="prompt">></span> ${bootMessages[bootMessages.length - 1]}<span class="cursor">▌</span>`;
-      introSkip.classList.remove("hidden");
-      return;
-    }
-    const message = bootMessages[bootIndex];
-    let charIndex = 0;
-    const interval = setInterval(() => {
-      charIndex += 1;
-      bootLine.innerHTML = `<span class="prompt">></span> ${message.slice(0, charIndex)}<span class="cursor">▌</span>`;
-      if (charIndex >= message.length) {
-        clearInterval(interval);
-        bootIndex += 1;
-        setTimeout(typeMessage, 450);
-      }
-    }, 32);
-  }
-
-  function startIntroFlight() {
-    if (introDone) return;
-    introDone = true;
-    intro.classList.add("hidden");
-    introFlight = {
-      start: performance.now(),
-      duration: 2600,
-      fromRadius: orbit.desiredRadius,
-      toRadius: 160,
-    };
-  }
-
-  introSkip.addEventListener("click", (e) => {
-    e.stopPropagation();
-    startIntroFlight();
-  });
-  intro.addEventListener("click", startIntroFlight);
-
   /* ---------- Boucle d'animation ---------- */
 
   const clock = new THREE.Clock();
@@ -1033,13 +977,6 @@
       orbit.desiredTarget.copy(pos);
     }
 
-    if (introFlight) {
-      const k = Math.min(1, (performance.now() - introFlight.start) / introFlight.duration);
-      const eased = 1 - Math.pow(1 - k, 3);
-      orbit.desiredRadius = introFlight.fromRadius + (introFlight.toRadius - introFlight.fromRadius) * eased;
-      if (k >= 1) introFlight = null;
-    }
-
     applyOrbit();
     renderer.render(scene, camera);
   }
@@ -1050,6 +987,5 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  typeMessage();
   animate();
 })();
