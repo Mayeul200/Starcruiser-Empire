@@ -536,6 +536,8 @@
       else if (t < 0.985) { alpha = 0.4; color = "#c9bb98"; }
       else { alpha = 0.08; color = "#b0a488"; }
       alpha *= 0.8 + rng() * 0.2;
+      if (t > 0.96) alpha *= (1 - t) / 0.04;
+      if (t < 0.47) alpha *= (t - 0.44) / 0.03;
       g.strokeStyle = color;
       g.globalAlpha = alpha;
       g.beginPath();
@@ -811,8 +813,17 @@
     labels.push(label);
 
     if (data.rings) {
+      const ringOuter = data.radius * 2.45;
+      const ringGeo = new THREE.RingGeometry(data.radius * 0.5, ringOuter, 160, 1);
+      const posAttr = ringGeo.attributes.position;
+      const uvAttr = ringGeo.attributes.uv;
+      for (let i = 0; i < posAttr.count; i++) {
+        const x = posAttr.getX(i);
+        const y = posAttr.getY(i);
+        uvAttr.setXY(i, Math.sqrt(x * x + y * y) / ringOuter, 0.5);
+      }
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(data.radius * 0.5, data.radius * 2.4, 160, 1),
+        ringGeo,
         new THREE.MeshBasicMaterial({ map: makeRingTexture(), side: THREE.DoubleSide, transparent: true, depthWrite: false })
       );
       ring.rotation.x = Math.PI / 2;
