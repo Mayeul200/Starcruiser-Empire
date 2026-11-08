@@ -222,7 +222,7 @@
   ];
 
   const G_SURF = { Mercure: 3.7, Vénus: 8.87, Terre: 9.81, Mars: 3.71, Jupiter: 24.79, Saturne: 10.44, Uranus: 8.87, Neptune: 11.15 };
-  const ACCEL_SCALE = 3.924;
+  const ACCEL_SCALE = 8.2;
   const SUN_MU = 1.4;
   for (const p of PLANETS) {
     p.orbit = orbitFromAU(p.au);
@@ -1195,6 +1195,7 @@
       rocket.position.copy(center).addScaledVector(n, min);
       const vn = rocketVel.dot(n);
       if (vn < 0) rocketVel.addScaledVector(n, -vn * 1.4);
+      if (rocketVel.length() < 0.6) rocketVel.set(0, 0, 0);
     }
   }
 
@@ -1572,11 +1573,10 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      const speedK = Math.min(1, rocketVel.length() / 5);
-      const camDist = rocketCam.radius * (1 + speedK * 0.05);
+      const camDist = rocketCam.radius;
       camera.up.copy(tmpUp);
       tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.018);
-      camSmooth.lerp(tmpV, 0.25);
+      camSmooth.lerp(tmpV, 0.6);
       camera.position.copy(camSmooth);
       camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.03));
     }
