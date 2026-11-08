@@ -222,7 +222,7 @@
   ];
 
   const MU = { Mercure: 1.5, Vénus: 6, Terre: 8, Mars: 2.5, Jupiter: 60, Saturne: 45, Uranus: 15, Neptune: 16 };
-  const SUN_MU = 800;
+  const SUN_MU = 60;
   for (const p of PLANETS) {
     p.orbit = orbitFromAU(p.au);
     p.radius = radiusFromKm(p.rKm);
@@ -990,7 +990,7 @@
       moonMesh.position.x = m.dist;
       tilt.add(moonPivot);
       if (m.atmoGlow) moonMesh.add(makeAtmosphere(size, m.color, m.atmoGlow, 0.8));
-      moons.push({ pivot: moonPivot, speed: m.speed });
+      moons.push({ pivot: moonPivot, speed: m.speed, mesh: moonMesh, mu: m.name === "Lune" ? 0.6 : 0.15 });
     });
 
     if (data.clouds) {
@@ -1169,7 +1169,7 @@
     flame.visible = false;
     gimbal.add(flame);
 
-    rocket.scale.setScalar(0.0875);
+    rocket.scale.setScalar(0.0175);
     return { group: rocket, flame, gimbal };
   }
 
@@ -1215,7 +1215,7 @@
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
-  const rocketCam = { radius: 0.6, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 0.12, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1268,7 +1268,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.4, Math.min(8, rocketCam.radius));
+      rocketCam.radius = Math.max(0.08, Math.min(1.6, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1377,7 +1377,7 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 0.6;
+      rocketCam.radius = 0.12;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       camSmooth.copy(camera.position);
@@ -1516,17 +1516,17 @@
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.KeyW) rocketVel.addScaledVector(fwd, 12 * delta);
-      if (keys.KeyS) rocketVel.addScaledVector(fwd, -9 * delta);
-      if (keys.Space) rocketVel.y += 12 * delta;
-      if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 12 * delta;
+      if (keys.KeyW) rocketVel.addScaledVector(fwd, 2.5 * delta);
+      if (keys.KeyS) rocketVel.addScaledVector(fwd, -2 * delta);
+      if (keys.Space) rocketVel.y += 2.5 * delta;
+      if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 2.5 * delta;
       if (keys.KeyA) {
         tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, 12 * delta);
+        rocketVel.addScaledVector(tmpV, 2.5 * delta);
       }
       if (keys.KeyD) {
         tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, 12 * delta);
+        rocketVel.addScaledVector(tmpV, 2.5 * delta);
       }
       if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
@@ -1539,20 +1539,29 @@
           tmpV2.subVectors(tmpV, rocket.position).normalize();
           rocketVel.addScaledVector(tmpV2, (p.data.mu / d2) * delta);
         }
+        for (const m of p.moons) {
+          m.mesh.getWorldPosition(tmpC);
+          const md2 = Math.max(0.01, rocket.position.distanceToSquared(tmpC));
+          const md = Math.sqrt(md2);
+          if (md > 0.3) {
+            tmpV2.subVectors(tmpC, rocket.position).normalize();
+            rocketVel.addScaledVector(tmpV2, (m.mu / md2) * delta);
+          }
+        }
       }
       const dSun2 = Math.max(0.01, rocket.position.lengthSq());
       tmpV.copy(rocket.position).normalize();
       rocketVel.addScaledVector(tmpV, (-SUN_MU / dSun2) * delta);
 
-      if (rocketVel.length() > 10) rocketVel.setLength(10);
+      if (rocketVel.length() > 5) rocketVel.setLength(5);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpC);
-        collideSegment(tmpC, p.data.radius + 0.08);
+        collideSegment(tmpC, p.data.radius + 0.02);
       }
-      collideSegment(ORIGIN, SUN_RADIUS + 0.15);
+      collideSegment(ORIGIN, SUN_RADIUS + 0.04);
 
       flame.visible = !!keys.KeyW;
       if (flame.visible) {
@@ -1562,13 +1571,13 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      const speedK = Math.min(1, rocketVel.length() / 10);
+      const speedK = Math.min(1, rocketVel.length() / 5);
       const camDist = rocketCam.radius * (1 + speedK * 0.05);
       camera.up.copy(tmpUp);
-      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.09);
+      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.018);
       camSmooth.lerp(tmpV, 0.25);
       camera.position.copy(camSmooth);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.15));
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.03));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
