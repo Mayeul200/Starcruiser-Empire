@@ -1184,8 +1184,10 @@
   const keys = {};
   const qYaw = new THREE.Quaternion();
   const qPitch = new THREE.Quaternion();
+  const qRoll = new THREE.Quaternion();
   const upAxis = new THREE.Vector3(0, 1, 0);
   const xAxis = new THREE.Vector3(1, 0, 0);
+  const zAxis = new THREE.Vector3(0, 0, 1);
   const fwd = new THREE.Vector3();
   const tmpV = new THREE.Vector3();
   const tmpUp = new THREE.Vector3();
@@ -1463,6 +1465,14 @@
       if (keys.ArrowDown) {
         qPitch.setFromAxisAngle(xAxis, 1.9 * delta);
         rocket.quaternion.multiply(qPitch);
+      }
+      if (keys.KeyA) {
+        qRoll.setFromAxisAngle(zAxis, -2.2 * delta);
+        rocket.quaternion.multiply(qRoll);
+      }
+      if (keys.KeyE) {
+        qRoll.setFromAxisAngle(zAxis, 2.2 * delta);
+        rocket.quaternion.multiply(qRoll);
       }
       const mYaw = -mouseDX * 0.0022;
       const mPitch = -mouseDY * 0.0022;
