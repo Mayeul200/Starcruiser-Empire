@@ -1216,6 +1216,7 @@
   const tmpC = new THREE.Vector3();
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
+  const camVel = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
   const rocketCam = { radius: 0.12, dTheta: 0, dPhi: 0 };
 
@@ -1383,6 +1384,7 @@
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       camSmooth.copy(camera.position);
+      camVel.set(0, 0, 0);
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -1576,7 +1578,9 @@
       const camDist = rocketCam.radius;
       camera.up.copy(tmpUp);
       tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.018);
-      camSmooth.lerp(tmpV, 0.6);
+      camVel.addScaledVector(tmpV2.subVectors(tmpV, camSmooth), 30 * delta);
+      camVel.multiplyScalar(Math.max(0, 1 - 9 * delta));
+      camSmooth.addScaledVector(camVel, delta);
       camera.position.copy(camSmooth);
       camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.03));
     }
