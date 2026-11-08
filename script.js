@@ -1147,26 +1147,30 @@
       rocket.add(fin);
     }
 
+    const gimbal = new THREE.Group();
+    gimbal.position.y = -1.05;
+    rocket.add(gimbal);
+
     const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 0.3, 16), dark);
-    nozzle.position.y = -1.05;
-    rocket.add(nozzle);
+    gimbal.add(nozzle);
 
     const flame = new THREE.Mesh(
       new THREE.ConeGeometry(0.2, 1.1, 16),
       new THREE.MeshBasicMaterial({ color: 0xffa726, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.9, depthWrite: false })
     );
     flame.rotation.x = Math.PI;
-    flame.position.y = -1.6;
+    flame.position.y = -0.6;
     flame.visible = false;
-    rocket.add(flame);
+    gimbal.add(flame);
 
     rocket.scale.setScalar(1.4);
-    return { group: rocket, flame };
+    return { group: rocket, flame, gimbal };
   }
 
   const rocketBuilt = buildRocket();
   const rocket = rocketBuilt.group;
   const flame = rocketBuilt.flame;
+  const gimbal = rocketBuilt.gimbal;
   rocket.position.set(40, 4, 0);
   scene.add(rocket);
 
@@ -1404,6 +1408,8 @@
         qYaw.setFromAxisAngle(upAxis, -1.9 * delta);
         rocket.quaternion.multiply(qYaw);
       }
+      const gimbalTarget = keys.ArrowLeft ? 0.3 : keys.ArrowRight ? -0.3 : 0;
+      gimbal.rotation.z += (gimbalTarget - gimbal.rotation.z) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 12 * delta);
       if (keys.ArrowDown) rocketVel.addScaledVector(fwd, -9 * delta);
@@ -1435,8 +1441,8 @@
       }
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      tmpV.copy(fwd).multiplyScalar(-8).addScaledVector(upAxis, 2.6);
-      orbit.desiredTarget.copy(rocket.position);
+      tmpV.copy(fwd).multiplyScalar(-8.5).addScaledVector(upAxis, 1.1);
+      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 3);
       orbit.desiredRadius = tmpV.length();
       orbit.desiredPhi = Math.acos(Math.max(-1, Math.min(1, tmpV.y / tmpV.length())));
       orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z);
