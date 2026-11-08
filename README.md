@@ -18,6 +18,7 @@ Textures NASA en projection équirectangulaire, chargées en direct avec **repli
   - 2K (toutes les planètes, Soleil, Lune, anneaux, Voie lactée, Uranus) : `cdn.jsdelivr.net/gh/Shrey1803/Solar-system@main|master/textures/2k_*` et `cdn.jsdelivr.net/gh/ongyishen/SolarSystem@main|master/textures/2k_*`
   - Vénus 4K : `4k_venus_atmosphere.jpg` (Shriisoot)
 - Exemples officiels Three.js (CORS `*`) : `earth_atmos_2048.jpg`, `earth_clouds_1024.png`, `earth_lights_2048.png`, `moon_1024.jpg`
+- **upload.wikimedia.org en direct** (CORS `*`, hash vérifiés) : 4096px pour Jupiter/Saturne/Mars/Terre/Voie lactée, et le **PNG alpha 8K des anneaux de Saturne** (thumb 2048px + 2K original)
 - ⚠️ `solarsystemscope.com` et `commons.wikimedia.org/wiki/Special:FilePath` sont exclus : pas d'en-tête CORS, ils échouent depuis GitHub Pages
 - Anti-pixelisation : anisotropie max du GPU sur chaque texture + zoom minimum ajusté par planète
 
