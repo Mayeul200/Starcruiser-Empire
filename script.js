@@ -1355,8 +1355,13 @@
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       if (focused) resetView();
+      try {
+        const p = canvas.requestPointerLock();
+        if (p && p.catch) p.catch(() => {});
+      } catch (err) {}
     } else {
       camera.up.set(0, 1, 0);
+      if (document.exitPointerLock) document.exitPointerLock();
       const off = tmpV.copy(camera.position).sub(orbit.target);
       const len = Math.max(0.001, off.length());
       orbit.radius = orbit.desiredRadius = Math.max(12, len);
@@ -1372,13 +1377,21 @@
   document.getElementById("btn-rocket").addEventListener("click", toggleRocketMode);
 
   window.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "PageUp", "PageDown"].includes(e.code)) e.preventDefault();
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "PageUp", "PageDown", "ControlLeft", "ControlRight"].includes(e.code)) e.preventDefault();
     keys[e.code] = true;
     if (e.code === "KeyR") toggleRocketMode();
   });
 
   window.addEventListener("keyup", (e) => {
     keys[e.code] = false;
+  });
+
+  let mouseDX = 0;
+  let mouseDY = 0;
+  document.addEventListener("mousemove", (e) => {
+    if (!rocketMode || document.pointerLockElement !== canvas) return;
+    mouseDX += e.movementX;
+    mouseDY += e.movementY;
   });
 
   /* ---------- Sélection au clic ---------- */
@@ -1451,14 +1464,27 @@
         qPitch.setFromAxisAngle(xAxis, 1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
-      const gimbalZ = keys.ArrowLeft ? 0.3 : keys.ArrowRight ? -0.3 : 0;
-      const gimbalX = keys.ArrowUp ? -0.3 : keys.ArrowDown ? 0.3 : 0;
+      const mYaw = -mouseDX * 0.0022;
+      const mPitch = -mouseDY * 0.0022;
+      mouseDX = 0;
+      mouseDY = 0;
+      if (mYaw) {
+        qYaw.setFromAxisAngle(upAxis, mYaw);
+        rocket.quaternion.multiply(qYaw);
+      }
+      if (mPitch) {
+        qPitch.setFromAxisAngle(xAxis, mPitch);
+        rocket.quaternion.multiply(qPitch);
+      }
+      const gimbalZ = keys.ArrowLeft ? 0.3 : keys.ArrowRight ? -0.3 : Math.max(-0.3, Math.min(0.3, mYaw * 0.2));
+      const gimbalX = keys.ArrowUp ? -0.3 : keys.ArrowDown ? 0.3 : Math.max(-0.3, Math.min(0.3, mPitch * 0.2));
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.KeyW || keys.Equal) rocketVel.addScaledVector(fwd, 12 * delta);
-      if (keys.KeyS || keys.Minus) rocketVel.addScaledVector(fwd, -9 * delta);
-      if (keys.Space) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
+      if (keys.KeyW) rocketVel.addScaledVector(fwd, 12 * delta);
+      if (keys.KeyS) rocketVel.addScaledVector(fwd, -9 * delta);
+      if (keys.Space) rocketVel.y += 12 * delta;
+      if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 12 * delta;
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
       if (rocketVel.length() > 400) rocketVel.setLength(400);
       rocket.position.addScaledVector(rocketVel, delta);
@@ -1480,7 +1506,7 @@
         rocketVel.multiplyScalar(0.3);
       }
 
-      flame.visible = !!(keys.KeyW || keys.Equal);
+      flame.visible = !!keys.KeyW;
       if (flame.visible) {
         const f = 0.9 + Math.random() * 0.3;
         flame.scale.set(f, 0.9 + Math.random() * 0.5, f);
