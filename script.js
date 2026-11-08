@@ -1241,7 +1241,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(1.2, Math.min(25, rocketCam.radius));
+      rocketCam.radius = Math.max(1.6, Math.min(25, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1356,7 +1356,7 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
       const offLen = tmpV.length();
-      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 1);
+      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 0.6);
       orbit.target.copy(orbit.desiredTarget);
       orbit.desiredRadius = rocketCam.radius;
       orbit.radius = rocketCam.radius;
@@ -1488,7 +1488,7 @@
       }
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 3);
+      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 0.6);
       tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
       const offLen = tmpV.length();
       orbit.desiredRadius = rocketCam.radius;
