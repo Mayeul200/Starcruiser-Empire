@@ -1578,8 +1578,8 @@
       const camDist = rocketCam.radius;
       camera.up.copy(tmpUp);
       tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.018);
-      camVel.addScaledVector(tmpV2.subVectors(tmpV, camSmooth), 30 * delta);
-      camVel.multiplyScalar(Math.max(0, 1 - 9 * delta));
+      camVel.addScaledVector(tmpV2.subVectors(tmpV, camSmooth), 150 * delta);
+      camVel.multiplyScalar(Math.max(0, 1 - 16 * delta));
       camSmooth.addScaledVector(camVel, delta);
       camera.position.copy(camSmooth);
       camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.03));
