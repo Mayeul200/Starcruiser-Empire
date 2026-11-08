@@ -14,7 +14,8 @@
 Textures NASA en projection équirectangulaire, chargées en direct avec **repli procédural** hors-ligne :
 
 - [Solar System Scope](https://www.solarsystemscope.com/textures/) (CC-BY 4.0, données NASA) : `2k_mercury`, `2k_venus_atmosphere`, `2k_earth_daymap`, `2k_mars`, `2k_jupiter`, `2k_saturn`, `2k_saturn_ring_alpha`, `2k_uranus`, `2k_neptune`, `2k_moon`, `2k_sun`, `2k_stars_milky_way`
-- Exemples officiels Three.js : `earth_atmos_2048.jpg`, `earth_clouds_1024.png`, `moon_1024.jpg`
+- **Wikimedia Commons** (secours CORS fiable, mêmes textures NASA) via `Special:FilePath/Solarsystemscope_texture_2k_*.jpg`
+- Exemples officiels Three.js : `earth_atmos_2048.jpg`, `earth_clouds_1024.png`, `earth_lights_2048.png` (lumières nocturnes), `moon_1024.jpg`
 
 Les textures procédurales de secours reproduisent les vraies caractéristiques : continents pour la Terre, Grande Tache rouge pour Jupiter, calottes polaires pour Mars, taches sombres de Neptune, division de Cassini dans les anneaux de Saturne, etc.
 
@@ -24,13 +25,13 @@ L'échelle 1:1 est illisible (Neptune à 30 UA, Soleil = 109 Terres), donc compr
 
 | Grandeur | Formule scène | Exemple |
 |---|---|---|
-| Distance au Soleil | `26 × UA^0,6` | Terre (1 UA) = 26 ; Neptune (30,1 UA) = 200 |
+| Distance au Soleil | `30 × UA^0,55` | Terre (1 UA) = 30 ; Neptune (30,1 UA) = 195 |
 | Rayon des planètes | `2,2 × √(r_km / 6371)` | Terre = 2,2 ; Jupiter = 7,3 |
-| Soleil | 9 (compressé) | — |
+| Soleil | 8 (compressé) | — |
 | Lunes | rayon réel relatif à la planète (min 0,12) | Lune = 0,60 |
 | Ceinture d'astéroïdes | 2,1–3,3 UA compressés | entre Mars et Jupiter |
 
-Inclinaisons axiales réelles appliquées (Vénus 177°, Uranus 98°, Terre 23,4°...).
+**Orbites elliptiques réelles** : vraies excentricités (Mercure 0,206, Mars 0,093...) et longitudes du périhélie. Inclinaisons axiales réelles (Vénus 177°, Uranus 98°, Terre 23,4°...). Halo atmosphérique sur Terre, Vénus, Mars, Jupiter, Neptune et Titan ; lumières nocturnes de la Terre.
 
 ## Contenu
 
