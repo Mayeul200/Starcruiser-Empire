@@ -39,50 +39,96 @@
     {
       name: "Mercure", color: 0x9c8e82, orbit: 13, radius: 1.1, speed: 4.15,
       texture: { type: "rocky", base: "#8a7f74", spots: ["#6f655c", "#a39687", "#5d544d"] },
-      diameter: "4 879 km", distance: "57,9 M km", period: "88 jours",
-      desc: "La planète la plus proche du Soleil et la plus petite du système solaire.",
+      type: "Tellurique", typeClass: "tellurique",
+      diameter: "4 879 km", mass: "3,30 × 10²³ kg", distance: "57,9 M km",
+      period: "88 jours", temp: "−173 à 427 °C", gravity: "3,7 m/s²",
+      atmo: "Quasi nulle", moons: "0", discovered: "Antiquité",
+      desc: "La planète la plus proche du Soleil et la plus petite du système solaire, criblée de cratères.",
+      fact: "À retenir : un jour solaire sur Mercure dure 176 jours terrestres.",
     },
     {
       name: "Vénus", color: 0xe8c98a, orbit: 17.5, radius: 2.1, speed: 1.62,
       texture: { type: "bands", base: "#d9b878", bands: ["#e8cf9a", "#c9a45e", "#f0dcb0"] },
-      diameter: "12 104 km", distance: "108,2 M km", period: "225 jours",
-      desc: "Enveloppée d'une épaisse atmosphère de CO₂, c'est la planète la plus chaude.",
+      type: "Tellurique", typeClass: "tellurique",
+      diameter: "12 104 km", mass: "4,87 × 10²⁴ kg", distance: "108,2 M km",
+      period: "225 jours", temp: "464 °C", gravity: "8,87 m/s²",
+      atmo: "CO₂ très dense", moons: "0", discovered: "Antiquité",
+      desc: "Enveloppée d'une épaisse atmosphère de CO₂, c'est la planète la plus chaude du système solaire.",
+      fact: "À retenir : Vénus tourne à l'envers par rapport aux autres planètes.",
     },
     {
       name: "Terre", color: 0x4d8fd1, orbit: 23, radius: 2.3, speed: 1.0,
       texture: { type: "earth", base: "#2f6fb8", land: "#3f9e5a", ice: "#eef4f8" },
-      diameter: "12 756 km", distance: "149,6 M km", period: "365,25 jours",
-      desc: "Seule planète connue à abriter la vie, avec de l'eau liquide en surface.",
+      type: "Tellurique", typeClass: "tellurique",
+      diameter: "12 756 km", mass: "5,97 × 10²⁴ kg", distance: "149,6 M km",
+      period: "365,25 jours", temp: "15 °C", gravity: "9,81 m/s²",
+      atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
+      desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
+      fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
+      moons3d: [{ name: "Lune", dist: 4.1, size: 0.6, color: 0xbbbbbb, speed: 1.4 }],
     },
     {
       name: "Mars", color: 0xc1552f, orbit: 29, radius: 1.6, speed: 0.53,
       texture: { type: "rocky", base: "#b0512c", spots: ["#8f3d20", "#cf6a3d", "#7a341c"] },
-      diameter: "6 779 km", distance: "227,9 M km", period: "687 jours",
-      desc: "La planète rouge, connue pour ses volcans géants comme Olympus Mons.",
+      type: "Tellurique", typeClass: "tellurique",
+      diameter: "6 779 km", mass: "6,42 × 10²³ kg", distance: "227,9 M km",
+      period: "687 jours", temp: "−63 °C", gravity: "3,71 m/s²",
+      atmo: "CO₂ ténue", moons: "2 (Phobos, Deimos)", discovered: "Antiquité",
+      desc: "La planète rouge, hôte du plus haut volcan du système solaire, Olympus Mons (22 km).",
+      fact: "À retenir : Mars possède les plus grandes tempêtes de poussière du système solaire.",
+      moons3d: [
+        { name: "Phobos", dist: 2.9, size: 0.26, color: 0x9a8f85, speed: 2.4 },
+        { name: "Deimos", dist: 3.9, size: 0.19, color: 0x8a7f76, speed: 1.2 },
+      ],
     },
     {
       name: "Jupiter", color: 0xd8b08c, orbit: 39, radius: 5.2, speed: 0.084,
       texture: { type: "bands", base: "#cfa87e", bands: ["#e6c9a3", "#b08a5e", "#e8b98f", "#a3764f"] },
-      diameter: "139 820 km", distance: "778,5 M km", period: "11,9 ans",
-      desc: "Géante gazeuse la plus massive, célèbre pour sa Grande Tache rouge.",
+      type: "Géante gazeuse", typeClass: "gazeuse",
+      diameter: "139 820 km", mass: "1,90 × 10²⁷ kg", distance: "778,5 M km",
+      period: "11,9 ans", temp: "−110 °C", gravity: "24,79 m/s²",
+      atmo: "Hydrogène / Hélium", moons: "95 connues", discovered: "Antiquité",
+      desc: "La plus massive des planètes, célèbre pour sa Grande Tache rouge, une tempête géante.",
+      fact: "À retenir : la Grande Tache rouge souffle depuis au moins 300 ans et pourrait engloutir la Terre.",
+      moons3d: [
+        { name: "Io", dist: 6.6, size: 0.42, color: 0xd8c27a, speed: 1.8 },
+        { name: "Europe", dist: 7.7, size: 0.38, color: 0xd8e4ee, speed: 1.3 },
+        { name: "Ganymède", dist: 9.1, size: 0.58, color: 0xb0a898, speed: 0.95 },
+        { name: "Callisto", dist: 10.3, size: 0.52, color: 0x6f6a62, speed: 0.7 },
+      ],
     },
     {
       name: "Saturne", color: 0xe3cf9e, orbit: 49, radius: 4.4, speed: 0.034, rings: true,
       texture: { type: "bands", base: "#dcc48f", bands: ["#efe0b5", "#cbb27f", "#e8d6a4"] },
-      diameter: "116 460 km", distance: "1,43 Md km", period: "29,4 ans",
-      desc: "Célèbre pour ses anneaux de glace spectaculaires.",
+      type: "Géante gazeuse", typeClass: "gazeuse",
+      diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km",
+      period: "29,4 ans", temp: "−140 °C", gravity: "10,44 m/s²",
+      atmo: "Hydrogène / Hélium", moons: "146 connues", discovered: "Antiquité",
+      desc: "Célèbre pour ses anneaux de glace spectaculaires, visibles même avec une petite lunette.",
+      fact: "À retenir : Saturne est si peu dense qu'elle flotterait sur l'eau.",
+      moons3d: [{ name: "Titan", dist: 6.6, size: 0.68, color: 0xe0a83c, speed: 0.8 }],
     },
     {
       name: "Uranus", color: 0x9fe3e0, orbit: 58, radius: 3.4, speed: 0.012,
       texture: { type: "bands", base: "#a5dedb", bands: ["#c2efec", "#8fd0cd", "#d6f5f2"] },
-      diameter: "50 724 km", distance: "2,87 Md km", period: "84 ans",
-      desc: "Géante de glace qui roule sur son orbite, axe incliné à 98°.",
+      type: "Géante de glaces", typeClass: "glaces",
+      diameter: "50 724 km", mass: "8,68 × 10²⁵ kg", distance: "2,87 Md km",
+      period: "84 ans", temp: "−195 °C", gravity: "8,87 m/s²",
+      atmo: "H₂ / Hélium / Méthane", moons: "28 connues", discovered: "1781 — W. Herschel",
+      desc: "Géante de glace qui roule sur son orbite, son axe étant incliné à 98°.",
+      fact: "À retenir : sur Uranus, chaque pôle connaît 42 ans de jour puis 42 ans de nuit.",
+      moons3d: [{ name: "Titania", dist: 5.2, size: 0.42, color: 0xb8c4cc, speed: 0.9 }],
     },
     {
       name: "Neptune", color: 0x4f6fd8, orbit: 67, radius: 3.3, speed: 0.006,
       texture: { type: "bands", base: "#4a68c9", bands: ["#6d8ade", "#3a56b0", "#8aa5ec"] },
-      diameter: "49 244 km", distance: "4,50 Md km", period: "164,8 ans",
-      desc: "La planète la plus éloignée, balayée par les vents les plus rapides du système.",
+      type: "Géante de glaces", typeClass: "glaces",
+      diameter: "49 244 km", mass: "1,02 × 10²⁶ kg", distance: "4,50 Md km",
+      period: "164,8 ans", temp: "−200 °C", gravity: "11,15 m/s²",
+      atmo: "H₂ / Hélium / Méthane", moons: "16 connues", discovered: "1846 — Le Verrier",
+      desc: "La planète la plus éloignée du Soleil, balayée par les vents les plus rapides connus.",
+      fact: "À retenir : les vents de Neptune atteignent 2 100 km/h, les plus rapides du système solaire.",
+      moons3d: [{ name: "Triton", dist: 5.0, size: 0.48, color: 0xd8b8c8, speed: 1.1 }],
     },
   ];
 
@@ -176,6 +222,32 @@
     return new THREE.CanvasTexture(c);
   }
 
+  function makeLabelTexture(text) {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 64;
+    const g = c.getContext("2d");
+    g.font = "700 30px 'Space Grotesk', sans-serif";
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.shadowColor = "rgba(96, 165, 250, 0.9)";
+    g.shadowBlur = 12;
+    g.fillStyle = "#e2e8f0";
+    g.fillText(text.toUpperCase(), 128, 32);
+    const tex = new THREE.CanvasTexture(c);
+    if (THREE.SRGBColorSpace !== undefined) tex.colorSpace = THREE.SRGBColorSpace;
+    else tex.encoding = THREE.sRGBEncoding;
+    return tex;
+  }
+
+  function makeLabel(text, scale) {
+    const sprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: makeLabelTexture(text), transparent: true, depthWrite: false })
+    );
+    sprite.scale.set(scale, scale / 4, 1);
+    return sprite;
+  }
+
   const sun = new THREE.Mesh(
     new THREE.SphereGeometry(SUN_RADIUS, 48, 48),
     new THREE.MeshBasicMaterial({ color: 0xffd27a })
@@ -188,6 +260,10 @@
   sunGlow.scale.set(SUN_RADIUS * 6, SUN_RADIUS * 6, 1);
   scene.add(sunGlow);
 
+  const sunLabel = makeLabel("Soleil", 9);
+  sunLabel.position.set(0, SUN_RADIUS + 4, 0);
+  scene.add(sunLabel);
+
   function makeOrbitLine(radius) {
     const points = [];
     for (let i = 0; i <= 128; i++) {
@@ -195,12 +271,34 @@
       points.push(new THREE.Vector3(Math.cos(a) * radius, 0, Math.sin(a) * radius));
     }
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x3d4a6b, transparent: true, opacity: 0.7 }));
+    const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.8 }));
     scene.add(line);
     return line;
   }
 
+  function makeAsteroidBelt() {
+    const count = 1600;
+    const positions = new Float32Array(count * 3);
+    const rng = makeRng(4242);
+    for (let i = 0; i < count; i++) {
+      const a = rng() * Math.PI * 2;
+      const r = 33 + rng() * 4.5;
+      positions.set([Math.cos(a) * r, (rng() - 0.5) * 1.2, Math.sin(a) * r], i * 3);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const belt = new THREE.Points(
+      geometry,
+      new THREE.PointsMaterial({ color: 0x8d8577, size: 0.28, transparent: true, opacity: 0.9 })
+    );
+    scene.add(belt);
+    return belt;
+  }
+
+  const asteroidBelt = makeAsteroidBelt();
+
   const orbitLines = [];
+  const labels = [];
   const planetObjects = [];
 
   PLANETS.forEach((data, index) => {
@@ -214,12 +312,16 @@
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 40, 40), material);
     mesh.userData.planet = data;
-    scene.add(mesh);
 
     const pivot = new THREE.Group();
     pivot.add(mesh);
     mesh.position.x = data.orbit;
     scene.add(pivot);
+
+    const label = makeLabel(data.name, 6.5);
+    label.position.set(data.orbit, data.radius + 2.6, 0);
+    pivot.add(label);
+    labels.push(label);
 
     if (data.rings) {
       const ring = new THREE.Mesh(
@@ -230,19 +332,20 @@
       mesh.add(ring);
     }
 
-    if (data.name === "Terre") {
-      const moon = new THREE.Mesh(
-        new THREE.SphereGeometry(0.6, 24, 24),
-        new THREE.MeshStandardMaterial({ color: 0xbbbbbb, roughness: 1 })
+    const moons = [];
+    (data.moons3d || []).forEach((m) => {
+      const moonMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(m.size, 20, 20),
+        new THREE.MeshStandardMaterial({ color: m.color, roughness: 1 })
       );
       const moonPivot = new THREE.Group();
-      moonPivot.add(moon);
-      moon.position.x = data.radius + 1.8;
+      moonPivot.add(moonMesh);
+      moonMesh.position.x = m.dist;
       mesh.add(moonPivot);
-      data.moonPivot = moonPivot;
-    }
+      moons.push({ pivot: moonPivot, speed: m.speed });
+    });
 
-    planetObjects.push({ data, mesh, pivot, angle: Math.random() * Math.PI * 2 });
+    planetObjects.push({ data, mesh, pivot, label, moons, angle: Math.random() * Math.PI * 2 });
   });
 
   function makeStars() {
@@ -268,7 +371,7 @@
 
   const stars = makeStars();
 
-  /* ---------- Contrôles caméra maison (glisser / molette) ---------- */
+  /* ---------- Contrôles caméra maison ---------- */
 
   const orbit = {
     target: new THREE.Vector3(0, 0, 0),
@@ -347,16 +450,31 @@
     planetNav.appendChild(btn);
   });
 
+  function setInfo(id, value) {
+    document.getElementById(id).textContent = value;
+  }
+
   function focusPlanet(obj) {
     focused = obj;
     document.querySelectorAll(".planet-btn").forEach((b, i) => {
       b.classList.toggle("active", planetObjects[i] === obj);
     });
-    document.getElementById("info-name").textContent = obj.data.name.toUpperCase();
-    document.getElementById("info-diameter").textContent = obj.data.diameter;
-    document.getElementById("info-distance").textContent = obj.data.distance;
-    document.getElementById("info-period").textContent = obj.data.period;
-    document.getElementById("info-desc").textContent = obj.data.desc;
+    const d = obj.data;
+    setInfo("info-name", d.name.toUpperCase());
+    const typeEl = document.getElementById("info-type");
+    typeEl.textContent = d.type;
+    typeEl.className = `info-type ${d.typeClass}`;
+    setInfo("info-diameter", d.diameter);
+    setInfo("info-mass", d.mass);
+    setInfo("info-distance", d.distance);
+    setInfo("info-period", d.period);
+    setInfo("info-temp", d.temp);
+    setInfo("info-gravity", d.gravity);
+    setInfo("info-atmo", d.atmo);
+    setInfo("info-moons", d.moons);
+    setInfo("info-discovered", d.discovered);
+    setInfo("info-desc", d.desc);
+    setInfo("info-fact", d.fact);
     infoPanel.classList.remove("hidden");
     orbit.desiredRadius = obj.data.radius * 6 + 6;
   }
@@ -390,6 +508,11 @@
     orbitLines.forEach((line) => (line.visible = e.target.checked));
   });
 
+  document.getElementById("toggle-labels").addEventListener("change", (e) => {
+    labels.forEach((l) => (l.visible = e.target.checked));
+    sunLabel.visible = e.target.checked;
+  });
+
   /* ---------- Sélection au clic ---------- */
 
   const raycaster = new THREE.Raycaster();
@@ -414,11 +537,11 @@
   const bootLine = document.getElementById("boot-line");
   const introSkip = document.getElementById("intro-skip");
   const bootMessages = [
-    "Initialisation du système",
+    "Initialisation du système STARCRUISER EMPIRE",
     "Chargement du noyau solaire... OK",
     "8 planètes détectées... OK",
-    "Trajectoires verrouillées... OK",
-    "Bienvenue dans le système PlanetX",
+    "Ceinture d'astéroïdes cartographiée... OK",
+    "Bienvenue dans l'Empire Starcruiser",
   ];
 
   let bootIndex = 0;
@@ -475,8 +598,9 @@
         p.angle += delta * speedMultiplier * (0.35 / Math.pow(p.data.orbit / 20, 0.6)) * p.data.speed * 10;
         p.pivot.rotation.y = p.angle;
         p.mesh.rotation.y += delta * speedMultiplier * 0.4;
-        if (p.data.moonPivot) p.data.moonPivot.rotation.y += delta * speedMultiplier * 1.4;
+        for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * m.speed;
       }
+      asteroidBelt.rotation.y += delta * speedMultiplier * 0.01;
       sun.rotation.y += delta * speedMultiplier * 0.05;
     }
 

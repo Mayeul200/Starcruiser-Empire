@@ -1,13 +1,28 @@
+/* ============================================
+   STARCRUISER EMPIRE — DA SPATIALE
+   Palette : bleu #1e3a8a/#3b82f6, or #fbbf24,
+   violet #a78bfa, panneaux #1e293b, fond #0a0a0a
+   Polices : Orbitron (display) / Space Grotesk (body)
+   ============================================ */
+
 :root {
-  --bg: #050508;
-  --panel: rgba(8, 8, 18, 0.72);
-  --border: rgba(125, 249, 255, 0.25);
-  --text: #e8e8f2;
-  --muted: #9a9ab0;
-  --accent: #7df9ff;
-  --accent-2: #b18cff;
-  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  --bg: #0a0a0a;
+  --bg-light: #0f172a;
+  --bg-panel: rgba(30, 41, 59, 0.78);
+  --border: #334155;
+  --border-light: #475569;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --blue: #3b82f6;
+  --blue-deep: #1e3a8a;
+  --blue-soft: #60a5fa;
+  --gold: #fbbf24;
+  --gold-deep: #f59e0b;
+  --violet: #a78bfa;
+  --radius: 8px;
+  --font-display: "Orbitron", "Space Grotesk", sans-serif;
+  --font-body: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
 }
 
 * {
@@ -25,7 +40,7 @@ body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   line-height: 1.5;
 }
 
@@ -46,10 +61,16 @@ body {
     to bottom,
     transparent 0px,
     transparent 3px,
-    rgba(0, 0, 0, 0.16) 4px
+    rgba(0, 0, 0, 0.14) 4px
   );
-  opacity: 0.5;
+  opacity: 0.45;
 }
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Erreur fatale ---------- */
 
 .fatal-error {
   position: fixed;
@@ -67,7 +88,8 @@ body {
 }
 
 .fatal-title {
-  color: #ff6b6b;
+  font-family: var(--font-display);
+  color: #ef4444;
   letter-spacing: 0.3em;
   font-size: 1rem;
 }
@@ -79,7 +101,7 @@ body {
 }
 
 .fatal-hint code {
-  color: var(--accent);
+  color: var(--gold);
 }
 
 /* ---------- Intro ---------- */
@@ -91,7 +113,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at center, rgba(5, 5, 8, 0.55), rgba(5, 5, 8, 0.96));
+  background: radial-gradient(ellipse at center, rgba(10, 10, 10, 0.55), rgba(10, 10, 10, 0.97));
   cursor: pointer;
   transition: opacity 0.8s ease;
 }
@@ -110,16 +132,27 @@ body {
   gap: 1.5rem;
 }
 
+.intro-brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
+  letter-spacing: 0.35em;
+  background: linear-gradient(90deg, var(--blue-soft), #ffffff 45%, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .boot-line {
   font-family: var(--font-mono);
-  font-size: clamp(0.85rem, 2.4vw, 1.1rem);
-  color: var(--accent);
+  font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+  color: var(--gold);
   letter-spacing: 0.08em;
   min-height: 1.6em;
 }
 
 .boot-line .prompt {
-  color: var(--accent-2);
+  color: var(--violet);
 }
 
 .cursor {
@@ -130,16 +163,11 @@ body {
   50% { opacity: 0; }
 }
 
-.hidden {
-  display: none !important;
-}
-
 /* ---------- HUD ---------- */
 
 .hud {
   position: fixed;
   z-index: 10;
-  font-family: var(--font-mono);
 }
 
 .hud-title {
@@ -149,22 +177,42 @@ body {
 }
 
 .site-title {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: clamp(1rem, 3vw, 1.8rem);
-  letter-spacing: 0.12em;
-  background: linear-gradient(90deg, var(--accent), #ffffff 45%, var(--accent-2));
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1rem, 3vw, 1.7rem);
+  letter-spacing: 0.22em;
+  background: linear-gradient(90deg, var(--blue-soft), #ffffff 45%, var(--gold));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 40px rgba(125, 249, 255, 0.25);
+  filter: drop-shadow(0 0 18px rgba(96, 165, 250, 0.35));
 }
 
 .site-sub {
   color: var(--muted);
-  font-size: clamp(0.7rem, 1.8vw, 0.85rem);
-  letter-spacing: 0.15em;
+  font-size: clamp(0.68rem, 1.8vw, 0.82rem);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.hud-planets,
+.hud-controls,
+.hud-info {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.hud-label {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
 }
 
 .hud-planets {
@@ -172,17 +220,6 @@ body {
   bottom: 3.25rem;
   max-width: 220px;
   padding: 0.9rem 1rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  backdrop-filter: blur(8px);
-}
-
-.hud-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.3em;
-  color: var(--accent-2);
-  margin-bottom: 0.6rem;
 }
 
 .planet-buttons {
@@ -201,8 +238,9 @@ body {
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -211,13 +249,13 @@ body {
 }
 
 .planet-btn:hover {
-  background: rgba(125, 249, 255, 0.08);
-  border-color: var(--border);
+  background: rgba(59, 130, 246, 0.12);
+  border-color: var(--border-light);
 }
 
 .planet-btn.active {
-  border-color: var(--accent);
-  background: rgba(125, 249, 255, 0.14);
+  border-color: var(--gold);
+  background: rgba(251, 191, 36, 0.14);
 }
 
 .planet-dot {
@@ -235,10 +273,6 @@ body {
   flex-direction: column;
   gap: 0.6rem;
   padding: 0.9rem 1rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  backdrop-filter: blur(8px);
 }
 
 .control-row {
@@ -254,34 +288,54 @@ body {
 
 .control-row input[type="range"] {
   width: 110px;
-  accent-color: var(--accent);
+  accent-color: var(--gold-deep);
 }
 
 .control-row input[type="checkbox"] {
-  accent-color: var(--accent);
+  accent-color: var(--gold-deep);
 }
 
 .hud-info {
   right: 1.5rem;
   bottom: 3.25rem;
-  width: 250px;
+  width: 270px;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
   padding: 1rem;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  backdrop-filter: blur(8px);
 }
 
 .hud-info .hud-label {
-  color: var(--accent);
-  font-size: 0.85rem;
+  color: var(--blue-soft);
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.info-type {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
   margin-bottom: 0.75rem;
+  border: 1px solid var(--border-light);
+  color: var(--gold);
+}
+
+.info-type.gazeuse {
+  color: var(--blue-soft);
+}
+
+.info-type.glaces {
+  color: var(--violet);
 }
 
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
   margin-bottom: 0.75rem;
 }
 
@@ -302,15 +356,24 @@ body {
 }
 
 .info-desc {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--muted);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.info-fact {
+  font-size: 0.75rem;
+  color: var(--gold);
+  border-left: 3px solid var(--gold-deep);
+  padding-left: 0.6rem;
+  margin-bottom: 0.9rem;
 }
 
 .hud-hint {
   bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   color: var(--muted);
@@ -322,35 +385,34 @@ body {
 
 .btn {
   display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 0.8rem 1.6rem;
-  border-radius: 4px;
-  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
   color: var(--text);
-  background: var(--panel);
+  background: var(--bg-panel);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 24px rgba(125, 249, 255, 0.25);
+  box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
 }
 
-.btn-primary {
-  background: linear-gradient(90deg, rgba(125, 249, 255, 0.18), rgba(177, 140, 255, 0.18));
-  border-color: rgba(125, 249, 255, 0.5);
-  color: var(--accent);
+.btn-accent {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .btn-small {
   padding: 0.45rem 0.9rem;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
 }
 
 /* ---------- Responsive ---------- */
@@ -364,7 +426,7 @@ body {
   }
 
   .planet-btn {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     padding: 0.3rem 0.4rem;
   }
 
@@ -379,7 +441,7 @@ body {
     right: 0.75rem;
     bottom: auto;
     top: 4.5rem;
-    width: 200px;
+    width: 210px;
   }
 
   .hud-title {

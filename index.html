@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlanetX — Système solaire en 3D</title>
-  <meta name="description" content="SYSTÈME PLANETX — explorez le système solaire en 3D : 8 planètes en orbite autour du Soleil, cliquez sur une planète pour la viser." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>" />
+  <title>Starcruiser Empire — Système solaire en 3D</title>
+  <meta name="description" content="STARCRUISER EMPIRE — explorez le système solaire en 3D : 8 planètes, lunes, ceinture d'astéroïdes, cliquez sur un astre pour tout savoir." />
+  <meta property="og:title" content="Starcruiser Empire — Système solaire en 3D" />
+  <meta property="og:site_name" content="Starcruiser Empire" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=4" />
   <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 </head>
 <body>
@@ -24,14 +26,15 @@
 
   <div class="intro" id="intro">
     <div class="intro-box">
+      <p class="intro-brand">STARCRUISER&nbsp;EMPIRE</p>
       <p class="boot-line" id="boot-line"><span class="prompt">></span> Initialisation du système<span class="cursor">▌</span></p>
-      <button class="btn btn-primary intro-skip hidden" id="intro-skip" type="button">PASSER L'INTRO</button>
+      <button class="btn btn-accent intro-skip hidden" id="intro-skip" type="button">PASSER L'INTRO</button>
     </div>
   </div>
 
   <header class="hud hud-title">
-    <h1 class="site-title">ＳＹＳＴÈＭＥ ＰＬＡＮＥＴＸ</h1>
-    <p class="site-sub">Système solaire — vue 3D interactive</p>
+    <h1 class="site-title">STARCRUISER&nbsp;EMPIRE</h1>
+    <p class="site-sub">Système stellaire — exploration 3D</p>
   </header>
 
   <nav class="hud hud-planets" id="planet-nav" aria-label="Planètes">
@@ -51,21 +54,33 @@
       <span>Orbites</span>
       <input type="checkbox" id="toggle-orbits" checked />
     </label>
+    <label class="control-row">
+      <span>Étiquettes</span>
+      <input type="checkbox" id="toggle-labels" checked />
+    </label>
   </div>
 
   <aside class="hud hud-info hidden" id="info-panel">
     <p class="hud-label" id="info-name">PLANÈTE</p>
+    <p class="info-type" id="info-type">—</p>
     <dl class="info-list">
       <div><dt>Diamètre</dt><dd id="info-diameter">—</dd></div>
+      <div><dt>Masse</dt><dd id="info-mass">—</dd></div>
       <div><dt>Distance au Soleil</dt><dd id="info-distance">—</dd></div>
       <div><dt>Année orbitale</dt><dd id="info-period">—</dd></div>
+      <div><dt>Température moy.</dt><dd id="info-temp">—</dd></div>
+      <div><dt>Gravité</dt><dd id="info-gravity">—</dd></div>
+      <div><dt>Atmosphère</dt><dd id="info-atmo">—</dd></div>
+      <div><dt>Lunes</dt><dd id="info-moons">—</dd></div>
+      <div><dt>Découverte</dt><dd id="info-discovered">—</dd></div>
     </dl>
     <p class="info-desc" id="info-desc"></p>
+    <p class="info-fact" id="info-fact"></p>
     <button class="btn btn-small" id="info-close" type="button">✕ FERMER</button>
   </aside>
 
-  <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur une planète</p>
+  <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur un astre</p>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
