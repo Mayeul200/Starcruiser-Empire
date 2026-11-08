@@ -1216,8 +1216,9 @@
   const tmpC = new THREE.Vector3();
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
-  const camVel = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
+  const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+  const camLocal = new THREE.Vector3();
   const rocketCam = { radius: 0.12, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
@@ -1383,8 +1384,6 @@
       rocketCam.radius = 0.12;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
-      camSmooth.copy(camera.position);
-      camVel.set(0, 0, 0);
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -1575,14 +1574,11 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      const camDist = rocketCam.radius;
-      camera.up.copy(tmpUp);
-      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.018);
-      camVel.addScaledVector(tmpV2.subVectors(tmpV, camSmooth), 150 * delta);
-      camVel.multiplyScalar(Math.max(0, 1 - 16 * delta));
-      camSmooth.addScaledVector(camVel, delta);
-      camera.position.copy(camSmooth);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.03));
+      camera.up.set(0, 1, 0);
+      camLocal.set(0, 0.018, -rocketCam.radius);
+      rocket.updateMatrixWorld();
+      camera.position.copy(rocket.localToWorld(camLocal));
+      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
