@@ -9,19 +9,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="style.css?v=3" />
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 </head>
 <body>
   <canvas id="scene"></canvas>
   <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="fatal-error hidden" id="fatal-error">
+    <p class="fatal-title">SYSTÈME INDISPONIBLE</p>
+    <p id="fatal-message">Impossible de charger la scène 3D.</p>
+    <p class="fatal-hint">Rechargez la page (Ctrl+F5 / Cmd+Maj+R) avec une connexion Internet active, ou servez le dossier en local : <code>python3 -m http.server 8000</code></p>
+  </div>
 
   <div class="intro" id="intro">
     <div class="intro-box">
@@ -67,6 +66,6 @@
 
   <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur une planète</p>
 
-  <script type="module" src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>

@@ -51,6 +51,37 @@ body {
   opacity: 0.5;
 }
 
+.fatal-error {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--bg);
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--font-mono);
+}
+
+.fatal-title {
+  color: #ff6b6b;
+  letter-spacing: 0.3em;
+  font-size: 1rem;
+}
+
+.fatal-hint {
+  color: var(--muted);
+  font-size: 0.75rem;
+  max-width: 480px;
+}
+
+.fatal-hint code {
+  color: var(--accent);
+}
+
 /* ---------- Intro ---------- */
 
 .intro {

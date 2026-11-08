@@ -18,10 +18,10 @@ Système solaire interactif en 3D — « SYSTÈME PLANETX ».
 
 ## Utilisation
 
-Servir le dossier en statique (nécessite un accès à Internet pour charger Three.js via CDN) :
+Ouvrir `index.html` directement dans le navigateur (connexion Internet requise pour charger Three.js via CDN), ou servir le dossier en statique :
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Puis ouvrir `http://localhost:8000`.
+Puis aller sur `http://localhost:8000`.
