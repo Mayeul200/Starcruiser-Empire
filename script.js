@@ -1354,20 +1354,16 @@
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       if (focused) resetView();
-      fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
-      const offLen = tmpV.length();
-      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 0.6);
-      orbit.target.copy(orbit.desiredTarget);
-      orbit.desiredRadius = rocketCam.radius;
-      orbit.radius = rocketCam.radius;
-      orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z);
-      orbit.theta = orbit.desiredTheta;
-      orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, Math.acos(tmpV.y / offLen)));
-      orbit.phi = orbit.desiredPhi;
-    } else if (!focused) {
-      orbit.desiredTarget.set(0, 0, 0);
-      orbit.desiredRadius = 285;
+    } else {
+      const off = tmpV.copy(camera.position).sub(orbit.target);
+      const len = Math.max(0.001, off.length());
+      orbit.radius = orbit.desiredRadius = Math.max(12, len);
+      orbit.phi = orbit.desiredPhi = Math.acos(Math.max(-1, Math.min(1, off.y / len)));
+      orbit.theta = orbit.desiredTheta = Math.atan2(off.x, off.z);
+      if (!focused) {
+        orbit.desiredTarget.set(0, 0, 0);
+        orbit.desiredRadius = 285;
+      }
     }
   }
 
@@ -1489,18 +1485,15 @@
       }
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 0.6);
-      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
-      const offLen = tmpV.length();
       const speedK = Math.min(1, rocketVel.length() / 400);
-      orbit.desiredRadius = rocketCam.radius * (1 + speedK * 0.15);
-      orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z) + rocketCam.dTheta;
-      orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, Math.acos(tmpV.y / offLen) + rocketCam.dPhi));
+      const camDist = rocketCam.radius * (1 + speedK * 0.15);
+      camera.position.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(upAxis, 0.35);
+      camera.lookAt(tmpV.copy(rocket.position).addScaledVector(fwd, 0.6));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
 
-    applyOrbit();
+    if (!rocketMode) applyOrbit();
     renderer.render(scene, camera);
   }
 
