@@ -37,8 +37,8 @@
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 3000);
   camera.position.set(0, 95, 300);
 
-  scene.add(new THREE.AmbientLight(0x334466, 1.0));
-  const sunLight = new THREE.PointLight(0xfff3d6, 2.8, 0, 0);
+  scene.add(new THREE.AmbientLight(0x334466, 1.1));
+  const sunLight = new THREE.PointLight(0xfff3d6, 4.5, 0, 0);
   scene.add(sunLight);
 
   /* ============================================================
@@ -67,8 +67,8 @@
 
   const PLANETS = [
     {
-      name: "Mercure", au: 0.387, rKm: 2439, tilt: 0.03, e: 0.2056, omega: 77, speed: 4.15, color: 0x9c8e82,
-      texUrls: [SSS + "2k_mercury.jpg", WCSS("2k_mercury.jpg")],
+      name: "Mercure", au: 0.387, rKm: 2439, tilt: 0.03, e: 0.2056, omega: 77, periodDays: 88, flattening: 0.0001, color: 0x9c8e82,
+      texUrls: [SSS + "8k_mercury.jpg", SSS + "2k_mercury.jpg", WCSS("2k_mercury.jpg")],
       proc: { type: "craters", base: "#8a7f74", dark: "#5f564e", light: "#a39687" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "4 879 km", mass: "3,30 × 10²³ kg", distance: "57,9 M km (0,39 UA)",
@@ -78,8 +78,8 @@
       fact: "À retenir : un jour solaire sur Mercure dure 176 jours terrestres.",
     },
     {
-      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, speed: 1.62, color: 0xe8c98a, atmoGlow: 0xe8c98a,
-      texUrls: [SSS + "2k_venus_atmosphere.jpg", WCSS("2k_venus_atmosphere.jpg"), SSS + "2k_venus_surface.jpg", WCSS("2k_venus_surface.jpg")],
+      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a,
+      texUrls: [SSS + "8k_venus_atmosphere.jpg", SSS + "2k_venus_atmosphere.jpg", WCSS("2k_venus_atmosphere.jpg"), SSS + "2k_venus_surface.jpg", WCSS("2k_venus_surface.jpg")],
       proc: { type: "venus", base: "#d9b878", light: "#f0dcb0", dark: "#c9a45e" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 104 km", mass: "4,87 × 10²⁴ kg", distance: "108,2 M km (0,72 UA)",
@@ -89,8 +89,8 @@
       fact: "À retenir : Vénus tourne à l'envers (rotation rétrograde) par rapport aux autres planètes.",
     },
     {
-      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, speed: 1.0, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
-      texUrls: [SSS + "2k_earth_daymap.jpg", WCSS("2k_earth_daymap.jpg"), TJ + "earth_atmos_2048.jpg"],
+      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
+      texUrls: [SSS + "8k_earth_daymap.jpg", SSS + "2k_earth_daymap.jpg", WCSS("2k_earth_daymap.jpg"), TJ + "earth_atmos_2048.jpg"],
       cloudUrls: [TJ + "earth_clouds_1024.png", SSS + "2k_earth_clouds_1024.png"],
       nightUrls: [TJ + "earth_lights_2048.png", WCSS("2k_earth_nightmap.jpg")],
       proc: { type: "earth", base: "#14508f", land: "#3f9e5a", desert: "#c2a86b", ice: "#eef4f8" },
@@ -103,8 +103,8 @@
       moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [SSS + "2k_moon.jpg", WCSS("2k_moon.jpg"), TJ + "moon_1024.jpg"] }],
     },
     {
-      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, speed: 0.53, color: 0xc1552f, atmoGlow: 0xd08a5a,
-      texUrls: [SSS + "2k_mars.jpg", WCSS("2k_mars.jpg")],
+      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
+      texUrls: [SSS + "8k_mars.jpg", SSS + "2k_mars.jpg", WCSS("2k_mars.jpg")],
       proc: { type: "mars", base: "#b5502a", dark: "#7a3418", ice: "#f2f2f2" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "6 779 km", mass: "6,42 × 10²³ kg", distance: "227,9 M km (1,52 UA)",
@@ -118,9 +118,9 @@
       ],
     },
     {
-      name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, speed: 0.084, color: 0xd8b08c, atmoGlow: 0xd8b08c,
-      texUrls: [SSS + "2k_jupiter.jpg", WCSS("2k_jupiter.jpg")],
-      proc: { type: "jupiter", bands: ["#d8b48e", "#b08a5e", "#e8cfae", "#c49a6c", "#a3764f", "#e0c9a8"], spot: "#c1442e" },
+      name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, periodDays: 4333, flattening: 0.0649, color: 0xd8b08c, atmoGlow: 0xd8b08c,
+      texUrls: [SSS + "8k_jupiter.jpg", SSS + "2k_jupiter.jpg", WCSS("2k_jupiter.jpg")],
+      proc: { type: "jupiter" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "139 820 km", mass: "1,90 × 10²⁷ kg", distance: "778,5 M km (5,2 UA)",
       period: "11,9 ans", temp: "−110 °C", gravity: "24,79 m/s²",
@@ -135,10 +135,10 @@
       ],
     },
     {
-      name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, speed: 0.034, color: 0xe3cf9e, rings: true,
-      texUrls: [SSS + "2k_saturn.jpg", WCSS("2k_saturn.jpg")],
-      ringUrls: [SSS + "2k_saturn_ring_alpha.png", WCSS("2k_saturn_ring_alpha.png")],
-      proc: { type: "saturn", bands: ["#e6d3a3", "#d9c48f", "#efe3bb", "#cbb27f"] },
+      name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
+      texUrls: [SSS + "8k_saturn.jpg", SSS + "2k_saturn.jpg", WCSS("2k_saturn.jpg")],
+      ringUrls: [SSS + "8k_saturn_ring_alpha.png", SSS + "2k_saturn_ring_alpha.png", WCSS("2k_saturn_ring_alpha.png")],
+      proc: { type: "saturn" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km (9,5 UA)",
       period: "29,4 ans", temp: "−140 °C", gravity: "10,44 m/s²",
@@ -148,8 +148,8 @@
       moons3d: [{ name: "Titan", rKm: 2574, dist: 9.6, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
     },
     {
-      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, speed: 0.012, color: 0x9fe3e0, faintRings: true,
-      texUrls: [SSS + "2k_uranus.jpg", WCSS("2k_uranus.jpg")],
+      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0, faintRings: true,
+      texUrls: [SSS + "8k_uranus.jpg", SSS + "2k_uranus.jpg", WCSS("2k_uranus.jpg")],
       proc: { type: "uranus", base: "#9fdcd9", band: "#c8efeb" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "50 724 km", mass: "8,68 × 10²⁵ kg", distance: "2,87 Md km (19,2 UA)",
@@ -160,8 +160,8 @@
       moons3d: [{ name: "Titania", rKm: 788, dist: 6.4, color: 0xb8c4cc, speed: 0.9 }],
     },
     {
-      name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, speed: 0.006, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
-      texUrls: [SSS + "2k_neptune.jpg", WCSS("2k_neptune.jpg")],
+      name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
+      texUrls: [SSS + "8k_neptune.jpg", SSS + "2k_neptune.jpg", WCSS("2k_neptune.jpg")],
       proc: { type: "neptune", base: "#3d5bd0", bands: ["#4a68c9", "#3350b0", "#6d8ade"], spot: "#2a3f8f" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "49 244 km", mass: "1,02 × 10²⁶ kg", distance: "4,50 Md km (30,1 UA)",
@@ -300,30 +300,84 @@
       g.fillRect(0, 0, w, h * 0.055);
       g.fillRect(0, h * 0.945, w, h * 0.055);
     } else if (spec.type === "jupiter") {
-      drawBands(g, w, h, spec.bands, rng, 7);
-      for (let i = 0; i < 40; i++) {
-        g.strokeStyle = "rgba(120, 80, 50, 0.25)";
-        g.lineWidth = 1 + rng() * 2;
-        const y0 = rng() * h;
+      const zoneColors = ["#efe3cb", "#e8d8b8", "#f2e9d8", "#e6d6b8"];
+      const beltColors = ["#c9a176", "#b0855c", "#9a6f4b", "#8f6a4a", "#d9bd97", "#a87b5a"];
+      let y = 0;
+      let phase = rng() * 9;
+      let isZone = rng() > 0.5;
+      while (y < h) {
+        const bh = 8 + rng() * 26;
+        const colors = isZone ? zoneColors : beltColors;
+        g.fillStyle = colors[Math.floor(rng() * colors.length)];
+        g.globalAlpha = 0.6 + rng() * 0.4;
         g.beginPath();
-        for (let x = 0; x <= w; x += 12) g.lineTo(x, y0 + Math.sin(x / 25 + i) * 5);
-        g.stroke();
+        g.moveTo(0, y);
+        for (let x = 0; x <= w; x += 12) {
+          g.lineTo(x, y + Math.sin(x / 55 + phase) * 6 + Math.sin(x / 13 + phase * 2) * 2);
+        }
+        g.lineTo(w, y + bh);
+        g.lineTo(0, y + bh);
+        g.closePath();
+        g.fill();
+        for (let s = 0; s < 8; s++) {
+          g.fillStyle = rng() > 0.5 ? "rgba(255,245,225,0.18)" : "rgba(90,60,40,0.16)";
+          g.beginPath();
+          g.ellipse(rng() * w, y + rng() * bh, 6 + rng() * 18, 1.5 + rng() * 3, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        y += bh;
+        phase += 1.3;
+        if (rng() > 0.55) isZone = !isZone;
       }
-      drawSpot(g, 190, -22, 30, 12, spec.spot, w, h);
-      g.strokeStyle = "#e8b98f";
-      g.lineWidth = 3;
+      g.globalAlpha = 1;
+      drawSpot(g, 190, -22, 34, 13, "#c1543a", w, h);
+      drawSpot(g, 190, -22, 26, 9, "#d96a4a", w, h);
+      drawSpot(g, 188, -21, 12, 4.5, "#e8805e", w, h);
+      g.strokeStyle = "rgba(240,220,190,0.8)";
+      g.lineWidth = 2.5;
       g.beginPath();
-      g.ellipse(...lonLatToXY(190, -22, w, h), 33, 14, 0, 0, Math.PI * 2);
+      g.ellipse(...lonLatToXY(190, -22, w, h), 36, 15, 0, 0, Math.PI * 2);
       g.stroke();
-      drawSpot(g, 192, -22, 12, 5, "#e06a4a", w, h);
-      for (let i = 0; i < 6; i++) {
-        g.fillStyle = "rgba(255,255,255,0.5)";
+      for (let i = 0; i < 7; i++) {
+        g.fillStyle = "rgba(255,252,244,0.55)";
         g.beginPath();
-        g.ellipse(...lonLatToXY(rng() * 360 - 180, -30 + rng() * 50, w, h), 8 + rng() * 10, 3 + rng() * 3, 0, 0, Math.PI * 2);
+        g.ellipse(...lonLatToXY(rng() * 360 - 180, -38 + rng() * 28, w, h), 7 + rng() * 11, 2.5 + rng() * 3, 0, 0, Math.PI * 2);
         g.fill();
       }
+      g.fillStyle = "rgba(140,150,170,0.22)";
+      g.fillRect(0, 0, w, h * 0.06);
+      g.fillRect(0, h * 0.94, w, h * 0.06);
     } else if (spec.type === "saturn") {
-      drawBands(g, w, h, spec.bands, rng, 4);
+      const bands = ["#f0e5c2", "#e6d3a3", "#dcc896", "#efe0b5", "#d4c08a"];
+      let y = 0;
+      let phase = rng() * 9;
+      while (y < h) {
+        const bh = 14 + rng() * 30;
+        g.fillStyle = bands[Math.floor(rng() * bands.length)];
+        g.globalAlpha = 0.35 + rng() * 0.25;
+        g.beginPath();
+        g.moveTo(0, y);
+        for (let x = 0; x <= w; x += 16) g.lineTo(x, y + Math.sin(x / 80 + phase) * 3);
+        g.lineTo(w, y + bh);
+        g.lineTo(0, y + bh);
+        g.closePath();
+        g.fill();
+        y += bh;
+        phase += 2.1;
+      }
+      g.globalAlpha = 1;
+      g.strokeStyle = "rgba(190,170,130,0.35)";
+      g.lineWidth = 3;
+      g.beginPath();
+      const [hx, hy] = lonLatToXY(0, 90, w, h);
+      for (let i = 0; i <= 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const px = hx + Math.cos(a) * 26;
+        const py = Math.max(6, hy + Math.sin(a) * 9);
+        if (i === 0) g.moveTo(px, py);
+        else g.lineTo(px, py);
+      }
+      g.stroke();
     } else if (spec.type === "neptune") {
       g.fillStyle = spec.base;
       g.fillRect(0, 0, w, h);
@@ -427,14 +481,17 @@
     const maxR = s / 2 - 4;
     for (let r = 0; r < maxR; r += 1) {
       const t = r / maxR;
-      if (t < 0.46) continue;
-      let alpha = 0.85;
-      let color = "#d8c9a0";
-      if (t < 0.58) { alpha = 0.25; color = "#b0a488"; }
-      if (t > 0.72 && t < 0.78) { alpha = 0.06; }
-      if (t > 0.78 && t < 0.92) { alpha = 0.7; color = "#e8dcc0"; }
-      if (t > 0.92) { alpha = 0.35; color = "#c0b294"; }
-      alpha *= 0.75 + rng() * 0.25;
+      if (t < 0.44) continue;
+      let alpha;
+      let color;
+      if (t < 0.58) { alpha = 0.22; color = "#a89880"; }
+      else if (t < 0.76) { alpha = 0.92; color = "#e6d9b4"; }
+      else if (t < 0.795) { alpha = 0.05; color = "#d8c9a0"; }
+      else if (t < 0.93) { alpha = 0.62; color = "#cfc2a0"; }
+      else if (t < 0.945) { alpha = 0.12; color = "#c0b294"; }
+      else if (t < 0.985) { alpha = 0.4; color = "#c9bb98"; }
+      else { alpha = 0.08; color = "#b0a488"; }
+      alpha *= 0.8 + rng() * 0.2;
       g.strokeStyle = color;
       g.globalAlpha = alpha;
       g.beginPath();
@@ -451,9 +508,9 @@
     c.height = 256;
     const g = c.getContext("2d");
     const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-    grad.addColorStop(0, "rgba(255, 230, 170, 0.9)");
-    grad.addColorStop(0.3, "rgba(255, 190, 90, 0.4)");
-    grad.addColorStop(0.65, "rgba(255, 140, 40, 0.1)");
+    grad.addColorStop(0, "rgba(255, 240, 200, 1)");
+    grad.addColorStop(0.3, "rgba(255, 200, 100, 0.55)");
+    grad.addColorStop(0.65, "rgba(255, 150, 50, 0.16)");
     grad.addColorStop(1, "rgba(255, 120, 20, 0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, 256, 256);
@@ -513,7 +570,7 @@
   const sunMat = new THREE.MeshBasicMaterial({ map: makeSunTexture() });
   const sun = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 48, 48), sunMat);
   scene.add(sun);
-  tryLoadTexture([SSS + "2k_sun.jpg", WCSS("2k_sun.jpg")], (tex) => {
+  tryLoadTexture([SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg")], (tex) => {
     sunMat.map = tex;
     sunMat.needsUpdate = true;
   });
@@ -521,8 +578,14 @@
   const sunGlow = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: makeGlowTexture(), blending: THREE.AdditiveBlending, depthWrite: false })
   );
-  sunGlow.scale.set(SUN_RADIUS * 3.2, SUN_RADIUS * 3.2, 1);
+  sunGlow.scale.set(SUN_RADIUS * 4.6, SUN_RADIUS * 4.6, 1);
   scene.add(sunGlow);
+
+  const corona = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: makeGlowTexture(), blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.35 })
+  );
+  corona.scale.set(SUN_RADIUS * 9, SUN_RADIUS * 9, 1);
+  scene.add(corona);
 
   const sunLabel = makeLabel("Soleil", 9, "rgba(251,191,36,0.9)");
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
@@ -603,6 +666,7 @@
       metalness: 0.02,
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 48, 48), material);
+    mesh.scale.y = 1 - (data.flattening || 0);
     mesh.userData.planet = data;
     tryLoadTexture(data.texUrls, (tex) => {
       material.map = tex;
@@ -949,7 +1013,7 @@
 
     if (!paused) {
       for (const p of planetObjects) {
-        p.angle += delta * speedMultiplier * (0.35 / Math.pow(p.data.orbit / 20, 0.6)) * p.data.speed * 10;
+        p.angle += delta * speedMultiplier * 0.9 * (365.25 / p.data.periodDays);
         planetPosition(p, p.angle, tmpPos);
         p.tilt.position.copy(tmpPos);
         p.label.position.set(tmpPos.x, p.data.radius + 2.4, tmpPos.z);

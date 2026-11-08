@@ -31,7 +31,7 @@ L'échelle 1:1 est illisible (Neptune à 30 UA, Soleil = 109 Terres), donc compr
 | Lunes | rayon réel relatif à la planète (min 0,12) | Lune = 0,60 |
 | Ceinture d'astéroïdes | 2,1–3,3 UA compressés | entre Mars et Jupiter |
 
-**Orbites elliptiques réelles** : vraies excentricités (Mercure 0,206, Mars 0,093...) et longitudes du périhélie. Inclinaisons axiales réelles (Vénus 177°, Uranus 98°, Terre 23,4°...). Halo atmosphérique sur Terre, Vénus, Mars, Jupiter, Neptune et Titan ; lumières nocturnes de la Terre.
+**Orbites elliptiques réelles** : vraies excentricités (Mercure 0,206, Mars 0,093...), longitudes du périhélie, **sens prograde** (anti-horaire vu du pôle nord) et **vitesses réelles** (3ᵉ loi de Kepler, vraies périodes : 88 j à 60 190 j). Aplatissement polaire réel (Jupiter −6,5 %, Saturne −9,8 %). Inclinaisons axiales réelles (Vénus 177°, Uranus 98°...). Soleil renforcé : lumière ponctuelle ×4,5 + halo + couronne. Halos atmosphériques (Terre, Vénus, Mars, Jupiter, Neptune, Titan) ; lumières nocturnes de la Terre. Jupiter/Saturne : textures 8K prioritaires + génération procédurale soignée (zones/cintures turbulentes, Grande Tache rouge, hexagone du pôle nord de Saturne, anneaux à 7 zones avec division de Cassini et d'Encke).
 
 ## Contenu
 
