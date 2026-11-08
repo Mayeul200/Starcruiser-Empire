@@ -145,7 +145,12 @@
     },
     {
       name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, inc: 1.303, node: 100.464, periodDays: 4333, flattening: 0.0649, color: 0xd8b08c, atmoGlow: 0xd8b08c,
-      thinRings: [{ inner: 1.4, outer: 2.9, opacity: 0.05, color: 0xaa9988 }],
+      thinRings: [
+        { inner: 1.08, outer: 1.25, opacity: 0.06, color: 0xaa9988 },
+        { inner: 1.30, outer: 1.50, opacity: 0.11, color: 0xb8a894 },
+        { inner: 1.55, outer: 1.75, opacity: 0.07, color: 0xaa9988 },
+        { inner: 1.85, outer: 2.03, opacity: 0.04, color: 0x9a8a78 },
+      ],
       texUrls: [...TEX8("jupiter"), ...TEX2("2k_jupiter.jpg")],
       proc: { type: "jupiter" },
       type: "Géante gazeuse", typeClass: "gazeuse",
@@ -178,9 +183,10 @@
     {
       name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0,
       thinRings: [
-        { inner: 1.55, outer: 1.60, opacity: 0.20, color: 0x9fb8c8 },
-        { inner: 1.70, outer: 1.75, opacity: 0.16, color: 0x9fb8c8 },
-        { inner: 1.95, outer: 2.00, opacity: 0.14, color: 0x9fb8c8 },
+        { inner: 1.08, outer: 1.13, opacity: 0.26, color: 0xaec8d8 },
+        { inner: 1.16, outer: 1.20, opacity: 0.18, color: 0x9fb8c8 },
+        { inner: 1.24, outer: 1.30, opacity: 0.22, color: 0xb8d0e0 },
+        { inner: 1.33, outer: 1.40, opacity: 0.15, color: 0x9fb8c8 },
       ],
       texUrls: [
         JDS("Shriisoot/Planets-texture", "main", "2k_uranus.jpg"),
@@ -199,8 +205,9 @@
     {
       name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, inc: 1.770, node: 131.784, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
       thinRings: [
-        { inner: 1.7, outer: 1.8, opacity: 0.14, color: 0x8fa8c8 },
-        { inner: 2.0, outer: 2.1, opacity: 0.12, color: 0x8fa8c8 },
+        { inner: 1.08, outer: 1.18, opacity: 0.12, color: 0x8fa8c8 },
+        { inner: 1.24, outer: 1.32, opacity: 0.10, color: 0x8fa8c8 },
+        { inner: 1.38, outer: 1.47, opacity: 0.18, color: 0xa8c0e0, arcs: 4, arcColor: 0xd8e8ff },
       ],
       texUrls: [...TEX2("2k_neptune.jpg")],
       proc: { type: "neptune", base: "#3d5bd0", bands: ["#4a68c9", "#3350b0", "#6d8ade"], spot: "#2a3f8f" },
@@ -907,6 +914,17 @@
       );
       ring.rotation.x = Math.PI / 2;
       tilt.add(ring);
+      if (spec.arcs) {
+        for (let k = 0; k < spec.arcs; k++) {
+          const start = Math.random() * Math.PI * 2;
+          const arc = new THREE.Mesh(
+            new THREE.RingGeometry(data.radius * spec.inner, data.radius * spec.outer, 48, 1, start, 0.4 + Math.random() * 0.7),
+            new THREE.MeshBasicMaterial({ color: spec.arcColor || 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: Math.min(0.6, spec.opacity * 3.2), depthWrite: false })
+          );
+          arc.rotation.x = Math.PI / 2;
+          tilt.add(arc);
+        }
+      }
     });
 
     const moons = [];
