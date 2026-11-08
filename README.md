@@ -1,25 +1,27 @@
 # Starcruiser-Empire — PlanetX
 
-Recréation statique du site [abdxxl.com](https://abdxxl.com/) : **PlanetX — l'univers d'ABDXXL**.
+Système solaire interactif en 3D — « SYSTÈME PLANETX ».
 
 ## Contenu
 
-- `index.html` — page unique (hero « SYSTÈME PLANETX », nouvelle sortie, 65 titres, clips, album *COMME UN RÊVE* 2025 avec sélection de titres)
-- `style.css` — thème spatial sombre, champ d'étoiles, effets terminal
-- `script.js` — champ d'étoiles animé (canvas) + lecteur avec sélection de titres, progression et play/pause
+- `index.html` — page plein écran avec intro « Initialisation du système », HUD et panneau d'info
+- `style.css` — interface type terminal spatial (HUD, scanlines, panneaux)
+- `script.js` — scène Three.js : Soleil lumineux, 8 planètes avec textures procédurales, anneaux de Saturne, Lune, orbites, champ d'étoiles
+
+## Fonctionnalités
+
+- Intro animée avec bouton « PASSER L'INTRO » et vol de caméra vers le système
+- 8 planètes en orbite autour du Soleil (textures générées en canvas, aucun asset externe)
+- Clic sur une planète (ou via le menu latéral) pour la viser : la caméra la suit et un panneau affiche diamètre, distance au Soleil et période orbitale
+- Contrôles : pause, vitesse de révolution, affichage des orbites, retour à la vue d'ensemble
+- Zoom (molette) et rotation (glisser) via OrbitControls
 
 ## Utilisation
 
-Ouvrir `index.html` dans un navigateur, ou servir le dossier en statique :
+Servir le dossier en statique (nécessite un accès à Internet pour charger Three.js via CDN) :
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Puis aller sur `http://localhost:8000`.
-
-## Liens officiels intégrés
-
-- Spotify : album *COMME UN RÊVE*
-- Apple Music : profil ABDXXL
-- YouTube : clips officiels (*X*, *Planète*)
+Puis ouvrir `http://localhost:8000`.

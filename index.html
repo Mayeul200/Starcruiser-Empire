@@ -3,158 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlanetX — l'univers d'ABDXXL</title>
-  <meta name="description" content="SYSTÈME PLANETX — l'univers d'ABDXXL. Nouvelle sortie : COMME UN RÊVE, album 2025. 65 titres, clips et écoutes sur Spotify & Apple Music." />
+  <title>PlanetX — Système solaire en 3D</title>
+  <meta name="description" content="SYSTÈME PLANETX — explorez le système solaire en 3D : 8 planètes en orbite autour du Soleil, cliquez sur une planète pour la viser." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
-  <canvas id="starfield" aria-hidden="true"></canvas>
+  <canvas id="scene"></canvas>
   <div class="scanlines" aria-hidden="true"></div>
 
-  <header class="hero">
-    <p class="boot-line"><span class="prompt">></span> Initialisation du système<span class="cursor">▌</span></p>
-    <h1 class="site-title">ＳＹＳＴÈＭＥ ＰＬＡＮＥＴＸ</h1>
-    <p class="site-sub">PlanetX — l'univers d'<strong>ABDXXL</strong></p>
-    <div class="hero-cta">
-      <a class="btn btn-primary" href="#album">Nouvelle sortie</a>
-      <a class="btn btn-ghost" href="#titres">Explorer le système</a>
+  <div class="intro" id="intro">
+    <div class="intro-box">
+      <p class="boot-line" id="boot-line"><span class="prompt">></span> Initialisation du système<span class="cursor">▌</span></p>
+      <button class="btn btn-primary intro-skip hidden" id="intro-skip" type="button">PASSER L'INTRO</button>
     </div>
+  </div>
+
+  <header class="hud hud-title">
+    <h1 class="site-title">ＳＹＳＴÈＭＥ ＰＬＡＮＥＴＸ</h1>
+    <p class="site-sub">Système solaire — vue 3D interactive</p>
   </header>
 
-  <main>
-    <!-- Nouvelle sortie -->
-    <section class="section" id="sortie">
-      <p class="kicker">Nouvelle sortie</p>
-      <h2 class="section-title">COMME UN RÊVE</h2>
-      <p class="section-meta">2025 ALBUM • ABDXXL</p>
+  <nav class="hud hud-planets" id="planet-nav" aria-label="Planètes">
+    <p class="hud-label">CORPS CÉLESTES</p>
+    <div class="planet-buttons" id="planet-buttons"></div>
+  </nav>
 
-      <div class="player-card" data-player>
-        <div class="player-cover" aria-hidden="true">
-          <span class="planet"></span>
-        </div>
-        <div class="player-body">
-          <p class="player-label">LECTEUR PLANETX</p>
-          <p class="player-track" data-now-playing>Aucun titre sélectionné</p>
-          <div class="progress" data-progress>
-            <div class="progress-bar" data-progress-bar></div>
-          </div>
-          <div class="player-times">
-            <span data-time-current>0:00</span>
-            <span data-time-total>0:00</span>
-          </div>
-          <button class="btn btn-primary" type="button" data-play disabled>▶ ÉCOUTER</button>
-        </div>
-      </div>
-    </section>
+  <div class="hud hud-controls" id="controls">
+    <p class="hud-label">CONTRÔLES</p>
+    <button class="btn btn-small" id="btn-pause" type="button">⏸ PAUSE</button>
+    <button class="btn btn-small" id="btn-reset" type="button">⟲ VUE D'ENSEMBLE</button>
+    <label class="control-row">
+      <span>Vitesse</span>
+      <input type="range" id="speed" min="0" max="5" step="0.1" value="1" />
+    </label>
+    <label class="control-row">
+      <span>Orbites</span>
+      <input type="checkbox" id="toggle-orbits" checked />
+    </label>
+  </div>
 
-    <!-- Système PlanetX : tous les titres -->
-    <section class="section" id="titres">
-      <h2 class="section-title">SYSTÈME PLANETX</h2>
-      <p class="section-meta">65 titres</p>
+  <aside class="hud hud-info hidden" id="info-panel">
+    <p class="hud-label" id="info-name">PLANÈTE</p>
+    <dl class="info-list">
+      <div><dt>Diamètre</dt><dd id="info-diameter">—</dd></div>
+      <div><dt>Distance au Soleil</dt><dd id="info-distance">—</dd></div>
+      <div><dt>Année orbitale</dt><dd id="info-period">—</dd></div>
+    </dl>
+    <p class="info-desc" id="info-desc"></p>
+    <button class="btn btn-small" id="info-close" type="button">✕ FERMER</button>
+  </aside>
 
-      <div class="projects-grid">
-        <article class="project-card">
-          <h3>Feeling Somewhere Vol.2</h3>
-          <p class="project-tag">PROJET</p>
-        </article>
-        <article class="project-card">
-          <h3>CA$H $EX DRUG$</h3>
-          <p class="project-tag">ALBUM</p>
-        </article>
-        <article class="project-card">
-          <h3>CA$H $EX DRUG$ 2</h3>
-          <p class="project-tag">ALBUM</p>
-        </article>
-        <article class="project-card">
-          <h3>Design</h3>
-          <p class="project-tag">PROJET</p>
-        </article>
-        <article class="project-card project-card-featured">
-          <h3>Comme un rêve</h3>
-          <p class="project-tag">2025 ALBUM • ABDXXL</p>
-        </article>
-        <article class="project-card">
-          <h3>Toxic vol 2</h3>
-          <p class="project-tag">PROJET</p>
-        </article>
-      </div>
+  <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur une planète</p>
 
-      <div class="listen-links">
-        <p class="kicker">Écouter</p>
-        <div class="btn-row">
-          <a class="btn btn-spotify" href="https://open.spotify.com/album/48KokaBNFXcxPbQUCZ4a8e" target="_blank" rel="noopener">SPOTIFY</a>
-          <a class="btn btn-apple" href="https://music.apple.com/cg/artist/abdxxl/1206543494" target="_blank" rel="noopener">APPLE MUSIC</a>
-        </div>
-        <a class="btn btn-ghost" href="#album">TOUS LES TITRES</a>
-      </div>
-    </section>
-
-    <!-- Clips -->
-    <section class="section" id="clips">
-      <h2 class="section-title">CLIPS</h2>
-      <div class="clips-grid">
-        <div class="clip-frame">
-          <iframe src="https://www.youtube.com/embed/wg7DVK0M7DU" title="Abdxxl — X (clip officiel)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-        </div>
-        <div class="clip-frame">
-          <iframe src="https://www.youtube.com/embed/q1vsMF_d6pg" title="Abdxxl — Planète (clip officiel)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-        </div>
-      </div>
-    </section>
-
-    <!-- Album : sélection de titres -->
-    <section class="section" id="album">
-      <p class="kicker">2025 ALBUM • ABDXXL</p>
-      <h2 class="section-title">COMME UN RÊVE</h2>
-      <p class="section-meta">SÉLECTIONNER UN TITRE</p>
-      <p class="hint">Clique sur un titre pour l'écouter</p>
-
-      <ol class="tracklist" id="tracklist" data-tracklist>
-        <li><button type="button" class="track" data-duration="137"><span class="track-num">01</span><span class="track-name">KUSH UP</span><span class="track-time">2:17</span></button></li>
-        <li><button type="button" class="track" data-duration="137"><span class="track-num">02</span><span class="track-name">OHMYGOD!</span><span class="track-time">2:17</span></button></li>
-        <li><button type="button" class="track" data-duration="121"><span class="track-num">03</span><span class="track-name">X</span><span class="track-time">2:01</span></button></li>
-        <li><button type="button" class="track" data-duration="146"><span class="track-num">04</span><span class="track-name">JAZZ INTERLUDE</span><span class="track-time">2:26</span></button></li>
-        <li><button type="button" class="track" data-duration="154"><span class="track-num">05</span><span class="track-name">RATCHET BABY <em>(feat. Jowski)</em></span><span class="track-time">2:34</span></button></li>
-        <li><button type="button" class="track" data-duration="122"><span class="track-num">06</span><span class="track-name">LVDRTL</span><span class="track-time">2:02</span></button></li>
-        <li><button type="button" class="track" data-duration="174"><span class="track-num">07</span><span class="track-name">OR SUR MES CICATRICES</span><span class="track-time">2:54</span></button></li>
-        <li><button type="button" class="track" data-duration="183"><span class="track-num">08</span><span class="track-name">LE CHEMIN DU PASSIONNÉ</span><span class="track-time">3:03</span></button></li>
-        <li><button type="button" class="track" data-duration="124"><span class="track-num">09</span><span class="track-name">COMME UN RÊVE</span><span class="track-time">2:04</span></button></li>
-      </ol>
-
-      <div class="player-card player-card-inline" data-player>
-        <div class="player-body">
-          <p class="player-label">LECTEUR PLANETX</p>
-          <p class="player-track" data-now-playing>Aucun titre sélectionné</p>
-          <div class="progress" data-progress>
-            <div class="progress-bar" data-progress-bar></div>
-          </div>
-          <div class="player-times">
-            <span data-time-current>0:00</span>
-            <span data-time-total>0:00</span>
-          </div>
-          <button class="btn btn-primary" type="button" data-play disabled>▶ ÉCOUTER</button>
-        </div>
-      </div>
-
-      <div class="listen-links">
-        <p class="kicker">Écouter sur :</p>
-        <div class="btn-row">
-          <a class="btn btn-spotify" href="https://open.spotify.com/album/48KokaBNFXcxPbQUCZ4a8e" target="_blank" rel="noopener">SPOTIFY</a>
-          <a class="btn btn-apple" href="https://music.apple.com/cg/artist/abdxxl/1206543494" target="_blank" rel="noopener">APPLE MUSIC</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <p class="site-title-small">ＳＹＳＴÈＭＥ ＰＬＡＮＥＴＸ</p>
-    <p>PlanetX — l'univers d'ABDXXL • 2025</p>
-  </footer>
-
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
