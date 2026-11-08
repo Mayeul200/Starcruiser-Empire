@@ -126,7 +126,7 @@
       atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
       desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
       fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
-      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
+      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
     },
     {
       name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
@@ -221,14 +221,15 @@
     },
   ];
 
-  const MU = { Mercure: 1.5, Vénus: 6, Terre: 8, Mars: 2.5, Jupiter: 60, Saturne: 45, Uranus: 15, Neptune: 16 };
-  const SUN_MU = 60;
+  const G_SURF = { Mercure: 3.7, Vénus: 8.87, Terre: 9.81, Mars: 3.71, Jupiter: 24.79, Saturne: 10.44, Uranus: 8.87, Neptune: 11.15 };
+  const ACCEL_SCALE = 3.924;
+  const SUN_MU = 1.4;
   for (const p of PLANETS) {
     p.orbit = orbitFromAU(p.au);
     p.radius = radiusFromKm(p.rKm);
     p.b = p.orbit * Math.sqrt(1 - p.e * p.e);
     p.omegaRad = THREE.MathUtils.degToRad(p.omega);
-    p.mu = MU[p.name] || 5;
+    p.mu = ((G_SURF[p.name] || 5) / ACCEL_SCALE) * p.radius * p.radius;
   }
 
 
@@ -990,7 +991,7 @@
       moonMesh.position.x = m.dist;
       tilt.add(moonPivot);
       if (m.atmoGlow) moonMesh.add(makeAtmosphere(size, m.color, m.atmoGlow, 0.8));
-      moons.push({ pivot: moonPivot, speed: m.speed, mesh: moonMesh, mu: m.name === "Lune" ? 0.6 : 0.15 });
+      moons.push({ pivot: moonPivot, speed: m.speed, mesh: moonMesh, mu: m.gSurface ? (m.gSurface / ACCEL_SCALE) * size * size : 0.05 });
     });
 
     if (data.clouds) {
