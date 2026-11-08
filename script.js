@@ -660,45 +660,64 @@
     return line;
   }
 
+  const beltLayers = [];
+
   function makeAsteroidBelt() {
     const group = new THREE.Group();
     const rng = makeRng(4242);
     const inner = orbitFromAU(2.1);
     const outer = orbitFromAU(3.3);
     const layers = [
-      { count: 2600, size: 0.3, color: 0x8d8577, spread: 1.6 },
-      { count: 1400, size: 0.45, color: 0x9a917f, spread: 2.4 },
-      { count: 600, size: 0.2, color: 0x6f6a60, spread: 1.0 },
+      { count: 3200, size: 0.26, spread: 1.6, au: 2.2, tints: [0x8d8577, 0x9a917f, 0x7a7468, 0xa39a88] },
+      { count: 1800, size: 0.4, spread: 2.4, au: 2.7, tints: [0x9a917f, 0x8d8577, 0x6f6a60, 0xb0a898] },
+      { count: 800, size: 0.18, spread: 1.0, au: 3.1, tints: [0x6f6a60, 0x7a7468, 0x5d584f] },
     ];
     for (const layer of layers) {
       const positions = new Float32Array(layer.count * 3);
+      const colors = new Float32Array(layer.count * 3);
+      const c = new THREE.Color();
       for (let i = 0; i < layer.count; i++) {
         const a = rng() * Math.PI * 2;
         const r = inner + Math.pow(rng(), 0.8) * (outer - inner);
         positions.set([Math.cos(a) * r, (rng() - 0.5) * layer.spread, Math.sin(a) * r], i * 3);
+        c.set(layer.tints[Math.floor(rng() * layer.tints.length)]);
+        const b = 0.85 + rng() * 0.3;
+        colors.set([c.r * b, c.g * b, c.b * b], i * 3);
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      group.add(new THREE.Points(geometry, new THREE.PointsMaterial({
-        color: layer.color, size: layer.size, transparent: true, opacity: 0.9,
-      })));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      const points = new THREE.Points(
+        geometry,
+        new THREE.PointsMaterial({ map: starDotTex, size: layer.size * 2.2, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false })
+      );
+      const sub = new THREE.Group();
+      sub.add(points);
+      group.add(sub);
+      beltLayers.push({ group: sub, speed: 0.9 / Math.pow(layer.au, 1.5) });
     }
     const bigAsteroids = [
-      { name: "Cérès", au: 2.77, r: 0.6, color: 0x9a9188 },
-      { name: "Vesta", au: 2.36, r: 0.48, color: 0xb0a898 },
-      { name: "Pallas", au: 2.77, r: 0.42, color: 0x8a8378 },
-      { name: "Hygiea", au: 3.14, r: 0.4, color: 0x6f6a62 },
+      { au: 2.77, r: 0.6, color: 0x9a9188 },
+      { au: 2.36, r: 0.48, color: 0xb0a898 },
+      { au: 2.77, r: 0.42, color: 0x8a8378 },
+      { au: 3.14, r: 0.4, color: 0x6f6a62 },
+      { au: 2.5, r: 0.34, color: 0x7a7468 },
+      { au: 2.95, r: 0.3, color: 0x9a9188 },
+      { au: 2.2, r: 0.3, color: 0x6f6a60 },
+      { au: 3.3, r: 0.28, color: 0x8a8378 },
     ];
     for (const b of bigAsteroids) {
+      const pivot = new THREE.Group();
       const mesh = new THREE.Mesh(
         new THREE.IcosahedronGeometry(b.r, 1),
         new THREE.MeshStandardMaterial({ color: b.color, roughness: 1, flatShading: true })
       );
-      const a = rng() * Math.PI * 2;
-      const r = orbitFromAU(b.au);
-      mesh.position.set(Math.cos(a) * r, (rng() - 0.5) * 1.5, Math.sin(a) * r);
+      mesh.position.set(orbitFromAU(b.au), (rng() - 0.5) * 1.5, 0);
       mesh.rotation.set(rng() * 3, rng() * 3, rng() * 3);
-      group.add(mesh);
+      pivot.add(mesh);
+      pivot.rotation.y = rng() * Math.PI * 2;
+      group.add(pivot);
+      beltLayers.push({ group: pivot, speed: 0.9 / Math.pow(b.au, 1.5), spin: mesh });
     }
     scene.add(group);
     return group;
@@ -892,6 +911,23 @@
 
   /* ---------- Champ d'étoiles ---------- */
 
+  function makeStarDotTexture() {
+    const s = 64;
+    const c = document.createElement("canvas");
+    c.width = s;
+    c.height = s;
+    const g = c.getContext("2d");
+    const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.4, "rgba(255,255,255,0.8)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, s, s);
+    return new THREE.CanvasTexture(c);
+  }
+
+  const starDotTex = makeStarDotTexture();
+
   function makeStars() {
     const palette = [0xffffff, 0xcfe0ff, 0x9db8ff, 0xffe9c4, 0xffc9a3];
     const mkLayer = (count, size, op) => {
@@ -913,7 +949,7 @@
       geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
       return new THREE.Points(
         geometry,
-        new THREE.PointsMaterial({ size, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: op, depthWrite: false })
+        new THREE.PointsMaterial({ map: starDotTex, size, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: op, depthWrite: false })
       );
     };
     const group = new THREE.Group();
@@ -945,6 +981,14 @@
       g.arc(x, y, r, 0, Math.PI * 2);
       g.fill();
     }
+    g.globalCompositeOperation = "destination-in";
+    const mask = g.createRadialGradient(s / 2, s / 2, s * 0.08, s / 2, s / 2, s / 2);
+    mask.addColorStop(0, "rgba(255,255,255,1)");
+    mask.addColorStop(0.65, "rgba(255,255,255,0.55)");
+    mask.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = mask;
+    g.fillRect(0, 0, s, s);
+    g.globalCompositeOperation = "source-over";
     return new THREE.CanvasTexture(c);
   }
 
@@ -1155,7 +1199,10 @@
         if (p.data.cloudsMesh) p.data.cloudsMesh.rotation.y += delta * speedMultiplier * 0.55;
         for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * m.speed;
       }
-      asteroidBelt.rotation.y += delta * speedMultiplier * 0.01;
+      for (const l of beltLayers) {
+        l.group.rotation.y += delta * speedMultiplier * l.speed;
+        if (l.spin) l.spin.rotation.y += delta * speedMultiplier * 0.6;
+      }
       sun.rotation.y += delta * speedMultiplier * 0.05;
     }
 
