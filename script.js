@@ -660,6 +660,23 @@
     return line;
   }
 
+  function makeStarDotTexture() {
+    const s = 64;
+    const c = document.createElement("canvas");
+    c.width = s;
+    c.height = s;
+    const g = c.getContext("2d");
+    const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.4, "rgba(255,255,255,0.8)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, s, s);
+    return new THREE.CanvasTexture(c);
+  }
+
+  const starDotTex = makeStarDotTexture();
+
   const beltLayers = [];
 
   function makeAsteroidBelt() {
@@ -910,23 +927,6 @@
   }
 
   /* ---------- Champ d'étoiles ---------- */
-
-  function makeStarDotTexture() {
-    const s = 64;
-    const c = document.createElement("canvas");
-    c.width = s;
-    c.height = s;
-    const g = c.getContext("2d");
-    const grad = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-    grad.addColorStop(0, "rgba(255,255,255,1)");
-    grad.addColorStop(0.4, "rgba(255,255,255,0.8)");
-    grad.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = grad;
-    g.fillRect(0, 0, s, s);
-    return new THREE.CanvasTexture(c);
-  }
-
-  const starDotTex = makeStarDotTexture();
 
   function makeStars() {
     const palette = [0xffffff, 0xcfe0ff, 0x9db8ff, 0xffe9c4, 0xffc9a3];
