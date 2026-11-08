@@ -60,13 +60,14 @@
 
   const SSS = "https://www.solarsystemscope.com/textures/download/";
   const TJ = "https://threejs.org/examples/textures/planets/";
-  const WC = (file) => `https://commons.wikimedia.org/wiki/Special:FilePath/${file}?width=2048`;
-  const WCSS = (name) => WC(`Solarsystemscope_texture_${name}`);
+  const WC = (file, width) => `https://commons.wikimedia.org/wiki/Special:FilePath/${file}?width=${width || 2048}`;
+  const WCSS = (name) => WC(`Solarsystemscope_texture_${name}.jpg`);
+  const WC8K = (name) => WC(`Solarsystemscope_texture_8k_${name}.jpg`, 4096);
 
   const PLANETS = [
     {
-      name: "Mercure", au: 0.387, rKm: 2439, tilt: 0.03, e: 0.2056, omega: 77, periodDays: 88, flattening: 0.0001, color: 0x9c8e82,
-      texUrls: [SSS + "8k_mercury.jpg", SSS + "2k_mercury.jpg", WCSS("2k_mercury.jpg")],
+      name: "Mercure", au: 0.387, rKm: 2439, tilt: 0.03, e: 0.2056, omega: 77, inc: 7.005, node: 48.331, periodDays: 88, flattening: 0.0001, color: 0x9c8e82,
+      texUrls: [WC8K("mercury"), SSS + "8k_mercury.jpg", SSS + "2k_mercury.jpg", WCSS("2k_mercury.jpg")],
       proc: { type: "craters", base: "#8a7f74", dark: "#5f564e", light: "#a39687" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "4 879 km", mass: "3,30 × 10²³ kg", distance: "57,9 M km (0,39 UA)",
@@ -76,8 +77,8 @@
       fact: "À retenir : un jour solaire sur Mercure dure 176 jours terrestres.",
     },
     {
-      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a,
-      texUrls: [SSS + "8k_venus_atmosphere.jpg", SSS + "2k_venus_atmosphere.jpg", WCSS("2k_venus_atmosphere.jpg"), SSS + "2k_venus_surface.jpg", WCSS("2k_venus_surface.jpg")],
+      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, inc: 3.394, node: 76.680, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a,
+      texUrls: [WC8K("venus_atmosphere"), SSS + "8k_venus_atmosphere.jpg", SSS + "2k_venus_atmosphere.jpg", WCSS("2k_venus_atmosphere.jpg"), SSS + "2k_venus_surface.jpg", WCSS("2k_venus_surface.jpg")],
       proc: { type: "venus", base: "#d9b878", light: "#f0dcb0", dark: "#c9a45e" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 104 km", mass: "4,87 × 10²⁴ kg", distance: "108,2 M km (0,72 UA)",
@@ -87,10 +88,10 @@
       fact: "À retenir : Vénus tourne à l'envers (rotation rétrograde) par rapport aux autres planètes.",
     },
     {
-      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
-      texUrls: [SSS + "8k_earth_daymap.jpg", SSS + "2k_earth_daymap.jpg", WCSS("2k_earth_daymap.jpg"), TJ + "earth_atmos_2048.jpg"],
-      cloudUrls: [TJ + "earth_clouds_1024.png", SSS + "2k_earth_clouds_1024.png"],
-      nightUrls: [TJ + "earth_lights_2048.png", WCSS("2k_earth_nightmap.jpg")],
+      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
+      texUrls: [WC8K("earth_daymap"), SSS + "8k_earth_daymap.jpg", WCSS("2k_earth_daymap.jpg"), TJ + "earth_atmos_2048.jpg"],
+      cloudUrls: [WC8K("earth_clouds"), TJ + "earth_clouds_1024.png", SSS + "2k_earth_clouds_1024.png"],
+      nightUrls: [WC8K("earth_nightmap"), TJ + "earth_lights_2048.png", WCSS("2k_earth_nightmap.jpg")],
       proc: { type: "earth", base: "#14508f", land: "#3f9e5a", desert: "#c2a86b", ice: "#eef4f8" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 756 km", mass: "5,97 × 10²⁴ kg", distance: "149,6 M km (1 UA)",
@@ -98,11 +99,11 @@
       atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
       desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
       fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
-      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [SSS + "2k_moon.jpg", WCSS("2k_moon.jpg"), TJ + "moon_1024.jpg"] }],
+      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [WC8K("moon"), SSS + "8k_moon.jpg", SSS + "2k_moon.jpg", WCSS("2k_moon.jpg"), TJ + "moon_1024.jpg"] }],
     },
     {
-      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
-      texUrls: [SSS + "8k_mars.jpg", SSS + "2k_mars.jpg", WCSS("2k_mars.jpg")],
+      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
+      texUrls: [WC8K("mars"), SSS + "8k_mars.jpg", SSS + "2k_mars.jpg", WCSS("2k_mars.jpg")],
       proc: { type: "mars", base: "#b5502a", dark: "#7a3418", ice: "#f2f2f2" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "6 779 km", mass: "6,42 × 10²³ kg", distance: "227,9 M km (1,52 UA)",
@@ -116,8 +117,8 @@
       ],
     },
     {
-      name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, periodDays: 4333, flattening: 0.0649, color: 0xd8b08c, atmoGlow: 0xd8b08c,
-      texUrls: [SSS + "8k_jupiter.jpg", SSS + "2k_jupiter.jpg", WCSS("2k_jupiter.jpg")],
+      name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, inc: 1.303, node: 100.464, periodDays: 4333, flattening: 0.0649, color: 0xd8b08c, atmoGlow: 0xd8b08c,
+      texUrls: [WC8K("jupiter"), SSS + "8k_jupiter.jpg", SSS + "2k_jupiter.jpg", WCSS("2k_jupiter.jpg")],
       proc: { type: "jupiter" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "139 820 km", mass: "1,90 × 10²⁷ kg", distance: "778,5 M km (5,2 UA)",
@@ -133,9 +134,9 @@
       ],
     },
     {
-      name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
-      texUrls: [SSS + "8k_saturn.jpg", SSS + "2k_saturn.jpg", WCSS("2k_saturn.jpg")],
-      ringUrls: [SSS + "8k_saturn_ring_alpha.png", SSS + "2k_saturn_ring_alpha.png", WCSS("2k_saturn_ring_alpha.png")],
+      name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, inc: 2.489, node: 113.666, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
+      texUrls: [WC8K("saturn"), SSS + "8k_saturn.jpg", SSS + "2k_saturn.jpg", WCSS("2k_saturn.jpg")],
+      ringUrls: [WC8K("saturn_ring_alpha").replace(".jpg", ".png"), SSS + "8k_saturn_ring_alpha.png", SSS + "2k_saturn_ring_alpha.png", WCSS("2k_saturn_ring_alpha.png")],
       proc: { type: "saturn" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km (9,5 UA)",
@@ -146,8 +147,8 @@
       moons3d: [{ name: "Titan", rKm: 2574, dist: 9.6, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
     },
     {
-      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0, faintRings: true,
-      texUrls: [SSS + "8k_uranus.jpg", SSS + "2k_uranus.jpg", WCSS("2k_uranus.jpg")],
+      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0, faintRings: true,
+      texUrls: [WC8K("uranus"), SSS + "8k_uranus.jpg", SSS + "2k_uranus.jpg", WCSS("2k_uranus.jpg")],
       proc: { type: "uranus", base: "#9fdcd9", band: "#c8efeb" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "50 724 km", mass: "8,68 × 10²⁵ kg", distance: "2,87 Md km (19,2 UA)",
@@ -158,8 +159,8 @@
       moons3d: [{ name: "Titania", rKm: 788, dist: 6.4, color: 0xb8c4cc, speed: 0.9 }],
     },
     {
-      name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
-      texUrls: [SSS + "8k_neptune.jpg", SSS + "2k_neptune.jpg", WCSS("2k_neptune.jpg")],
+      name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, inc: 1.770, node: 131.784, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
+      texUrls: [WC8K("neptune"), SSS + "8k_neptune.jpg", SSS + "2k_neptune.jpg", WCSS("2k_neptune.jpg")],
       proc: { type: "neptune", base: "#3d5bd0", bands: ["#4a68c9", "#3350b0", "#6d8ade"], spot: "#2a3f8f" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "49 244 km", mass: "1,02 × 10²⁶ kg", distance: "4,50 Md km (30,1 UA)",
@@ -199,6 +200,7 @@
     loader.load(urls[0], (tex) => {
       if (THREE.SRGBColorSpace !== undefined) tex.colorSpace = THREE.SRGBColorSpace;
       else tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
       onSuccess(tex);
     }, undefined, () => tryLoadTexture(urls.slice(1), onSuccess));
   }
@@ -264,8 +266,8 @@
   }
 
   function makeProcTexture(spec, seed) {
-    const w = 512;
-    const h = 256;
+    const w = 1024;
+    const h = 512;
     const c = document.createElement("canvas");
     c.width = w;
     c.height = h;
@@ -445,8 +447,8 @@
   }
 
   function makeCloudTexture(seed) {
-    const w = 512;
-    const h = 256;
+    const w = 1024;
+    const h = 512;
     const c = document.createElement("canvas");
     c.width = w;
     c.height = h;
@@ -568,7 +570,7 @@
   const sunMat = new THREE.MeshBasicMaterial({ map: makeSunTexture() });
   const sun = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 48, 48), sunMat);
   scene.add(sun);
-  tryLoadTexture([SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg")], (tex) => {
+  tryLoadTexture([WC8K("sun"), SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg")], (tex) => {
     sunMat.map = tex;
     sunMat.needsUpdate = true;
   });
@@ -589,14 +591,14 @@
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
   scene.add(sunLabel);
 
-  tryLoadTexture([SSS + "2k_stars_milky_way.jpg", WCSS("2k_stars_milky_way.jpg")], (tex) => {
+  tryLoadTexture([WC8K("stars_milky_way"), SSS + "8k_stars_milky_way.jpg", SSS + "2k_stars_milky_way.jpg", WCSS("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = tex;
   });
 
   /* ---------- Orbites elliptiques + ceinture d'astéroïdes ---------- */
 
-  function makeOrbitEllipse(a, b, omega) {
+  function makeOrbitEllipse(a, b, omega, parent) {
     const points = [];
     const cosW = Math.cos(omega);
     const sinW = Math.sin(omega);
@@ -608,7 +610,7 @@
     }
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x3b4a6b, transparent: true, opacity: 0.5 }));
-    scene.add(line);
+    parent.add(line);
     return line;
   }
 
@@ -654,8 +656,16 @@
     return new THREE.Mesh(geo, mat);
   }
 
+  const sharedGlowTex = makeGlowTexture();
+
   PLANETS.forEach((data, index) => {
-    const orbitLine = makeOrbitEllipse(data.orbit, data.b, data.omegaRad);
+    const orbitGroup = new THREE.Group();
+    orbitGroup.rotation.order = "YXZ";
+    orbitGroup.rotation.x = THREE.MathUtils.degToRad(data.inc);
+    orbitGroup.rotation.y = THREE.MathUtils.degToRad(data.node);
+    scene.add(orbitGroup);
+
+    const orbitLine = makeOrbitEllipse(data.orbit, data.b, data.omegaRad, orbitGroup);
     orbitLines.push(orbitLine);
 
     const material = new THREE.MeshStandardMaterial({
@@ -683,13 +693,26 @@
     const tilt = new THREE.Group();
     tilt.rotation.z = THREE.MathUtils.degToRad(data.tilt);
     tilt.add(mesh);
-    scene.add(tilt);
+    orbitGroup.add(tilt);
 
     if (data.atmoGlow) tilt.add(makeAtmosphereGlow(data.radius, data.atmoGlow));
 
+    const halo = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: sharedGlowTex,
+        color: data.color,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+      })
+    );
+    halo.scale.set(data.radius * 3.4, data.radius * 3.4, 1);
+    tilt.add(halo);
+
     const hex = `#${data.color.toString(16).padStart(6, "0")}`;
     const label = makeLabel(data.name, Math.max(3.6, data.radius * 1.25), hex);
-    scene.add(label);
+    orbitGroup.add(label);
     labels.push(label);
 
     if (data.rings) {
