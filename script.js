@@ -1163,7 +1163,7 @@
     flame.visible = false;
     gimbal.add(flame);
 
-    rocket.scale.setScalar(1.4);
+    rocket.scale.setScalar(0.35);
     return { group: rocket, flame, gimbal };
   }
 
@@ -1185,7 +1185,7 @@
   const xAxis = new THREE.Vector3(1, 0, 0);
   const fwd = new THREE.Vector3();
   const tmpV = new THREE.Vector3();
-  const rocketCam = { radius: 8.5, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 2.4, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1238,7 +1238,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(3, Math.min(60, rocketCam.radius));
+      rocketCam.radius = Math.max(1.2, Math.min(25, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1346,10 +1346,21 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 8.5;
+      rocketCam.radius = 2.4;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       if (focused) resetView();
+      fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
+      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
+      const offLen = tmpV.length();
+      orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 1);
+      orbit.target.copy(orbit.desiredTarget);
+      orbit.desiredRadius = rocketCam.radius;
+      orbit.radius = rocketCam.radius;
+      orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z);
+      orbit.theta = orbit.desiredTheta;
+      orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, Math.acos(tmpV.y / offLen)));
+      orbit.phi = orbit.desiredPhi;
     } else if (!focused) {
       orbit.desiredTarget.set(0, 0, 0);
       orbit.desiredRadius = 285;
@@ -1430,21 +1441,22 @@
         qYaw.setFromAxisAngle(upAxis, -1.9 * delta);
         rocket.quaternion.multiply(qYaw);
       }
-      if (keys.KeyZ || keys.PageUp) {
+      if (keys.ArrowUp) {
         qPitch.setFromAxisAngle(xAxis, -1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
-      if (keys.KeyS || keys.PageDown) {
+      if (keys.ArrowDown) {
         qPitch.setFromAxisAngle(xAxis, 1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
       const gimbalZ = keys.ArrowLeft ? 0.3 : keys.ArrowRight ? -0.3 : 0;
-      const gimbalX = (keys.KeyZ || keys.PageUp) ? -0.3 : (keys.KeyS || keys.PageDown) ? 0.3 : 0;
+      const gimbalX = keys.ArrowUp ? -0.3 : keys.ArrowDown ? 0.3 : 0;
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 12 * delta);
-      if (keys.ArrowDown) rocketVel.addScaledVector(fwd, -9 * delta);
+      if (keys.KeyW || keys.Equal) rocketVel.addScaledVector(fwd, 12 * delta);
+      if (keys.KeyS || keys.Minus) rocketVel.addScaledVector(fwd, -9 * delta);
+      if (keys.Space) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
       if (rocketVel.length() > 400) rocketVel.setLength(400);
       rocket.position.addScaledVector(rocketVel, delta);
@@ -1452,7 +1464,7 @@
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpV);
         const d = rocket.position.distanceTo(tmpV);
-        const min = p.data.radius * 1.15 + 0.9;
+        const min = p.data.radius * 1.15 + 0.35;
         if (d < min && d > 0.001) {
           tmpV.sub(rocket.position).normalize();
           rocket.position.addScaledVector(tmpV, min - d);
@@ -1460,13 +1472,13 @@
         }
       }
       const dSun = rocket.position.length();
-      if (dSun < SUN_RADIUS + 1.6) {
+      if (dSun < SUN_RADIUS + 0.7) {
         tmpV.copy(rocket.position).normalize();
-        rocket.position.copy(tmpV).multiplyScalar(SUN_RADIUS + 1.6);
+        rocket.position.copy(tmpV).multiplyScalar(SUN_RADIUS + 0.7);
         rocketVel.multiplyScalar(0.3);
       }
 
-      flame.visible = !!keys.ArrowUp;
+      flame.visible = !!(keys.KeyW || keys.Equal);
       if (flame.visible) {
         const f = 0.9 + Math.random() * 0.3;
         flame.scale.set(f, 0.9 + Math.random() * 0.5, f);
@@ -1474,7 +1486,7 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 3);
-      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 1.1);
+      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
       const offLen = tmpV.length();
       orbit.desiredRadius = rocketCam.radius;
       orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z) + rocketCam.dTheta;
