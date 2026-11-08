@@ -706,13 +706,43 @@
       geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
       const points = new THREE.Points(
         geometry,
-        new THREE.PointsMaterial({ map: starDotTex, size: layer.size * 2.2, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false })
+        new THREE.PointsMaterial({ map: starDotTex, size: layer.size * 3, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false })
       );
       const sub = new THREE.Group();
       sub.add(points);
       group.add(sub);
       beltLayers.push({ group: sub, speed: 0.9 / Math.pow(layer.au, 1.5) });
     }
+    const rockGeo = new THREE.IcosahedronGeometry(1, 0);
+    const rockMat = new THREE.MeshStandardMaterial({ roughness: 1, flatShading: true });
+    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 90);
+    const m4 = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const e = new THREE.Euler();
+    const col = new THREE.Color();
+    const rockTints = [0x8d8577, 0x9a917f, 0x6f6a60, 0xa39a88, 0x7a7468];
+    for (let i = 0; i < 90; i++) {
+      const a = rng() * Math.PI * 2;
+      const r = inner + Math.pow(rng(), 0.8) * (outer - inner);
+      const s = 0.12 + Math.pow(rng(), 2) * 0.55;
+      e.set(rng() * 3, rng() * 3, rng() * 3);
+      q.setFromEuler(e);
+      m4.compose(
+        new THREE.Vector3(Math.cos(a) * r, (rng() - 0.5) * 2.0, Math.sin(a) * r),
+        q,
+        new THREE.Vector3(s, s * (0.7 + rng() * 0.6), s)
+      );
+      rocks.setMatrixAt(i, m4);
+      col.set(rockTints[Math.floor(rng() * rockTints.length)]);
+      rocks.setColorAt(i, col);
+    }
+    rocks.instanceMatrix.needsUpdate = true;
+    if (rocks.instanceColor) rocks.instanceColor.needsUpdate = true;
+    const rockSub = new THREE.Group();
+    rockSub.add(rocks);
+    group.add(rockSub);
+    beltLayers.push({ group: rockSub, speed: 0.9 / Math.pow(2.7, 1.5) });
+
     const bigAsteroids = [
       { au: 2.77, r: 0.6, color: 0x9a9188 },
       { au: 2.36, r: 0.48, color: 0xb0a898 },
