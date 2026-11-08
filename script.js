@@ -165,10 +165,7 @@
       name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, inc: 2.489, node: 113.666, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
       thinRings: [{ inner: 2.32, outer: 2.37, opacity: 0.45, color: 0xe0d4b0 }],
       texUrls: [...TEX8("saturn"), ...TEX2("2k_saturn.jpg")],
-      ringUrls: [
-        UW("2/29", "Solarsystemscope_texture_8k_saturn_ring_alpha.png", 1024),
-        UW("7/7d", "Solarsystemscope_texture_2k_saturn_ring_alpha.png"),
-      ],
+      ringUrls: [UW("7/7d", "Solarsystemscope_texture_2k_saturn_ring_alpha.png")],
       proc: { type: "saturn" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km (9,5 UA)",
