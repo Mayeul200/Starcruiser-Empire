@@ -59,11 +59,10 @@
     return 2.2 * Math.sqrt(rKm / EARTH_R_KM);
   }
 
-  const SSS = "https://www.solarsystemscope.com/textures/download/";
+  const SSS = "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@main/";
   const TJ = "https://threejs.org/examples/textures/planets/";
-  const WC = (file, width) => `https://commons.wikimedia.org/wiki/Special:FilePath/${file}?width=${width || 2048}`;
-  const WCSS = (name) => WC(`Solarsystemscope_texture_${name}.jpg`);
-  const WC8K = (name) => WC(`Solarsystemscope_texture_8k_${name}.jpg`, 4096);
+  const WCSS = (name) => `https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@main/textures/${name}`;
+  const WC8K = (name) => `https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@master/8k_${name}.jpg`;
 
   const PLANETS = [
     {
@@ -188,16 +187,30 @@
     `https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_${name}.jpg`,
     `https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_${name}.jpg`,
   ];
+  const JD2K = (name) => [
+    `https://cdn.jsdelivr.net/gh/ongyishen/SolarSystem@main/textures/2k_${name}.jpg`,
+    `https://cdn.jsdelivr.net/gh/ongyishen/SolarSystem@master/textures/2k_${name}.jpg`,
+  ];
   for (const p of PLANETS) {
     const n = GH_NAMES[p.name];
-    if (n) p.texUrls = p.texUrls.concat(GH8K(n));
-    if (p.moons3d) for (const m of p.moons3d) if (m.name === "Lune") m.texUrls = m.texUrls.concat(GH8K("moon"));
+    if (n) p.texUrls = p.texUrls.concat(GH8K(n), JD2K(n));
+    if (p.name === "Vénus") {
+      p.texUrls = p.texUrls.concat([
+        "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@main/4k_venus_atmosphere.jpg",
+        "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@master/4k_venus_atmosphere.jpg",
+      ]);
+    }
+    if (p.moons3d) for (const m of p.moons3d) if (m.name === "Lune") m.texUrls = m.texUrls.concat(GH8K("moon"), JD2K("moon"));
     if (p.cloudUrls) p.cloudUrls = p.cloudUrls.concat(GH8K("earth_clouds"));
-    if (p.nightUrls) p.nightUrls = p.nightUrls.concat(GH8K("earth_nightmap"));
-    if (p.ringUrls) p.ringUrls = p.ringUrls.concat([
-      "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_saturn_ring_alpha.png",
-      "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_saturn_ring_alpha.png",
-    ]);
+    if (p.nightUrls) p.nightUrls = p.nightUrls.concat(GH8K("earth_nightmap"), JD2K("earth_nightmap"));
+    if (p.ringUrls) {
+      p.ringUrls = p.ringUrls.concat([
+        "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_saturn_ring_alpha.png",
+        "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_saturn_ring_alpha.png",
+        "https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@main/textures/2k_saturn_ring_alpha.png",
+        "https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@master/textures/2k_saturn_ring_alpha.png",
+      ]);
+    }
   }
 
   /* ---------- Utilitaires ---------- */
@@ -660,11 +673,6 @@
 
   const asteroidBelt = makeAsteroidBelt();
 
-  const eclipticGrid = new THREE.GridHelper(430, 43, 0x2b3a55, 0x182235);
-  eclipticGrid.material.transparent = true;
-  eclipticGrid.material.opacity = 0.3;
-  scene.add(eclipticGrid);
-
   /* ---------- Planètes ---------- */
 
   const orbitLines = [];
@@ -746,7 +754,7 @@
 
     if (data.rings) {
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(data.radius * 1.11, data.radius * 2.27, 128, 1),
+        new THREE.RingGeometry(data.radius * 0.5, data.radius * 2.4, 128, 1),
         new THREE.MeshBasicMaterial({ map: makeRingTexture(), side: THREE.DoubleSide, transparent: true, depthWrite: false })
       );
       ring.rotation.x = Math.PI / 2;
