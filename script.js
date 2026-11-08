@@ -1191,6 +1191,8 @@
   const fwd = new THREE.Vector3();
   const tmpV = new THREE.Vector3();
   const tmpUp = new THREE.Vector3();
+  const camSmooth = new THREE.Vector3();
+  const lookTarget = new THREE.Vector3();
   const rocketCam = { radius: 2.4, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
@@ -1356,6 +1358,7 @@
       rocketCam.radius = 2.4;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
+      camSmooth.copy(camera.position);
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -1475,7 +1478,7 @@
         rocket.quaternion.multiply(qRoll);
       }
       const mYaw = -mouseDX * 0.0022;
-      const mPitch = -mouseDY * 0.0022;
+      const mPitch = mouseDY * 0.0022;
       mouseDX = 0;
       mouseDY = 0;
       if (mYaw) {
@@ -1527,8 +1530,10 @@
       const speedK = Math.min(1, rocketVel.length() / 400);
       const camDist = rocketCam.radius * (1 + speedK * 0.15);
       camera.up.copy(tmpUp);
-      camera.position.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.35);
-      camera.lookAt(tmpV.copy(rocket.position).addScaledVector(fwd, 0.6));
+      tmpV.copy(rocket.position).addScaledVector(fwd, -camDist).addScaledVector(tmpUp, 0.35);
+      camSmooth.lerp(tmpV, 0.25);
+      camera.position.copy(camSmooth);
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.6));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
