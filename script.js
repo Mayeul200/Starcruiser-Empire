@@ -893,27 +893,88 @@
   /* ---------- Champ d'étoiles ---------- */
 
   function makeStars() {
-    const count = 2200;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const v = new THREE.Vector3(
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1
-      ).normalize().multiplyScalar(900 + Math.random() * 900);
-      positions.set([v.x, v.y, v.z], i * 3);
+    const palette = [0xffffff, 0xcfe0ff, 0x9db8ff, 0xffe9c4, 0xffc9a3];
+    const mkLayer = (count, size, op) => {
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const c = new THREE.Color();
+      for (let i = 0; i < count; i++) {
+        const v = new THREE.Vector3(
+          Math.random() * 2 - 1,
+          Math.random() * 2 - 1,
+          Math.random() * 2 - 1
+        ).normalize().multiplyScalar(900 + Math.random() * 900);
+        positions.set([v.x, v.y, v.z], i * 3);
+        c.set(palette[Math.floor(Math.random() * palette.length)]);
+        colors.set([c.r, c.g, c.b], i * 3);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+      return new THREE.Points(
+        geometry,
+        new THREE.PointsMaterial({ size, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: op, depthWrite: false })
+      );
+    };
+    const group = new THREE.Group();
+    group.add(mkLayer(5000, 1.4, 0.85));
+    group.add(mkLayer(700, 2.4, 0.9));
+    group.add(mkLayer(150, 3.4, 1.0));
+    scene.add(group);
+    return group;
+  }
+
+  function makeNebulaTexture(colorHex, seed) {
+    const s = 256;
+    const c = document.createElement("canvas");
+    c.width = s;
+    c.height = s;
+    const g = c.getContext("2d");
+    const rng = makeRng(seed);
+    const col = new THREE.Color(colorHex);
+    for (let i = 0; i < 60; i++) {
+      const x = rng() * s;
+      const y = rng() * s;
+      const r = 20 + rng() * 70;
+      const a = 0.04 + rng() * 0.1;
+      const grad = g.createRadialGradient(x, y, 0, x, y, r);
+      grad.addColorStop(0, `rgba(${Math.floor(col.r * 255)},${Math.floor(col.g * 255)},${Math.floor(col.b * 255)},${a})`);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = grad;
+      g.beginPath();
+      g.arc(x, y, r, 0, Math.PI * 2);
+      g.fill();
     }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const points = new THREE.Points(
-      geometry,
-      new THREE.PointsMaterial({ color: 0xcfe0ff, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0.7 })
-    );
-    scene.add(points);
-    return points;
+    return new THREE.CanvasTexture(c);
+  }
+
+  function makeNebulae() {
+    const group = new THREE.Group();
+    const tints = [0x7c5cbf, 0x3b82f6, 0xd97706, 0x2dd4bf, 0xec4899, 0x6366f1, 0x8b5cf6];
+    for (let i = 0; i < 14; i++) {
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: makeNebulaTexture(tints[i % tints.length], 9000 + i * 131),
+          blending: THREE.AdditiveBlending,
+          transparent: true,
+          opacity: 0.09 + Math.random() * 0.08,
+          depthWrite: false,
+        })
+      );
+      const dir = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+        .normalize()
+        .multiplyScalar(1000 + Math.random() * 600);
+      sprite.position.copy(dir);
+      const s = 300 + Math.random() * 450;
+      sprite.scale.set(s, s, 1);
+      group.add(sprite);
+    }
+    scene.add(group);
+    return group;
   }
 
   const stars = makeStars();
+  const nebulae = makeNebulae();
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1099,6 +1160,7 @@
     }
 
     stars.rotation.y += delta * 0.004;
+    nebulae.rotation.y += delta * 0.002;
 
     if (focused) {
       const pos = new THREE.Vector3();
