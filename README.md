@@ -14,9 +14,9 @@
 Textures NASA en projection équirectangulaire, chargées en direct avec **repli procédural** hors-ligne :
 
 - **Wikimedia Commons en PRIORITÉ** (CORS `*` fiable, haute résolution) : `Special:FilePath/Solarsystemscope_texture_8k_*.jpg?width=4096` pour toutes les planètes, le Soleil, la Lune, les anneaux, la Voie lactée (textures NASA CC-BY 4.0)
-- [Solar System Scope](https://www.solarsystemscope.com/textures/) (8K puis 2K) en deuxième source
+- [Solar System Scope](https://www.solarsystemscope.com/textures/) (8K puis 2K), puis **raw.githubusercontent.com** (repo `Shriisoot/Planets-texture`, 8K, CORS `*`) en secours
 - Exemples officiels Three.js : `earth_atmos_2048.jpg`, `earth_clouds_1024.png`, `earth_lights_2048.png`, `moon_1024.jpg`
-- Anti-pixelisation : anisotropie max du GPU appliquée à chaque texture chargée
+- Anti-pixelisation : anisotropie max du GPU sur chaque texture + zoom minimum ajusté par planète
 
 Les textures procédurales de secours reproduisent les vraies caractéristiques : continents pour la Terre, Grande Tache rouge pour Jupiter, calottes polaires pour Mars, taches sombres de Neptune, division de Cassini dans les anneaux de Saturne, etc.
 
@@ -32,7 +32,7 @@ L'échelle 1:1 est illisible (Neptune à 30 UA, Soleil = 109 Terres), donc compr
 | Lunes | rayon réel relatif à la planète (min 0,12) | Lune = 0,60 |
 | Ceinture d'astéroïdes | 2,1–3,3 UA compressés | entre Mars et Jupiter |
 
-**Orbites elliptiques réelles sur de vrais plans inclinés** : excentricités (Mercure 0,206...), périhélies, **inclinaisons au plan de l'écliptique** (Mercure 7,0°, Vénus 3,4°, Saturne 2,5°...) et **nœuds ascendants** appliqués à chaque orbite — les planètes ne sont plus coplanaires. **Sens prograde** (anti-horaire vu du pôle nord), **vitesses réelles** (3ᵉ loi de Kepler, 88 j à 60 190 j). Aplatissement polaire réel (Jupiter −6,5 %, Saturne −9,8 %). Inclinaisons axiales réelles (Vénus 177°, Uranus 98°...). Soleil renforcé : lumière ×4,5 + halo + couronne. **Halo lumineux style Soleil sur les 8 planètes** (sprite additif teinté, comme le halo solaire) + halos atmosphériques de bord (Terre, Vénus, Mars, Jupiter, Neptune, Titan) ; lumières nocturnes de la Terre. Jupiter/Saturne : textures 8K prioritaires + génération procédurale 1024px soignée (zones/cintures turbulentes, Grande Tache rouge, hexagone du pôle nord de Saturne, anneaux à 7 zones avec divisions de Cassini et d'Encke).
+**Orbites elliptiques réelles sur de vrais plans inclinés** : excentricités (Mercure 0,206...), périhélies, **inclinaisons au plan de l'écliptique** (Mercure 7,0°, Vénus 3,4°, Saturne 2,5°...) et **nœuds ascendants** appliqués à chaque orbite — les planètes ne sont plus coplanaires. Une **grille de l'écliptique** sert de référence ; les inclinaisons sont affichées ×3 pour rester lisibles à l'échelle compressée (valeurs réelles dans le code). **Halos lumineux uniformes** (sprite additif teinté, ratio fixe rayon ×2,8, opacité 0,38) sur les 8 planètes, comme le halo du Soleil. **Sens prograde** (anti-horaire vu du pôle nord), **vitesses réelles** (3ᵉ loi de Kepler, 88 j à 60 190 j). Aplatissement polaire réel (Jupiter −6,5 %, Saturne −9,8 %). Inclinaisons axiales réelles (Vénus 177°, Uranus 98°...). Soleil renforcé : lumière ×4,5 + halo + couronne. **Halo lumineux style Soleil sur les 8 planètes** (sprite additif teinté, comme le halo solaire) + halos atmosphériques de bord (Terre, Vénus, Mars, Jupiter, Neptune, Titan) ; lumières nocturnes de la Terre. Jupiter/Saturne : textures 8K prioritaires + génération procédurale 1024px soignée (zones/cintures turbulentes, Grande Tache rouge, hexagone du pôle nord de Saturne, anneaux à 7 zones avec divisions de Cassini et d'Encke).
 
 ## Contenu
 

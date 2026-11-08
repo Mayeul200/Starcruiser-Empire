@@ -49,6 +49,7 @@
 
   const SUN_RADIUS = 8;
   const EARTH_R_KM = 6371;
+  const INC_EXAGGERATION = 3;
 
   function orbitFromAU(au) {
     return 30 * Math.pow(au, 0.55);
@@ -177,6 +178,26 @@
     p.radius = radiusFromKm(p.rKm);
     p.b = p.orbit * Math.sqrt(1 - p.e * p.e);
     p.omegaRad = THREE.MathUtils.degToRad(p.omega);
+  }
+
+  const GH_NAMES = {
+    Mercure: "mercury", Vénus: "venus_atmosphere", Terre: "earth_daymap",
+    Mars: "mars", Jupiter: "jupiter", Saturne: "saturn", Uranus: "uranus", Neptune: "neptune",
+  };
+  const GH8K = (name) => [
+    `https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_${name}.jpg`,
+    `https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_${name}.jpg`,
+  ];
+  for (const p of PLANETS) {
+    const n = GH_NAMES[p.name];
+    if (n) p.texUrls = p.texUrls.concat(GH8K(n));
+    if (p.moons3d) for (const m of p.moons3d) if (m.name === "Lune") m.texUrls = m.texUrls.concat(GH8K("moon"));
+    if (p.cloudUrls) p.cloudUrls = p.cloudUrls.concat(GH8K("earth_clouds"));
+    if (p.nightUrls) p.nightUrls = p.nightUrls.concat(GH8K("earth_nightmap"));
+    if (p.ringUrls) p.ringUrls = p.ringUrls.concat([
+      "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_saturn_ring_alpha.png",
+      "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_saturn_ring_alpha.png",
+    ]);
   }
 
   /* ---------- Utilitaires ---------- */
@@ -570,7 +591,9 @@
   const sunMat = new THREE.MeshBasicMaterial({ map: makeSunTexture() });
   const sun = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 48, 48), sunMat);
   scene.add(sun);
-  tryLoadTexture([WC8K("sun"), SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg")], (tex) => {
+  tryLoadTexture([WC8K("sun"), SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg"),
+    "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_sun.jpg",
+    "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_sun.jpg"], (tex) => {
     sunMat.map = tex;
     sunMat.needsUpdate = true;
   });
@@ -637,6 +660,11 @@
 
   const asteroidBelt = makeAsteroidBelt();
 
+  const eclipticGrid = new THREE.GridHelper(430, 43, 0x2b3a55, 0x182235);
+  eclipticGrid.material.transparent = true;
+  eclipticGrid.material.opacity = 0.3;
+  scene.add(eclipticGrid);
+
   /* ---------- Planètes ---------- */
 
   const orbitLines = [];
@@ -661,7 +689,7 @@
   PLANETS.forEach((data, index) => {
     const orbitGroup = new THREE.Group();
     orbitGroup.rotation.order = "YXZ";
-    orbitGroup.rotation.x = THREE.MathUtils.degToRad(data.inc);
+    orbitGroup.rotation.x = THREE.MathUtils.degToRad(data.inc * INC_EXAGGERATION);
     orbitGroup.rotation.y = THREE.MathUtils.degToRad(data.node);
     scene.add(orbitGroup);
 
@@ -707,7 +735,8 @@
         depthWrite: false,
       })
     );
-    halo.scale.set(data.radius * 3.4, data.radius * 3.4, 1);
+    halo.scale.set(data.radius * 2.8, data.radius * 2.8, 1);
+    halo.material.opacity = 0.38;
     tilt.add(halo);
 
     const hex = `#${data.color.toString(16).padStart(6, "0")}`;
@@ -914,7 +943,7 @@
     setInfo("info-desc", d.desc);
     setInfo("info-fact", d.fact);
     infoPanel.classList.remove("hidden");
-    orbit.desiredRadius = obj.data.radius * 5 + 6;
+    orbit.desiredRadius = obj.data.radius * 6 + 7;
   }
 
   function resetView() {
