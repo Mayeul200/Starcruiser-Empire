@@ -1179,6 +1179,21 @@
 
   const speedHud = document.getElementById("hud-speed");
 
+  function collideSegment(center, min) {
+    const seg = tmpV2.subVectors(rocket.position, tmpPrev);
+    const segLen2 = seg.lengthSq();
+    const toC = tmpUp.subVectors(center, tmpPrev);
+    const t = segLen2 > 0 ? Math.max(0, Math.min(1, toC.dot(seg) / segLen2)) : 0;
+    const closest = tmpV.copy(tmpPrev).addScaledVector(seg, t);
+    const d = closest.distanceTo(center);
+    if (d < min && d > 0.0001) {
+      const n = closest.sub(center).normalize();
+      rocket.position.copy(center).addScaledVector(n, min);
+      const vn = rocketVel.dot(n);
+      if (vn < 0) rocketVel.addScaledVector(n, -vn * 1.4);
+    }
+  }
+
   let rocketMode = false;
   const rocketVel = new THREE.Vector3();
   const keys = {};
@@ -1191,6 +1206,9 @@
   const fwd = new THREE.Vector3();
   const tmpV = new THREE.Vector3();
   const tmpUp = new THREE.Vector3();
+  const tmpV2 = new THREE.Vector3();
+  const tmpPrev = new THREE.Vector3();
+  const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
   const rocketCam = { radius: 2.4, dTheta: 0, dPhi: 0 };
@@ -1469,7 +1487,7 @@
         qPitch.setFromAxisAngle(xAxis, 1.9 * delta);
         rocket.quaternion.multiply(qPitch);
       }
-      if (keys.KeyA) {
+      if (keys.KeyQ) {
         qRoll.setFromAxisAngle(zAxis, -2.2 * delta);
         rocket.quaternion.multiply(qRoll);
       }
@@ -1498,26 +1516,24 @@
       if (keys.KeyS) rocketVel.addScaledVector(fwd, -9 * delta);
       if (keys.Space) rocketVel.y += 12 * delta;
       if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 12 * delta;
+      if (keys.KeyA) {
+        tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
+        rocketVel.addScaledVector(tmpV, 12 * delta);
+      }
+      if (keys.KeyD) {
+        tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
+        rocketVel.addScaledVector(tmpV, 12 * delta);
+      }
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
       if (rocketVel.length() > 400) rocketVel.setLength(400);
+      tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpV);
-        const d = rocket.position.distanceTo(tmpV);
-        const min = p.data.radius * 1.15 + 0.35;
-        if (d < min && d > 0.001) {
-          tmpV.sub(rocket.position).normalize();
-          rocket.position.addScaledVector(tmpV, min - d);
-          rocketVel.addScaledVector(tmpV, -rocketVel.dot(tmpV) * 1.5);
-        }
+        collideSegment(tmpV, p.data.radius + 0.25);
       }
-      const dSun = rocket.position.length();
-      if (dSun < SUN_RADIUS + 0.7) {
-        tmpV.copy(rocket.position).normalize();
-        rocket.position.copy(tmpV).multiplyScalar(SUN_RADIUS + 0.7);
-        rocketVel.multiplyScalar(0.3);
-      }
+      collideSegment(ORIGIN, SUN_RADIUS + 0.3);
 
       flame.visible = !!keys.KeyW;
       if (flame.visible) {
@@ -1536,7 +1552,7 @@
       camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.6));
     }
 
-    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
+    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 3)} km/s`;
 
     if (!rocketMode) applyOrbit();
     renderer.render(scene, camera);
