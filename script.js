@@ -1405,10 +1405,10 @@
         rocket.quaternion.multiply(qYaw);
       }
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 16 * delta);
-      if (keys.ArrowDown) rocketVel.multiplyScalar(Math.max(0, 1 - 3 * delta));
-      rocketVel.multiplyScalar(Math.max(0, 1 - 0.5 * delta));
-      if (rocketVel.length() > 32) rocketVel.setLength(32);
+      if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 12 * delta);
+      if (keys.ArrowDown) rocketVel.addScaledVector(fwd, -9 * delta);
+      rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
+      if (rocketVel.length() > 400) rocketVel.setLength(400);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
