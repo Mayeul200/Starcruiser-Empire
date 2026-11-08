@@ -644,9 +644,42 @@
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
   scene.add(sunLabel);
 
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    depthWrite: false,
+    vertexShader: `
+      varying vec3 vDir;
+      void main() {
+        vDir = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vDir;
+      void main() {
+        vec3 dir = normalize(vDir);
+        vec3 col = mix(vec3(0.010, 0.010, 0.028), vec3(0.038, 0.032, 0.080), dir.y * 0.5 + 0.5);
+        vec3 bandN = normalize(vec3(0.35, 0.85, 0.30));
+        float d = dot(dir, bandN);
+        col += exp(-d * d * 6.0) * vec3(0.10, 0.12, 0.22);
+        vec3 bandN2 = normalize(vec3(-0.50, 0.20, 0.84));
+        float d2 = dot(dir, bandN2);
+        col += exp(-d2 * d2 * 10.0) * vec3(0.07, 0.06, 0.14);
+        col += exp(-abs(dir.y) * 3.0) * vec3(0.02, 0.02, 0.05);
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `,
+  });
+  const skySphere = new THREE.Mesh(new THREE.SphereGeometry(2500, 32, 32), skyMat);
+  scene.add(skySphere);
+
   tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg"), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
-    scene.background = tex;
+    const texSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(2490, 48, 32),
+      new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0.28, depthWrite: false })
+    );
+    scene.add(texSphere);
   });
 
   /* ---------- Orbites elliptiques + ceinture d'astéroïdes ---------- */
