@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 </head>
 <body>
@@ -38,6 +38,7 @@
     <p class="hud-label">CONTRÔLES</p>
     <button class="btn btn-small" id="btn-pause" type="button">⏸ PAUSE</button>
     <button class="btn btn-small" id="btn-reset" type="button">⟲ VUE D'ENSEMBLE</button>
+    <button class="btn btn-small" id="btn-rocket" type="button">🚀 PILOTER LA FUSÉE</button>
     <label class="control-row">
       <span>Vitesse</span>
       <input type="range" id="speed" min="0" max="5" step="0.1" value="1" />
@@ -71,8 +72,8 @@
     <button class="btn btn-small" id="info-close" type="button">✕ FERMER</button>
   </aside>
 
-  <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur un astre — plans orbitaux inclinés (réels ×3), sens prograde, vitesses de Kepler</p>
+  <p class="hud hud-hint">Glissez pour orbiter • Molette pour zoomer • Cliquez sur un astre • Mode 🚀 (touche R) : flèches ← → ↑ ↓ pour piloter la fusée</p>
 
-  <script src="script.js?v=26"></script>
+  <script src="script.js?v=27"></script>
 </body>
 </html>

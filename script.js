@@ -1112,6 +1112,73 @@
   const stars = makeStars();
   const nebulae = makeNebulae();
 
+  /* ---------- Fusée 3D pilotable ---------- */
+
+  function buildRocket() {
+    const rocket = new THREE.Group();
+    const white = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35, metalness: 0.4 });
+    const red = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.2 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.6 });
+
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.38, 1.8, 24), white);
+    body.position.y = 0;
+    rocket.add(body);
+
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 24), red);
+    nose.position.y = 1.25;
+    rocket.add(nose);
+
+    const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.385, 0.39, 0.18, 24), red);
+    stripe.position.y = 0.45;
+    rocket.add(stripe);
+
+    const window = new THREE.Mesh(
+      new THREE.SphereGeometry(0.13, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 0x7df9ff, emissive: 0x22d3ee, emissiveIntensity: 0.9, roughness: 0.2 })
+    );
+    window.position.set(0, 0.75, 0.26);
+    rocket.add(window);
+
+    for (let i = 0; i < 3; i++) {
+      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 0.45), red);
+      const a = (i / 3) * Math.PI * 2;
+      fin.position.set(Math.cos(a) * 0.38, -0.75, Math.sin(a) * 0.38);
+      fin.rotation.y = -a;
+      rocket.add(fin);
+    }
+
+    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 0.3, 16), dark);
+    nozzle.position.y = -1.05;
+    rocket.add(nozzle);
+
+    const flame = new THREE.Mesh(
+      new THREE.ConeGeometry(0.2, 1.1, 16),
+      new THREE.MeshBasicMaterial({ color: 0xffa726, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.9, depthWrite: false })
+    );
+    flame.rotation.x = Math.PI;
+    flame.position.y = -1.6;
+    flame.visible = false;
+    rocket.add(flame);
+
+    rocket.scale.setScalar(1.4);
+    return { group: rocket, flame };
+  }
+
+  const rocketBuilt = buildRocket();
+  const rocket = rocketBuilt.group;
+  const flame = rocketBuilt.flame;
+  rocket.position.set(40, 4, 0);
+  scene.add(rocket);
+
+  let rocketMode = false;
+  const rocketVel = new THREE.Vector3();
+  const keys = {};
+  const qYaw = new THREE.Quaternion();
+  const upAxis = new THREE.Vector3(0, 1, 0);
+  const fwd = new THREE.Vector3();
+  const tmpV = new THREE.Vector3();
+  const tmpQ = new THREE.Quaternion();
+
   /* ---------- Contrôles caméra maison ---------- */
 
   const orbit = {
@@ -1254,6 +1321,27 @@
     sunLabel.visible = e.target.checked;
   });
 
+  function toggleRocketMode() {
+    rocketMode = !rocketMode;
+    document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
+    if (!rocketMode && !focused) {
+      orbit.desiredTarget.set(0, 0, 0);
+      orbit.desiredRadius = 285;
+    }
+  }
+
+  document.getElementById("btn-rocket").addEventListener("click", toggleRocketMode);
+
+  window.addEventListener("keydown", (e) => {
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
+    keys[e.code] = true;
+    if (e.code === "KeyR") toggleRocketMode();
+  });
+
+  window.addEventListener("keyup", (e) => {
+    keys[e.code] = false;
+  });
+
   /* ---------- Sélection au clic ---------- */
 
   const raycaster = new THREE.Raycaster();
@@ -1305,6 +1393,53 @@
       const pos = new THREE.Vector3();
       focused.mesh.getWorldPosition(pos);
       orbit.desiredTarget.copy(pos);
+    }
+
+    if (rocketMode) {
+      if (keys.ArrowLeft) {
+        qYaw.setFromAxisAngle(upAxis, 1.9 * delta);
+        rocket.quaternion.multiply(qYaw);
+      }
+      if (keys.ArrowRight) {
+        qYaw.setFromAxisAngle(upAxis, -1.9 * delta);
+        rocket.quaternion.multiply(qYaw);
+      }
+      fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
+      if (keys.ArrowUp) rocketVel.addScaledVector(fwd, 16 * delta);
+      if (keys.ArrowDown) rocketVel.multiplyScalar(Math.max(0, 1 - 3 * delta));
+      rocketVel.multiplyScalar(Math.max(0, 1 - 0.5 * delta));
+      if (rocketVel.length() > 32) rocketVel.setLength(32);
+      rocket.position.addScaledVector(rocketVel, delta);
+
+      for (const p of planetObjects) {
+        p.mesh.getWorldPosition(tmpV);
+        const d = rocket.position.distanceTo(tmpV);
+        const min = p.data.radius * 1.15 + 0.9;
+        if (d < min && d > 0.001) {
+          tmpV.sub(rocket.position).normalize();
+          rocket.position.addScaledVector(tmpV, min - d);
+          rocketVel.addScaledVector(tmpV, -rocketVel.dot(tmpV) * 1.5);
+        }
+      }
+      const dSun = rocket.position.length();
+      if (dSun < SUN_RADIUS + 1.6) {
+        tmpV.copy(rocket.position).normalize();
+        rocket.position.copy(tmpV).multiplyScalar(SUN_RADIUS + 1.6);
+        rocketVel.multiplyScalar(0.3);
+      }
+
+      flame.visible = !!keys.ArrowUp;
+      if (flame.visible) {
+        const f = 0.9 + Math.random() * 0.3;
+        flame.scale.set(f, 0.9 + Math.random() * 0.5, f);
+      }
+
+      fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
+      tmpV.copy(fwd).multiplyScalar(-8).addScaledVector(upAxis, 2.6);
+      orbit.desiredTarget.copy(rocket.position);
+      orbit.desiredRadius = tmpV.length();
+      orbit.desiredPhi = Math.acos(Math.max(-1, Math.min(1, tmpV.y / tmpV.length())));
+      orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z);
     }
 
     applyOrbit();
