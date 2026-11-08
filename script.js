@@ -755,16 +755,16 @@
     }
     const rockGeo = new THREE.IcosahedronGeometry(1, 0);
     const rockMat = new THREE.MeshStandardMaterial({ roughness: 1, flatShading: true });
-    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 90);
+    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 180);
     const m4 = new THREE.Matrix4();
     const q = new THREE.Quaternion();
     const e = new THREE.Euler();
     const col = new THREE.Color();
     const rockTints = [0x8d8577, 0x9a917f, 0x6f6a60, 0xa39a88, 0x7a7468];
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 180; i++) {
       const a = rng() * Math.PI * 2;
       const r = inner + Math.pow(rng(), 0.8) * (outer - inner);
-      const s = 0.12 + Math.pow(rng(), 2) * 0.55;
+      const s = 0.06 + Math.pow(rng(), 2) * 0.275;
       e.set(rng() * 3, rng() * 3, rng() * 3);
       q.setFromEuler(e);
       m4.compose(
