@@ -1249,12 +1249,13 @@
   }, { passive: false });
 
   function applyOrbit() {
+    const rate = rocketMode ? 1 : 0.08;
     let dTh = orbit.desiredTheta - orbit.theta;
     dTh = Math.atan2(Math.sin(dTh), Math.cos(dTh));
-    orbit.theta += dTh * 0.08;
-    orbit.phi += (orbit.desiredPhi - orbit.phi) * 0.08;
-    orbit.radius += (orbit.desiredRadius - orbit.radius) * 0.08;
-    orbit.target.lerp(orbit.desiredTarget, 0.08);
+    orbit.theta += dTh * rate;
+    orbit.phi += (orbit.desiredPhi - orbit.phi) * rate;
+    orbit.radius += (orbit.desiredRadius - orbit.radius) * (rocketMode ? 0.15 : 0.08);
+    orbit.target.lerp(orbit.desiredTarget, rocketMode ? 0.3 : 0.08);
     const sp = new THREE.Spherical(orbit.radius, orbit.phi, orbit.theta);
     camera.position.setFromSpherical(sp).add(orbit.target);
     camera.lookAt(orbit.target);
@@ -1491,7 +1492,8 @@
       orbit.desiredTarget.copy(rocket.position).addScaledVector(fwd, 0.6);
       tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).addScaledVector(upAxis, 0.35);
       const offLen = tmpV.length();
-      orbit.desiredRadius = rocketCam.radius;
+      const speedK = Math.min(1, rocketVel.length() / 400);
+      orbit.desiredRadius = rocketCam.radius * (1 + speedK * 0.15);
       orbit.desiredTheta = Math.atan2(tmpV.x, tmpV.z) + rocketCam.dTheta;
       orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, Math.acos(tmpV.y / offLen) + rocketCam.dPhi));
     }
