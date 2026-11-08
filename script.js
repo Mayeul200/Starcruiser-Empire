@@ -59,15 +59,23 @@
     return 2.2 * Math.sqrt(rKm / EARTH_R_KM);
   }
 
-  const SSS = "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@main/";
   const TJ = "https://threejs.org/examples/textures/planets/";
-  const WCSS = (name) => `https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@main/textures/${name}`;
-  const WC8K = (name) => `https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@master/8k_${name}.jpg`;
+  const JDS = (repo, branch, file) => `https://cdn.jsdelivr.net/gh/${repo}@${branch}/${file}`;
+  const TEX8 = (n) => [
+    JDS("Shriisoot/Planets-texture", "main", `8k_${n}.jpg`),
+    JDS("Shriisoot/Planets-texture", "master", `8k_${n}.jpg`),
+  ];
+  const TEX2 = (f) => [
+    JDS("Shrey1803/Solar-system", "main", `textures/${f}`),
+    JDS("Shrey1803/Solar-system", "master", `textures/${f}`),
+    JDS("ongyishen/SolarSystem", "main", `textures/${f}`),
+    JDS("ongyishen/SolarSystem", "master", `textures/${f}`),
+  ];
 
   const PLANETS = [
     {
       name: "Mercure", au: 0.387, rKm: 2439, tilt: 0.03, e: 0.2056, omega: 77, inc: 7.005, node: 48.331, periodDays: 88, flattening: 0.0001, color: 0x9c8e82,
-      texUrls: [WC8K("mercury"), SSS + "8k_mercury.jpg", SSS + "2k_mercury.jpg", WCSS("2k_mercury.jpg")],
+      texUrls: [...TEX8("mercury"), ...TEX2("2k_mercury.jpg")],
       proc: { type: "craters", base: "#8a7f74", dark: "#5f564e", light: "#a39687" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "4 879 km", mass: "3,30 × 10²³ kg", distance: "57,9 M km (0,39 UA)",
@@ -78,7 +86,11 @@
     },
     {
       name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, inc: 3.394, node: 76.680, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a,
-      texUrls: [WC8K("venus_atmosphere"), SSS + "8k_venus_atmosphere.jpg", SSS + "2k_venus_atmosphere.jpg", WCSS("2k_venus_atmosphere.jpg"), SSS + "2k_venus_surface.jpg", WCSS("2k_venus_surface.jpg")],
+      texUrls: [
+        JDS("Shriisoot/Planets-texture", "main", "4k_venus_atmosphere.jpg"),
+        JDS("Shriisoot/Planets-texture", "master", "4k_venus_atmosphere.jpg"),
+        ...TEX2("2k_venus_surface.jpg"),
+      ],
       proc: { type: "venus", base: "#d9b878", light: "#f0dcb0", dark: "#c9a45e" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 104 km", mass: "4,87 × 10²⁴ kg", distance: "108,2 M km (0,72 UA)",
@@ -89,9 +101,9 @@
     },
     {
       name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
-      texUrls: [WC8K("earth_daymap"), SSS + "8k_earth_daymap.jpg", WCSS("2k_earth_daymap.jpg"), TJ + "earth_atmos_2048.jpg"],
-      cloudUrls: [WC8K("earth_clouds"), TJ + "earth_clouds_1024.png", SSS + "2k_earth_clouds_1024.png"],
-      nightUrls: [WC8K("earth_nightmap"), TJ + "earth_lights_2048.png", WCSS("2k_earth_nightmap.jpg")],
+      texUrls: [...TEX8("earth_daymap"), TJ + "earth_atmos_2048.jpg", ...TEX2("2k_earth_daymap.jpg")],
+      cloudUrls: [TJ + "earth_clouds_1024.png"],
+      nightUrls: [...TEX8("earth_nightmap"), TJ + "earth_lights_2048.png"],
       proc: { type: "earth", base: "#14508f", land: "#3f9e5a", desert: "#c2a86b", ice: "#eef4f8" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 756 km", mass: "5,97 × 10²⁴ kg", distance: "149,6 M km (1 UA)",
@@ -99,11 +111,11 @@
       atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
       desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
       fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
-      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [WC8K("moon"), SSS + "8k_moon.jpg", SSS + "2k_moon.jpg", WCSS("2k_moon.jpg"), TJ + "moon_1024.jpg"] }],
+      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
     },
     {
       name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
-      texUrls: [WC8K("mars"), SSS + "8k_mars.jpg", SSS + "2k_mars.jpg", WCSS("2k_mars.jpg")],
+      texUrls: [...TEX8("mars"), ...TEX2("2k_mars.jpg")],
       proc: { type: "mars", base: "#b5502a", dark: "#7a3418", ice: "#f2f2f2" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "6 779 km", mass: "6,42 × 10²³ kg", distance: "227,9 M km (1,52 UA)",
@@ -118,7 +130,8 @@
     },
     {
       name: "Jupiter", au: 5.203, rKm: 69911, tilt: 3.1, e: 0.0489, omega: 14, inc: 1.303, node: 100.464, periodDays: 4333, flattening: 0.0649, color: 0xd8b08c, atmoGlow: 0xd8b08c,
-      texUrls: [WC8K("jupiter"), SSS + "8k_jupiter.jpg", SSS + "2k_jupiter.jpg", WCSS("2k_jupiter.jpg")],
+      thinRings: [{ inner: 1.4, outer: 2.9, opacity: 0.05, color: 0xaa9988 }],
+      texUrls: [...TEX8("jupiter"), ...TEX2("2k_jupiter.jpg")],
       proc: { type: "jupiter" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "139 820 km", mass: "1,90 × 10²⁷ kg", distance: "778,5 M km (5,2 UA)",
@@ -135,8 +148,9 @@
     },
     {
       name: "Saturne", au: 9.537, rKm: 58232, tilt: 26.7, e: 0.0565, omega: 92, inc: 2.489, node: 113.666, periodDays: 10759, flattening: 0.0979, color: 0xe3cf9e, rings: true,
-      texUrls: [WC8K("saturn"), SSS + "8k_saturn.jpg", SSS + "2k_saturn.jpg", WCSS("2k_saturn.jpg")],
-      ringUrls: [WC8K("saturn_ring_alpha").replace(".jpg", ".png"), SSS + "8k_saturn_ring_alpha.png", SSS + "2k_saturn_ring_alpha.png", WCSS("2k_saturn_ring_alpha.png")],
+      thinRings: [{ inner: 2.32, outer: 2.37, opacity: 0.45, color: 0xe0d4b0 }],
+      texUrls: [...TEX8("saturn"), ...TEX2("2k_saturn.jpg")],
+      ringUrls: TEX2("2k_saturn_ring_alpha.png"),
       proc: { type: "saturn" },
       type: "Géante gazeuse", typeClass: "gazeuse",
       diameter: "116 460 km", mass: "5,68 × 10²⁶ kg", distance: "1,43 Md km (9,5 UA)",
@@ -147,8 +161,17 @@
       moons3d: [{ name: "Titan", rKm: 2574, dist: 9.6, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
     },
     {
-      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0, faintRings: true,
-      texUrls: [WC8K("uranus"), SSS + "8k_uranus.jpg", SSS + "2k_uranus.jpg", WCSS("2k_uranus.jpg")],
+      name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0,
+      thinRings: [
+        { inner: 1.55, outer: 1.60, opacity: 0.20, color: 0x9fb8c8 },
+        { inner: 1.70, outer: 1.75, opacity: 0.16, color: 0x9fb8c8 },
+        { inner: 1.95, outer: 2.00, opacity: 0.14, color: 0x9fb8c8 },
+      ],
+      texUrls: [
+        JDS("Shriisoot/Planets-texture", "main", "2k_uranus.jpg"),
+        JDS("Shriisoot/Planets-texture", "master", "2k_uranus.jpg"),
+        ...TEX2("2k_uranus.jpg"),
+      ],
       proc: { type: "uranus", base: "#9fdcd9", band: "#c8efeb" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "50 724 km", mass: "8,68 × 10²⁵ kg", distance: "2,87 Md km (19,2 UA)",
@@ -160,7 +183,11 @@
     },
     {
       name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, inc: 1.770, node: 131.784, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
-      texUrls: [WC8K("neptune"), SSS + "8k_neptune.jpg", SSS + "2k_neptune.jpg", WCSS("2k_neptune.jpg")],
+      thinRings: [
+        { inner: 1.7, outer: 1.8, opacity: 0.14, color: 0x8fa8c8 },
+        { inner: 2.0, outer: 2.1, opacity: 0.12, color: 0x8fa8c8 },
+      ],
+      texUrls: [...TEX2("2k_neptune.jpg")],
       proc: { type: "neptune", base: "#3d5bd0", bands: ["#4a68c9", "#3350b0", "#6d8ade"], spot: "#2a3f8f" },
       type: "Géante de glaces", typeClass: "glaces",
       diameter: "49 244 km", mass: "1,02 × 10²⁶ kg", distance: "4,50 Md km (30,1 UA)",
@@ -179,39 +206,7 @@
     p.omegaRad = THREE.MathUtils.degToRad(p.omega);
   }
 
-  const GH_NAMES = {
-    Mercure: "mercury", Vénus: "venus_atmosphere", Terre: "earth_daymap",
-    Mars: "mars", Jupiter: "jupiter", Saturne: "saturn", Uranus: "uranus", Neptune: "neptune",
-  };
-  const GH8K = (name) => [
-    `https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_${name}.jpg`,
-    `https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_${name}.jpg`,
-  ];
-  const JD2K = (name) => [
-    `https://cdn.jsdelivr.net/gh/ongyishen/SolarSystem@main/textures/2k_${name}.jpg`,
-    `https://cdn.jsdelivr.net/gh/ongyishen/SolarSystem@master/textures/2k_${name}.jpg`,
-  ];
-  for (const p of PLANETS) {
-    const n = GH_NAMES[p.name];
-    if (n) p.texUrls = p.texUrls.concat(GH8K(n), JD2K(n));
-    if (p.name === "Vénus") {
-      p.texUrls = p.texUrls.concat([
-        "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@main/4k_venus_atmosphere.jpg",
-        "https://cdn.jsdelivr.net/gh/Shriisoot/Planets-texture@master/4k_venus_atmosphere.jpg",
-      ]);
-    }
-    if (p.moons3d) for (const m of p.moons3d) if (m.name === "Lune") m.texUrls = m.texUrls.concat(GH8K("moon"), JD2K("moon"));
-    if (p.cloudUrls) p.cloudUrls = p.cloudUrls.concat(GH8K("earth_clouds"));
-    if (p.nightUrls) p.nightUrls = p.nightUrls.concat(GH8K("earth_nightmap"), JD2K("earth_nightmap"));
-    if (p.ringUrls) {
-      p.ringUrls = p.ringUrls.concat([
-        "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_saturn_ring_alpha.png",
-        "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_saturn_ring_alpha.png",
-        "https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@main/textures/2k_saturn_ring_alpha.png",
-        "https://cdn.jsdelivr.net/gh/Shrey1803/Solar-system@master/textures/2k_saturn_ring_alpha.png",
-      ]);
-    }
-  }
+
 
   /* ---------- Utilitaires ---------- */
 
@@ -604,9 +599,7 @@
   const sunMat = new THREE.MeshBasicMaterial({ map: makeSunTexture() });
   const sun = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 48, 48), sunMat);
   scene.add(sun);
-  tryLoadTexture([WC8K("sun"), SSS + "8k_sun.jpg", SSS + "2k_sun.jpg", WCSS("2k_sun.jpg"),
-    "https://raw.githubusercontent.com/Shriisoot/Planets-texture/main/8k_sun.jpg",
-    "https://raw.githubusercontent.com/Shriisoot/Planets-texture/master/8k_sun.jpg"], (tex) => {
+  tryLoadTexture([...TEX2("2k_sun.jpg")], (tex) => {
     sunMat.map = tex;
     sunMat.needsUpdate = true;
   });
@@ -627,7 +620,7 @@
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
   scene.add(sunLabel);
 
-  tryLoadTexture([WC8K("stars_milky_way"), SSS + "8k_stars_milky_way.jpg", SSS + "2k_stars_milky_way.jpg", WCSS("2k_stars_milky_way.jpg")], (tex) => {
+  tryLoadTexture([...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = tex;
   });
@@ -651,24 +644,47 @@
   }
 
   function makeAsteroidBelt() {
-    const count = 2600;
-    const positions = new Float32Array(count * 3);
+    const group = new THREE.Group();
     const rng = makeRng(4242);
     const inner = orbitFromAU(2.1);
     const outer = orbitFromAU(3.3);
-    for (let i = 0; i < count; i++) {
-      const a = rng() * Math.PI * 2;
-      const r = inner + rng() * (outer - inner);
-      positions.set([Math.cos(a) * r, (rng() - 0.5) * 1.6, Math.sin(a) * r], i * 3);
+    const layers = [
+      { count: 2600, size: 0.3, color: 0x8d8577, spread: 1.6 },
+      { count: 1400, size: 0.45, color: 0x9a917f, spread: 2.4 },
+      { count: 600, size: 0.2, color: 0x6f6a60, spread: 1.0 },
+    ];
+    for (const layer of layers) {
+      const positions = new Float32Array(layer.count * 3);
+      for (let i = 0; i < layer.count; i++) {
+        const a = rng() * Math.PI * 2;
+        const r = inner + Math.pow(rng(), 0.8) * (outer - inner);
+        positions.set([Math.cos(a) * r, (rng() - 0.5) * layer.spread, Math.sin(a) * r], i * 3);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      group.add(new THREE.Points(geometry, new THREE.PointsMaterial({
+        color: layer.color, size: layer.size, transparent: true, opacity: 0.9,
+      })));
     }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    const belt = new THREE.Points(
-      geometry,
-      new THREE.PointsMaterial({ color: 0x8d8577, size: 0.3, transparent: true, opacity: 0.9 })
-    );
-    scene.add(belt);
-    return belt;
+    const bigAsteroids = [
+      { name: "Cérès", au: 2.77, r: 0.6, color: 0x9a9188 },
+      { name: "Vesta", au: 2.36, r: 0.48, color: 0xb0a898 },
+      { name: "Pallas", au: 2.77, r: 0.42, color: 0x8a8378 },
+      { name: "Hygiea", au: 3.14, r: 0.4, color: 0x6f6a62 },
+    ];
+    for (const b of bigAsteroids) {
+      const mesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(b.r, 1),
+        new THREE.MeshStandardMaterial({ color: b.color, roughness: 1, flatShading: true })
+      );
+      const a = rng() * Math.PI * 2;
+      const r = orbitFromAU(b.au);
+      mesh.position.set(Math.cos(a) * r, (rng() - 0.5) * 1.5, Math.sin(a) * r);
+      mesh.rotation.set(rng() * 3, rng() * 3, rng() * 3);
+      group.add(mesh);
+    }
+    scene.add(group);
+    return group;
   }
 
   const asteroidBelt = makeAsteroidBelt();
@@ -754,7 +770,7 @@
 
     if (data.rings) {
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(data.radius * 0.5, data.radius * 2.4, 128, 1),
+        new THREE.RingGeometry(data.radius * 0.5, data.radius * 2.4, 160, 1),
         new THREE.MeshBasicMaterial({ map: makeRingTexture(), side: THREE.DoubleSide, transparent: true, depthWrite: false })
       );
       ring.rotation.x = Math.PI / 2;
@@ -765,14 +781,14 @@
       });
     }
 
-    if (data.faintRings) {
+    (data.thinRings || []).forEach((spec) => {
       const ring = new THREE.Mesh(
-        new THREE.RingGeometry(data.radius * 1.5, data.radius * 1.95, 96, 1),
-        new THREE.MeshBasicMaterial({ color: 0x8fa8b8, side: THREE.DoubleSide, transparent: true, opacity: 0.22, depthWrite: false })
+        new THREE.RingGeometry(data.radius * spec.inner, data.radius * spec.outer, 96, 1),
+        new THREE.MeshBasicMaterial({ color: spec.color, side: THREE.DoubleSide, transparent: true, opacity: spec.opacity, depthWrite: false })
       );
       ring.rotation.x = Math.PI / 2;
       tilt.add(ring);
-    }
+    });
 
     const moons = [];
     (data.moons3d || []).forEach((m) => {
