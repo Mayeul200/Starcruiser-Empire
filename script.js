@@ -658,14 +658,17 @@
       varying vec3 vDir;
       void main() {
         vec3 dir = normalize(vDir);
-        vec3 col = mix(vec3(0.010, 0.010, 0.028), vec3(0.038, 0.032, 0.080), dir.y * 0.5 + 0.5);
+        vec3 col = mix(vec3(0.008, 0.008, 0.032), vec3(0.058, 0.048, 0.115), dir.y * 0.5 + 0.5);
         vec3 bandN = normalize(vec3(0.35, 0.85, 0.30));
         float d = dot(dir, bandN);
-        col += exp(-d * d * 6.0) * vec3(0.10, 0.12, 0.22);
+        col += exp(-d * d * 6.0) * vec3(0.17, 0.19, 0.34);
         vec3 bandN2 = normalize(vec3(-0.50, 0.20, 0.84));
         float d2 = dot(dir, bandN2);
-        col += exp(-d2 * d2 * 10.0) * vec3(0.07, 0.06, 0.14);
-        col += exp(-abs(dir.y) * 3.0) * vec3(0.02, 0.02, 0.05);
+        col += exp(-d2 * d2 * 10.0) * vec3(0.11, 0.09, 0.21);
+        vec3 bandN3 = normalize(vec3(0.80, -0.30, 0.52));
+        float d3 = dot(dir, bandN3);
+        col += exp(-d3 * d3 * 8.0) * vec3(0.13, 0.07, 0.05);
+        col += exp(-abs(dir.y) * 3.0) * vec3(0.030, 0.026, 0.070);
         gl_FragColor = vec4(col, 1.0);
       }
     `,
@@ -677,7 +680,7 @@
     tex.mapping = THREE.EquirectangularReflectionMapping;
     const texSphere = new THREE.Mesh(
       new THREE.SphereGeometry(2490, 48, 32),
-      new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0.28, depthWrite: false })
+      new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0.5, depthWrite: false })
     );
     scene.add(texSphere);
   });
