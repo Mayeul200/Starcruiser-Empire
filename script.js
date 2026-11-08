@@ -73,7 +73,7 @@
     earth_nightmap: ["b/b3", "Solarsystemscope_texture_8k_earth_nightmap.jpg"],
   };
   const TEX8 = (n) => {
-    const uw = UW8K[n] ? [UW(UW8K[n][0], UW8K[n][1], 4096), UW(UW8K[n][0], UW8K[n][1])] : [];
+    const uw = UW8K[n] ? [UW(UW8K[n][0], UW8K[n][1])] : [];
     return [
       ...uw,
       JDS("Shriisoot/Planets-texture", "main", `8k_${n}.jpg`),
@@ -166,7 +166,7 @@
       thinRings: [{ inner: 2.32, outer: 2.37, opacity: 0.45, color: 0xe0d4b0 }],
       texUrls: [...TEX8("saturn"), ...TEX2("2k_saturn.jpg")],
       ringUrls: [
-        UW("2/29", "Solarsystemscope_texture_8k_saturn_ring_alpha.png", 2048),
+        UW("2/29", "Solarsystemscope_texture_8k_saturn_ring_alpha.png", 1024),
         UW("7/7d", "Solarsystemscope_texture_2k_saturn_ring_alpha.png"),
       ],
       proc: { type: "saturn" },
@@ -638,7 +638,7 @@
   sunLabel.position.set(0, SUN_RADIUS + 4, 0);
   scene.add(sunLabel);
 
-  tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg", 2048), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
+  tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg"), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = tex;
   });
@@ -713,17 +713,57 @@
   const labels = [];
   const planetObjects = [];
 
-  function makeAtmosphereGlow(radius, colorHex) {
-    const geo = new THREE.SphereGeometry(radius * 1.12, 32, 32);
-    const mat = new THREE.MeshBasicMaterial({
-      color: colorHex,
-      transparent: true,
-      opacity: 0.16,
+  function fresnelMaterial(colorHex, power, intensity) {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        c: { value: new THREE.Color(colorHex) },
+        p: { value: power },
+        i: { value: intensity },
+      },
+      vertexShader: `
+        varying vec3 vN;
+        void main() {
+          vN = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 c;
+        uniform float p;
+        uniform float i;
+        varying vec3 vN;
+        void main() {
+          float f = pow(clamp(0.72 - dot(vN, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), p);
+          gl_FragColor = vec4(c, 1.0) * f * i;
+        }
+      `,
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
+      transparent: true,
       depthWrite: false,
     });
-    return new THREE.Mesh(geo, mat);
+  }
+
+  function makeAtmosphere(radius, colorHex, atmoColor, strength) {
+    const group = new THREE.Group();
+    const shellOuter = new THREE.Mesh(
+      new THREE.SphereGeometry(radius * 1.1, 40, 40),
+      fresnelMaterial(atmoColor, 3.2, 0.9 * strength)
+    );
+    const shellInner = new THREE.Mesh(
+      new THREE.SphereGeometry(radius * 1.045, 40, 40),
+      fresnelMaterial(0xffffff, 5.0, 0.3 * strength)
+    );
+    const halo1 = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: colorHex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.22, depthWrite: false })
+    );
+    halo1.scale.set(radius * 2.3, radius * 2.3, 1);
+    const halo2 = new THREE.Sprite(
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.1, depthWrite: false })
+    );
+    halo2.scale.set(radius * 3.1, radius * 3.1, 1);
+    group.add(shellOuter, shellInner, halo1, halo2);
+    return group;
   }
 
   const sharedGlowTex = makeGlowTexture();
@@ -765,21 +805,8 @@
     tilt.add(mesh);
     orbitGroup.add(tilt);
 
-    if (data.atmoGlow) tilt.add(makeAtmosphereGlow(data.radius, data.atmoGlow));
-
-    const halo = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: sharedGlowTex,
-        color: data.color,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        opacity: 0.5,
-        depthWrite: false,
-      })
-    );
-    halo.scale.set(data.radius * 2.8, data.radius * 2.8, 1);
-    halo.material.opacity = 0.38;
-    tilt.add(halo);
+    const atmoStrength = data.atmoGlow ? 1 : 0.22;
+    tilt.add(makeAtmosphere(data.radius, data.color, data.atmoGlow || data.color, atmoStrength));
 
     const hex = `#${data.color.toString(16).padStart(6, "0")}`;
     const label = makeLabel(data.name, Math.max(3.6, data.radius * 1.25), hex);
@@ -823,7 +850,7 @@
       moonPivot.add(moonMesh);
       moonMesh.position.x = m.dist;
       tilt.add(moonPivot);
-      if (m.atmoGlow) moonMesh.add(makeAtmosphereGlow(size, m.atmoGlow));
+      if (m.atmoGlow) moonMesh.add(makeAtmosphere(size, m.color, m.atmoGlow, 0.8));
       moons.push({ pivot: moonPivot, speed: m.speed });
     });
 
