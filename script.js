@@ -973,8 +973,8 @@
       tryLoadTexture(data.normalUrls, (tex) => {
         material.normalMap = tex;
         material.bumpMap = tex;
-        material.bumpScale = 0.03;
-        material.normalScale = new THREE.Vector2(0.85, 0.85);
+        material.bumpScale = 0.06;
+        material.normalScale = new THREE.Vector2(1.2, 1.2);
         material.needsUpdate = true;
       });
     }
@@ -1071,16 +1071,17 @@
     });
 
     if (data.clouds) {
-      const cloudMat = new THREE.MeshStandardMaterial({
-        map: makeCloudTexture(555),
+      const cloudMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
         transparent: true,
         depthWrite: false,
-        roughness: 1,
+        shininess: 4,
+        opacity: 0.92,
       });
-      const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 1.018, 64, 64), cloudMat);
+      const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 1.015, 64, 64), cloudMat);
       tilt.add(clouds);
       tryLoadTexture(data.cloudUrls, (tex) => {
-        cloudMat.map = tex;
+        cloudMat.alphaMap = tex;
         cloudMat.needsUpdate = true;
       });
       data.cloudsMesh = clouds;
