@@ -92,7 +92,7 @@
   }
 
   function radiusFromKm(rKm) {
-    return 2.2 * Math.sqrt(rKm / EARTH_R_KM);
+    return 6 * Math.sqrt(rKm / EARTH_R_KM);
   }
 
   const TJ = "https://threejs.org/examples/textures/planets/";
@@ -164,7 +164,7 @@
       atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
       desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
       fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
-      moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
+      moons3d: [{ name: "Lune", rKm: 1737, dist: 12.5, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
     },
     {
       name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a, atmoPhys: { h0: 11500, rho0: 0.02, H: 11100 },
@@ -177,8 +177,8 @@
       desc: "La planète rouge, hôte du plus haut volcan du système solaire, Olympus Mons (22 km).",
       fact: "À retenir : Mars abrite aussi le plus grand canyon, Valles Marineris (4 000 km de long).",
       moons3d: [
-        { name: "Phobos", rKm: 11, dist: 2.6, color: 0x8a7f76, speed: 2.4 },
-        { name: "Deimos", rKm: 6, dist: 3.4, color: 0x7d736b, speed: 1.2 },
+        { name: "Phobos", rKm: 11, dist: 7.1, color: 0x8a7f76, speed: 2.4 },
+        { name: "Deimos", rKm: 6, dist: 9.3, color: 0x7d736b, speed: 1.2 },
       ],
     },
     {
@@ -198,10 +198,10 @@
       desc: "La plus massive des planètes, célèbre pour sa Grande Tache rouge, une tempête géante.",
       fact: "À retenir : la Grande Tache rouge souffle depuis au moins 300 ans et pourrait engloutir la Terre.",
       moons3d: [
-        { name: "Io", rKm: 1821, dist: 10.4, color: 0xe0c25a, speed: 1.8 },
-        { name: "Europe", rKm: 1560, dist: 12.2, color: 0xdfe8ee, speed: 1.3 },
-        { name: "Ganymède", rKm: 2634, dist: 14.6, color: 0xa89a8a, speed: 0.95 },
-        { name: "Callisto", rKm: 2410, dist: 17.0, color: 0x5f5a54, speed: 0.7 },
+        { name: "Io", rKm: 1821, dist: 28.3, color: 0xe0c25a, speed: 1.8 },
+        { name: "Europe", rKm: 1560, dist: 33.3, color: 0xdfe8ee, speed: 1.3 },
+        { name: "Ganymède", rKm: 2634, dist: 39.8, color: 0xa89a8a, speed: 0.95 },
+        { name: "Callisto", rKm: 2410, dist: 46.4, color: 0x5f5a54, speed: 0.7 },
       ],
     },
     {
@@ -216,7 +216,7 @@
       atmo: "Hydrogène / Hélium", moons: "146 connues", discovered: "Antiquité",
       desc: "Célèbre pour ses anneaux de glace spectaculaires, visibles même avec une petite lunette.",
       fact: "À retenir : Saturne est si peu dense qu'elle flotterait sur l'eau.",
-      moons3d: [{ name: "Titan", rKm: 2574, dist: 9.6, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
+      moons3d: [{ name: "Titan", rKm: 2574, dist: 26.2, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
     },
     {
       name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0,
@@ -238,7 +238,7 @@
       atmo: "H₂ / Hélium / Méthane", moons: "28 connues", discovered: "1781 — W. Herschel",
       desc: "Géante de glace qui roule sur son orbite, son axe étant incliné à 98°.",
       fact: "À retenir : sur Uranus, chaque pôle connaît 42 ans de jour puis 42 ans de nuit.",
-      moons3d: [{ name: "Titania", rKm: 788, dist: 6.4, color: 0xb8c4cc, speed: 0.9 }],
+      moons3d: [{ name: "Titania", rKm: 788, dist: 17.5, color: 0xb8c4cc, speed: 0.9 }],
     },
     {
       name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, inc: 1.770, node: 131.784, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
@@ -255,7 +255,7 @@
       atmo: "H₂ / Hélium / Méthane", moons: "16 connues", discovered: "1846 — Le Verrier",
       desc: "La planète la plus éloignée du Soleil, balayée par les vents les plus rapides connus.",
       fact: "À retenir : les vents de Neptune atteignent 2 100 km/h, les plus rapides du système solaire.",
-      moons3d: [{ name: "Triton", rKm: 1353, dist: 6.2, color: 0xd8b8c8, speed: 1.1 }],
+      moons3d: [{ name: "Triton", rKm: 1353, dist: 16.9, color: 0xd8b8c8, speed: 1.1 }],
     },
   ];
 
@@ -1370,7 +1370,7 @@
   /* ---------- Tirs laser ---------- */
 
   const bolts = [];
-  const boltGeo = new THREE.CylinderGeometry(8e-7, 8e-7, 9e-6, 6);
+  const boltGeo = new THREE.CylinderGeometry(2.2e-6, 2.2e-6, 2.45e-5, 6);
   boltGeo.rotateX(Math.PI / 2);
   const boltMat = new THREE.MeshBasicMaterial({ color: 0xff4455, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
   for (let i = 0; i < 40; i++) {
@@ -1380,7 +1380,7 @@
     bolts.push({ mesh: b, vel: new THREE.Vector3(), life: 0 });
   }
   const flashes = [];
-  const flashGeo = new THREE.SphereGeometry(1.5e-5, 10, 10);
+  const flashGeo = new THREE.SphereGeometry(4.1e-5, 10, 10);
   for (let i = 0; i < 12; i++) {
     const fm = new THREE.MeshBasicMaterial({ color: 0xffaa33, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false });
     const f = new THREE.Mesh(flashGeo, fm);
@@ -1411,7 +1411,7 @@
     tmpV.set(boltSide * shipLen * 0.55, 0, shipLen * 0.5).applyQuaternion(rocket.quaternion);
     b.mesh.position.copy(rocket.position).add(tmpV);
     b.mesh.quaternion.copy(rocket.quaternion);
-    b.vel.copy(fwd).multiplyScalar(0.0006).add(rocketVel);
+    b.vel.copy(fwd).multiplyScalar(0.00164 + rocketVel.length()).add(rocketVel);
     b.life = 8;
     b.mesh.visible = true;
     camShake = 1;
@@ -1506,7 +1506,7 @@
     };
     tryLoadXwing(XWING_URLS);
   }
-  rocket.position.set(40, 4, 0);
+  rocket.position.set(50, 5, 0);
   scene.add(rocket);
   shipBounds.setFromObject(rocket);
 
@@ -1522,7 +1522,7 @@
   const heatGlow = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: makeGlowTexture(), color: 0xff5522, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false })
   );
-  heatGlow.scale.set(0.002, 0.002, 1);
+  heatGlow.scale.set(0.00545, 0.00545, 1);
   scene.add(heatGlow);
   let atmoRho = 0;
   let atmoAltSU = Infinity;
@@ -1536,11 +1536,11 @@
   let earthObj = null;
   const tileCache = new Map();
   const terrainLevels = [
-    { zoom: 15, s: 0.0005, mesh: null, sample: null },
-    { zoom: 14, s: 0.002, mesh: null, sample: null },
-    { zoom: 12, s: 0.008, mesh: null, sample: null },
-    { zoom: 10, s: 0.03, mesh: null, sample: null },
-    { zoom: 8, s: 0.1, mesh: null, sample: null },
+    { zoom: 15, s: 0.00136, mesh: null, sample: null },
+    { zoom: 14, s: 0.00545, mesh: null, sample: null },
+    { zoom: 12, s: 0.0218, mesh: null, sample: null },
+    { zoom: 10, s: 0.0818, mesh: null, sample: null },
+    { zoom: 8, s: 0.273, mesh: null, sample: null },
   ];
 
   function loadTile(z, x, y) {
@@ -1606,11 +1606,11 @@
     const d = t.data;
     const idx = (py * 256 + px) * 4;
     const h = d[idx] * 65536 + d[idx + 1] * 256 + d[idx + 2] / 256 - 32768;
-    return SCALE.toSU(Math.max(0, h)) * 2;
+    return SCALE.toSU(Math.max(0, h)) * 3;
   }
 
   function terrainBiomeColor(hSU, ny, x, z, out) {
-    const hM = (hSU * SCALE.M_PER_SU) / 2;
+    const hM = (hSU * SCALE.M_PER_SU) / 3;
     const forest = Math.abs((Math.sin(x * 123.7 + z * 317.3) * 43758.5453) % 1);
     if (hM > 2200 || (hM > 1500 && ny > 0.72)) out.setRGB(0.93, 0.95, 0.97);
     else if (ny < 0.62) out.setRGB(0.36, 0.35, 0.37);
@@ -1679,10 +1679,10 @@
       loadLevel(lv, lat, lon);
     }
     const water = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.03, 0.03, 1, 1).rotateX(-Math.PI / 2),
+      new THREE.PlaneGeometry(0.0818, 0.0818, 1, 1).rotateX(-Math.PI / 2),
       new THREE.MeshStandardMaterial({ color: 0x123f66, roughness: 0.18, metalness: 0.35, transparent: true, opacity: 0.86 })
     );
-    water.position.y = 5e-7;
+    water.position.y = 1.36e-6;
     terrain.add(water);
     terrain.position.copy(center);
     terrain.quaternion.setFromUnitVectors(upAxis, dir);
@@ -1701,7 +1701,7 @@
     if (!earthObj) return;
     simPos(earthObj.mesh, tmpC);
     const alt = rocket.position.distanceTo(tmpC) - earthObj.data.radius;
-    if (alt > 0.12) {
+    if (alt > 0.327) {
       if (terrain) { world.remove(terrain); terrain = null; }
       return;
     }
@@ -1933,7 +1933,7 @@
       rocketCam.radius = 1.0;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
-      camera.near = 0.000005;
+      camera.near = 0.0000136;
       camera.updateProjectionMatrix();
       camSmooth.copy(camera.position);
       if (focused) resetView();
@@ -2092,16 +2092,16 @@
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       let thrustScale = 1;
-      let vMax = 1.727;
+      let vMax = 4.71;
       if (atmoBody && isFinite(atmoAltSU)) {
         const hM = SCALE.toM(Math.max(0, atmoAltSU));
-        if (hM < 500) { thrustScale = 3.5e-6; vMax = 0.0002; }
-        else if (hM < 5000) { thrustScale = 2e-5; vMax = 0.001; }
-        else if (hM < 20000) { thrustScale = 1e-4; vMax = 0.02; }
+        if (hM < 500) { thrustScale = 3.5e-6; vMax = 0.000545; }
+        else if (hM < 5000) { thrustScale = 2e-5; vMax = 0.00273; }
+        else if (hM < 20000) { thrustScale = 1e-4; vMax = 0.0545; }
       }
       const effThrust = THRUST_SU * thrustScale;
       if (keys.KeyW) rocketVel.addScaledVector(fwd, effThrust * delta);
-      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -effThrust * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
+      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -effThrust * delta); if (rocketVel.length() < 0.41) rocketVel.set(0, 0, 0); }
       tmpV.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       if (keys.Space) rocketVel.addScaledVector(tmpV, effThrust * delta);
       if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -effThrust * delta);
@@ -2120,7 +2120,7 @@
         simPos(p.mesh, tmpV);
         const d2 = Math.max(0.01, rocket.position.distanceToSquared(tmpV));
         const d = Math.sqrt(d2);
-        if (d > p.data.radius + 0.000005) {
+        if (d > p.data.radius + 0.0000136) {
           tmpV2.subVectors(tmpV, rocket.position).normalize();
           rocketVel.addScaledVector(tmpV2, (p.data.mu / d2) * delta);
         }
@@ -2128,7 +2128,7 @@
           simPos(m.mesh, tmpC);
           const md2 = Math.max(0.01, rocket.position.distanceToSquared(tmpC));
           const md = Math.sqrt(md2);
-          if (md > 0.000005) {
+          if (md > 0.0000136) {
             tmpV2.subVectors(tmpC, rocket.position).normalize();
             rocketVel.addScaledVector(tmpV2, (m.mu / md2) * delta);
           }
@@ -2189,19 +2189,20 @@
 
       for (const p of planetObjects) {
         simPos(p.mesh, tmpC);
-        collideSegment(tmpC, p.data.radius + 0.000002);
+        collideSegment(tmpC, p.data.radius + 0.0000055);
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.06);
 
       // Terrain local (Terre) + atterrissage
       ensureTerrain();
+      if (earthObj) earthObj.tilt.visible = !terrain || !(isFinite(atmoAltSU) && atmoAltSU < SCALE.toSU(15000));
       if (terrain) {
         const ep = earthObj;
         simPos(ep.mesh, tmpC);
         const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
         tmpQ.copy(terrain.quaternion).invert();
         const lp = tmpV2.copy(rocket.position).sub(terrainCenter).applyQuaternion(tmpQ);
-        const hu = (terrainSample ? terrainSample(lp.x, lp.z) : 0) + 1.5e-6;
+        const hu = (terrainSample ? terrainSample(lp.x, lp.z) : 0) + 4.1e-6;
         if (lp.y < hu) {
           rocket.position.addScaledVector(dir, hu - lp.y);
           const vn = rocketVel.dot(dir);
@@ -2227,17 +2228,17 @@
       const shipWp = rocket.getWorldPosition(tmpV2);
       const camT = clock.elapsedTime;
       camShake *= Math.exp(-5 * delta);
-      const speedStretch = Math.min(rocketVel.length(), 1.727) * 5e-7;
-      const swayR = Math.sin(camT * 0.9) * 2.5e-7 + Math.sin(camT * 2.3 + 1.7) * 1.2e-7;
-      const swayU = Math.sin(camT * 1.4 + 0.6) * 1.8e-7 + Math.sin(camT * 3.1) * 0.8e-7;
-      const shakeR = camShake * Math.sin(camT * 43) * 3e-7;
-      const shakeU = camShake * Math.cos(camT * 51) * 3e-7;
+      const speedStretch = Math.min(rocketVel.length(), 4.71) * 1.36e-6;
+      const swayR = Math.sin(camT * 0.9) * 6.8e-7 + Math.sin(camT * 2.3 + 1.7) * 3.3e-7;
+      const swayU = Math.sin(camT * 1.4 + 0.6) * 4.9e-7 + Math.sin(camT * 3.1) * 2.2e-7;
+      const shakeR = camShake * Math.sin(camT * 43) * 8.2e-7;
+      const shakeU = camShake * Math.cos(camT * 51) * 8.2e-7;
       camera.position.copy(shipWp)
-        .addScaledVector(fwd, -0.000012 - speedStretch)
-        .addScaledVector(tmpUp, 0.0000015 + swayU + shakeU)
+        .addScaledVector(fwd, -0.0000327 - speedStretch)
+        .addScaledVector(tmpUp, 0.0000041 + swayU + shakeU)
         .addScaledVector(camRight, swayR + shakeR);
       camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0002));
+      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.000545));
     }
 
     for (const b of bolts) {
@@ -2248,7 +2249,7 @@
       if (!hit) {
         for (const p of planetObjects) {
           simPos(p.mesh, tmpC);
-          const rr = p.data.radius + 0.05;
+          const rr = p.data.radius + 0.136;
           if (b.mesh.position.distanceToSquared(tmpC) < rr * rr) { hit = true; break; }
         }
       }
@@ -2287,7 +2288,10 @@
       perfHud.textContent = `${fps} fps • ${renderer.info.render.calls} calls • ${renderer.info.render.triangles} tri`;
     }
 
-    if (!rocketMode) applyOrbit();
+    if (!rocketMode) {
+      applyOrbit();
+      if (earthObj) earthObj.tilt.visible = true;
+    }
 
     renderer.render(scene, camera);
   }
