@@ -32,10 +32,10 @@
   const M_LOOK_AHEAD = SCALE.toSU(200);
   const M_SWAY = SCALE.toSU(0.4);
   const M_NEAR = SCALE.toSU(5);
-  const M_BOLT_R = SCALE.toSU(0.5);
-  const M_BOLT_LEN = SCALE.toSU(9);
-  const M_BOLT_V = SCALE.velSU(1740);
-  const M_FLASH = SCALE.toSU(15);
+  const M_BOLT_R = SCALE.toSU(1.2);
+  const M_BOLT_LEN = SCALE.toSU(30);
+  const M_BOLT_V = SCALE.velSU(3480);
+  const M_FLASH = SCALE.toSU(25);
   const M_HEAT = SCALE.toSU(3000);
   const M_LAND = SCALE.toSU(1.6);
   const M_COL = SCALE.toSU(3);
@@ -1425,7 +1425,7 @@
     tmpV.set(boltSide * shipLen * 0.55, 0, shipLen * 0.5).applyQuaternion(rocket.quaternion);
     b.mesh.position.copy(rocket.position).add(tmpV);
     b.mesh.quaternion.copy(rocket.quaternion);
-    b.vel.copy(fwd).multiplyScalar(M_BOLT_V + rocketVel.length()).add(rocketVel);
+    b.vel.copy(fwd).multiplyScalar(M_BOLT_V + Math.max(0, rocketVel.dot(fwd)));
     b.life = 8;
     b.mesh.visible = true;
     camShake = 1;
@@ -1693,7 +1693,7 @@
     Promise.all(loads).then((tiles) => {
       if (!terrain || !lv.mesh || tiles.some((t) => !t)) return;
       const base = (x, z) => demHeight(x, z, tiles, tx, ty, lv.zoom, lat, lon, lv.s);
-      lv.sample = lv.zoom === 15 ? (x, z) => base(x, z) + procHeight(x, z, lv.s) * 0.16 : base;
+      lv.sample = (x, z) => base(x, z) + procHeight(x, z, lv.s) * 0.16;
       const pos = lv.mesh.geometry.attributes.position;
       for (let i = 0; i < pos.count; i++) pos.setY(i, lv.sample(pos.getX(i), pos.getZ(i)));
       pos.needsUpdate = true;
@@ -1811,11 +1811,11 @@
 
   const orbit = {
     target: new THREE.Vector3(0, 0, 0),
-    radius: 900,
+    radius: 1400,
     theta: 0,
     phi: 1.22,
     desiredTarget: new THREE.Vector3(0, 0, 0),
-    desiredRadius: 900,
+    desiredRadius: 1400,
     desiredTheta: 0,
     desiredPhi: 1.22,
   };
@@ -1878,7 +1878,7 @@
     e.preventDefault();
     if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
-      orbit.desiredRadius = Math.max(40, Math.min(5000, orbit.desiredRadius));
+      orbit.desiredRadius = Math.max(40, Math.min(8000, orbit.desiredRadius));
     }
   }, { passive: false });
 
@@ -1949,7 +1949,7 @@
   function resetView() {
     focused = null;
     orbit.desiredTarget.copy(origin).negate();
-    orbit.desiredRadius = 900;
+    orbit.desiredRadius = 1400;
     document.querySelectorAll(".planet-btn").forEach((b) => b.classList.remove("active"));
     infoPanel.classList.add("hidden");
   }
@@ -2071,7 +2071,7 @@
     const delta = Math.min(clock.getDelta(), 1 / 30);
 
     if (!paused) {
-      const orbitTime = rocketMode ? 1e-4 : 1;
+      const orbitTime = rocketMode || focused ? 1e-4 : 0.02;
       for (const p of planetObjects) {
         p.angle += delta * speedMultiplier * orbitTime * 0.9 * (365.25 / p.data.periodDays);
         planetPosition(p, p.angle, tmpPos);
@@ -2150,14 +2150,14 @@
       let vMax = SCALE.toSU(5000000);
       if (atmoBody && isFinite(atmoAltSU)) {
         const hM = SCALE.toM(Math.max(0, atmoAltSU));
-        if (hM < 3000) { thrustScale = 1.7e-5; vMax = SCALE.toSU(212); }
-        else if (hM < 30000) { thrustScale = 1e-4; vMax = SCALE.toSU(1000); }
-        else if (hM < 300000) { thrustScale = 5e-4; vMax = SCALE.toSU(10600); }
-        else if (hM < 3000000) { thrustScale = 5e-3; vMax = SCALE.toSU(106000); }
+        if (hM < 3000) { thrustScale = 8.5e-5; vMax = SCALE.toSU(212); }
+        else if (hM < 30000) { thrustScale = 5e-4; vMax = SCALE.toSU(1000); }
+        else if (hM < 300000) { thrustScale = 2.5e-3; vMax = SCALE.toSU(10600); }
+        else if (hM < 3000000) { thrustScale = 2.5e-2; vMax = SCALE.toSU(106000); }
       }
       const effThrust = THRUST_SU * thrustScale;
       if (keys.KeyW) rocketVel.addScaledVector(fwd, effThrust * delta);
-      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -effThrust * delta); if (rocketVel.length() < SCALE.toSU(434000)) rocketVel.set(0, 0, 0); }
+      if (keys.KeyS) rocketVel.addScaledVector(fwd, -effThrust * 0.25 * delta);
       tmpV.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       if (keys.Space) rocketVel.addScaledVector(tmpV, effThrust * delta);
       if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -effThrust * delta);
@@ -2245,10 +2245,10 @@
 
       for (const p of planetObjects) {
         simPos(p.mesh, tmpC);
-        collideSegment(tmpC, p.data.radius + Math.max(M_COL, rocketVel.length() * 0.05));
+        collideSegment(tmpC, p.data.radius + Math.min(SCALE.toSU(500), Math.max(M_COL, rocketVel.length() * 0.02)));
         for (const m of p.moons) {
           simPos(m.mesh, tmpC);
-          collideSegment(tmpC, m.radius + Math.max(M_COL, rocketVel.length() * 0.05));
+          collideSegment(tmpC, m.radius + Math.min(SCALE.toSU(500), Math.max(M_COL, rocketVel.length() * 0.02)));
         }
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.06);
@@ -2264,10 +2264,11 @@
         const lp = tmpV2.copy(rocket.position).sub(terrainCenter).applyQuaternion(tmpQ);
         const hu = (terrainSample ? terrainSample(lp.x, lp.z) : 0) + M_LAND;
         if (lp.y < hu) {
-          rocket.position.addScaledVector(dir, hu - lp.y);
+          const dy = hu - lp.y;
+          rocket.position.addScaledVector(dir, dy * Math.min(1, 10 * delta));
           const vn = rocketVel.dot(dir);
-          if (vn < 0) rocketVel.addScaledVector(dir, -vn);
-          if (rocketVel.length() < 0.02) rocketVel.set(0, 0, 0);
+          if (vn < 0) rocketVel.addScaledVector(dir, -vn * Math.min(1, 8 * delta));
+          if (rocketVel.length() < SCALE.toSU(50)) rocketVel.set(0, 0, 0);
         }
       }
 

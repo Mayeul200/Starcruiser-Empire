@@ -12,7 +12,7 @@ window.SCALE = {
   SHIP: {
     lengthM: 4.5,       // chasseur léger
     massKg: 10000,
-    thrustN: 1.16e10,     // ÷5 : ~1.16e6 m/s²
+    thrustN: 2.32e9,      // ÷5 again : ~2.3e5 m/s²
     dragAreaM2: 8,
     dragCoef: 0.5,
   },
