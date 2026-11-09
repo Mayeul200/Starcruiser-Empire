@@ -2178,10 +2178,13 @@
 
     const dCam = tmpV.copy(camera.position).sub(prevCam);
     prevCam.copy(camera.position);
-    origin.add(dCam);
+    if (rocketMode) origin.copy(rocket.position);
+    else origin.add(dCam);
     world.position.copy(origin).negate();
-    orbit.target.sub(dCam);
-    orbit.desiredTarget.sub(dCam);
+    if (!rocketMode) {
+      orbit.target.sub(dCam);
+      orbit.desiredTarget.sub(dCam);
+    }
 
     renderer.render(scene, camera);
   }
@@ -2195,6 +2198,6 @@
   for (const c of [...scene.children]) if (c !== skySphere) world.add(c);
   scene.add(world);
   prevCam = camera.position.clone();
-  window.__scene = scene; window.__world = world; window.__origin = origin;
+  window.__scene = scene; window.__world = world; window.__origin = origin; window.__cam = camera;
   animate();
 })();
