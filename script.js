@@ -944,7 +944,7 @@
     return { mesh, uniform };
   }
 
-  function makeAtmosphere(radius, colorHex, atmoColor, strength) {
+  function makeAtmosphere(radius, colorHex, atmoColor, strength, skipOuter) {
     const group = new THREE.Group();
     const shellOuter = new THREE.Mesh(
       new THREE.SphereGeometry(radius * 1.1, 40, 40),
@@ -962,7 +962,8 @@
       new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.1 * strength, depthWrite: false })
     );
     halo2.scale.set(radius * 3.1, radius * 3.1, 1);
-    group.add(shellOuter, shellInner, halo1, halo2);
+    if (!skipOuter) group.add(shellOuter);
+    group.add(shellInner, halo1, halo2);
     return group;
   }
 
@@ -1031,7 +1032,7 @@
     orbitGroup.add(tilt);
 
     const atmoStrength = data.atmoGlow ? 1 : 0.22;
-    tilt.add(makeAtmosphere(data.radius, data.color, data.atmoGlow || data.color, atmoStrength));
+    tilt.add(makeAtmosphere(data.radius, data.color, data.atmoGlow || data.color, atmoStrength, data.name === "Terre"));
 
     if (data.name === "Terre") {
       const scatter = makeScatterAtmosphere(data.radius);
@@ -1604,20 +1605,20 @@
   }
 
   function buildTerrain(center, dir) {
-    if (terrain) scene.remove(terrain);
+    if (terrain) world.remove(terrain);
     terrain = new THREE.Group();
     terrainCenter.copy(center);
     const lat = Math.asin(dir.y);
     const lon = Math.atan2(dir.x, dir.z);
     for (const lv of terrainLevels) {
       lv.sample = (x, z) => procHeight(x, z, lv.s);
-      lv.mesh = new THREE.Mesh(makeTerrainGeo(lv.s), new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1 }));
+      lv.mesh = new THREE.Mesh(makeTerrainGeo(lv.s), new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
       terrain.add(lv.mesh);
       loadLevel(lv, lat, lon);
     }
     terrain.position.copy(center);
     terrain.quaternion.setFromUnitVectors(upAxis, dir);
-    scene.add(terrain);
+    world.add(terrain);
     terrainSample = (x, z) => {
       const r = Math.hypot(x, z);
       for (const lv of terrainLevels) {
@@ -1633,7 +1634,7 @@
     simPos(earthObj.mesh, tmpC);
     const alt = rocket.position.distanceTo(tmpC) - earthObj.data.radius;
     if (alt > 0.12) {
-      if (terrain) { scene.remove(terrain); terrain = null; }
+      if (terrain) { world.remove(terrain); terrain = null; }
       return;
     }
     const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
@@ -2138,9 +2139,9 @@
       world.position.copy(origin).negate();
       rocket.updateMatrixWorld();
       const shipWp = rocket.getWorldPosition(tmpV2);
-      camera.position.copy(shipWp).addScaledVector(fwd, -0.00005).addScaledVector(tmpUp, 0.00001);
+      camera.position.copy(shipWp).addScaledVector(fwd, -0.00003).addScaledVector(tmpUp, 0.000006);
       camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0005));
+      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0003));
     }
 
     for (const b of bolts) {

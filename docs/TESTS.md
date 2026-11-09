@@ -80,3 +80,5 @@ Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 plan�
 - **v114** : fix oscillation « double système » en mode vaisseau — boucle de rétroaction origin<->caméra ; maintenant `origin = position du vaisseau` en mode 🚀 (0 saut mesuré sur 30 frames en headless, 0 erreur). Test headless standard OK.
 
 - **v115** : fix caméra mode vaisseau — l'offset était scalé par le vaisseau (7,8e-6) via localToWorld → caméra dans le vaisseau ; maintenant offset en unités monde + origin synchronisé AVANT la caméra. Vérifié en headless : vaisseau visible à l'écran en mode R (NDC centré), 0 erreur JS, 8 planètes.
+
+- **v116** : terrain ajouté à `world` (plus de « planète fantôme » décalée) + polygonOffset anti z-fighting ; coquille fresnel externe retirée sur Terre (déjà scatter) → moins de scintillement ; caméra vaisseau -0.00003. Tests headless OK : 8 planètes, 0 erreur, vaisseau centré en mode R.
