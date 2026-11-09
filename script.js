@@ -36,7 +36,7 @@
   camera.position.set(0, 95, 300);
 
   scene.add(new THREE.AmbientLight(0x334466, 1.1));
-  const sunLight = new THREE.PointLight(0xfff3d6, 4.5, 0, 0);
+  const sunLight = new THREE.PointLight(0xfff3d6, 2.2, 0, 0);
   scene.add(sunLight);
 
   /* ============================================================
@@ -1877,9 +1877,8 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.14, -0.9);
-      rocket.updateMatrixWorld();
-      camera.position.copy(rocket.localToWorld(camLocal));
+      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      camera.position.copy(rocket.position).addScaledVector(fwd, -0.0045).addScaledVector(tmpUp, 0.0007);
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
