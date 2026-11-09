@@ -117,8 +117,10 @@
     {
       name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
       texUrls: [...TEX8("earth_daymap"), TJ + "earth_atmos_2048.jpg", ...TEX2("2k_earth_daymap.jpg")],
-      cloudUrls: [TJ + "earth_clouds_1024.png"],
+      cloudUrls: [UW("7/7a", "Solarsystemscope_texture_8k_earth_clouds.jpg"), TJ + "earth_clouds_1024.png"],
       nightUrls: [...TEX8("earth_nightmap"), TJ + "earth_lights_2048.png"],
+      normalUrls: [TJ + "earth_normal_2048.jpg"],
+      specUrls: [TJ + "earth_specular_2048.jpg"],
       proc: { type: "earth", base: "#14508f", land: "#3f9e5a", desert: "#c2a86b", ice: "#eef4f8" },
       type: "Tellurique", typeClass: "tellurique",
       diameter: "12 756 km", mass: "5,97 × 10²⁴ kg", distance: "149,6 M km (1 UA)",
@@ -864,6 +866,47 @@
     });
   }
 
+  function makeScatterAtmosphere(radius) {
+    const uniform = { value: new THREE.Vector3(0, 0, -1) };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { uSunDir: uniform },
+      vertexShader: `
+        varying vec3 vWorldN;
+        varying vec3 vWorldPos;
+        void main() {
+          vWorldN = normalize(mat3(modelMatrix) * normal);
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uSunDir;
+        varying vec3 vWorldN;
+        varying vec3 vWorldPos;
+        void main() {
+          vec3 N = normalize(vWorldN);
+          vec3 V = normalize(cameraPosition - vWorldPos);
+          float rim = pow(clamp(1.0 - dot(N, V), 0.0, 1.0), 3.2);
+          float day = dot(N, normalize(uSunDir));
+          float lit = smoothstep(-0.25, 0.45, day);
+          vec3 rayleigh = vec3(0.18, 0.38, 0.85);
+          vec3 mie = vec3(0.55, 0.58, 0.62);
+          float mu = dot(V, normalize(uSunDir));
+          float miePhase = 1.5 * pow(max(mu, 0.0), 8.0) * 0.05 + 0.02;
+          vec3 col = rayleigh * rim * (0.25 + 0.75 * lit) + mie * miePhase * lit * 0.6;
+          gl_FragColor = vec4(col, rim * (0.25 + 0.75 * lit));
+        }
+      `,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.07, 48, 48), mat);
+    return { mesh, uniform };
+  }
+
   function makeAtmosphere(radius, colorHex, atmoColor, strength) {
     const group = new THREE.Group();
     const shellOuter = new THREE.Mesh(
@@ -912,10 +955,42 @@
     });
 
     if (data.nightUrls) {
+      material.onBeforeCompile = (shader) => {
+        shader.uniforms.uSunDir = { value: new THREE.Vector3(0, 0, -1) };
+        material.userData.uSun = shader.uniforms.uSunDir;
+        shader.vertexShader = shader.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vWorldN;")
+          .replace("#include <fog_vertex>", "#include <fog_vertex>\nvWorldN = normalize(mat3(modelMatrix) * objectNormal);");
+        shader.fragmentShader = shader.fragmentShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vWorldN;\nuniform vec3 uSunDir;")
+          .replace(
+            "#include <emissivemap_fragment>",
+            "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= 1.0 - smoothstep(-0.15, 0.25, dot(normalize(vWorldN), normalize(uSunDir)));"
+          );
+      };
       tryLoadTexture(data.nightUrls, (tex) => {
         material.emissiveMap = tex;
         material.emissive = new THREE.Color(0xffffff);
-        material.emissiveIntensity = 0.55;
+        material.emissiveIntensity = 1.1;
+        material.needsUpdate = true;
+      });
+    }
+
+    if (data.normalUrls) {
+      tryLoadTexture(data.normalUrls, (tex) => {
+        material.normalMap = tex;
+        material.bumpMap = tex;
+        material.bumpScale = 0.03;
+        material.normalScale = new THREE.Vector2(0.85, 0.85);
+        material.needsUpdate = true;
+      });
+    }
+
+    if (data.specUrls) {
+      tryLoadTexture(data.specUrls, (tex) => {
+        material.specularMap = tex;
+        material.specular = new THREE.Color(0x9fc4e8);
+        material.roughness = 0.55;
         material.needsUpdate = true;
       });
     }
@@ -927,6 +1002,14 @@
 
     const atmoStrength = data.atmoGlow ? 1 : 0.22;
     tilt.add(makeAtmosphere(data.radius, data.color, data.atmoGlow || data.color, atmoStrength));
+
+    if (data.name === "Terre") {
+      const scatter = makeScatterAtmosphere(data.radius);
+      tilt.add(scatter.mesh);
+      data.scatterUniform = scatter.uniform;
+      data.self = mesh;
+      data.mat = material;
+    }
 
     const hex = `#${data.color.toString(16).padStart(6, "0")}`;
     const label = makeLabel(data.name, Math.max(3.6, data.radius * 1.25), hex);
@@ -1001,7 +1084,7 @@
         depthWrite: false,
         roughness: 1,
       });
-      const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 1.03, 48, 48), cloudMat);
+      const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 1.018, 64, 64), cloudMat);
       tilt.add(clouds);
       tryLoadTexture(data.cloudUrls, (tex) => {
         cloudMat.map = tex;
@@ -1625,6 +1708,16 @@
 
     stars.rotation.y += delta * 0.004;
     nebulae.rotation.y += delta * 0.002;
+
+    for (const p of planetObjects) {
+      if (p.data.scatterUniform && p.data.self) {
+        p.data.self.getWorldPosition(tmpV);
+        p.data.scatterUniform.value.copy(tmpV).normalize().negate();
+        if (p.data.mat && p.data.mat.userData.uSun) {
+          p.data.mat.userData.uSun.value.copy(p.data.scatterUniform.value);
+        }
+      }
+    }
 
     if (focused && !rocketMode) {
       const pos = new THREE.Vector3();
