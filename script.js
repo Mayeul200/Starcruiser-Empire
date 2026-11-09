@@ -1176,7 +1176,7 @@
     const flameMat = new THREE.MeshBasicMaterial({ color: 0x66ccff, blending: THREE.AdditiveBlending, transparent: true, opacity: 1, depthWrite: false });
     for (const sx of [-1, 1]) {
       for (const sy of [-1, 1]) {
-        const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
+        const f = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.16, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
         f.position.set(sx * 0.16, sy * 0.18, -0.28);
         f.visible = false;
@@ -1249,6 +1249,15 @@
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
             flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.02);
+          }
+        }
+        const coverMat = new THREE.MeshBasicMaterial({ color: 0x05080f, depthWrite: true });
+        for (const sxn of [-1, 1]) {
+          for (const syn of [-1, 1]) {
+            const disc = new THREE.Mesh(new THREE.CircleGeometry(Math.max(fx, fy) * 0.9, 16), coverMat);
+            disc.position.set(sxn * fx, syn * fy, box2.min.z - 0.004);
+            disc.rotation.y = Math.PI;
+            rocket.add(disc);
           }
         }
         rocket.add(flame);
