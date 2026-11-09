@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.16, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.16, sy * 0.18, -0.59);
+        f.position.set(sx * 0.16, sy * 0.18, -0.65);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1231,12 +1231,21 @@
         model.position.z -= box3.max.z;
         const boxF = new THREE.Box3().setFromObject(model);
         const modelLen = boxF.max.z - boxF.min.z;
+        const hideMesh = (o) => {
+          if (!o.material) return;
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          for (const m of mats) {
+            m.transparent = true;
+            m.opacity = 0;
+            m.depthWrite = false;
+          }
+        };
         model.traverse((o) => {
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
           if (mb.max.z < boxF.min.z + modelLen * 0.18) {
-            o.visible = false;
+            hideMesh(o);
             return;
           }
           const atBack = mb.max.z < boxF.min.z + modelLen * 0.65;
@@ -1246,7 +1255,7 @@
             const m = Array.isArray(o.material) ? o.material[0] : o.material;
             if (m.color) purple = m.color.b > 0.25 && m.color.b > m.color.r && m.color.b > m.color.g;
           }
-          if (atBack && (thinZ || purple)) o.visible = false;
+          if (atBack && (thinZ || purple)) hideMesh(o);
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
@@ -1255,7 +1264,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.04);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.1);
           }
         }
         rocket.add(flame);
