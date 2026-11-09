@@ -1206,6 +1206,10 @@
       if (!urls.length) return;
       gltfLoader.load(urls[0], (gltf) => {
         const model = gltf.scene;
+        const box0 = new THREE.Box3().setFromObject(model);
+        const size0 = box0.getSize(new THREE.Vector3());
+        if (size0.y >= size0.x && size0.y >= size0.z) model.rotation.x = Math.PI / 2;
+        else if (size0.x > size0.y && size0.x > size0.z) model.rotation.y = -Math.PI / 2;
         model.traverse((o) => {
           if (o.isMesh && o.material) {
             const mats = Array.isArray(o.material) ? o.material : [o.material];
