@@ -6,14 +6,14 @@
    ============================================ */
 window.SCALE = {
   // 1 unité scène = 6371 km / 2.2 SU = 2 895 909 m
-  M_PER_SU: 6371000 / 16,
+  M_PER_SU: 6371000 / 32,
   G: 6.674e-11,
 
   SHIP: {
-    lengthM: 12.5,      // X-Wing T-65 réel
+    lengthM: 4.5,       // chasseur léger
     massKg: 10000,
-    thrustN: 5.8e10,      // ~2 SU/s² (5 800 km/s²)
-    dragAreaM2: 20,
+    thrustN: 1.16e10,     // ÷5 : ~1.16e6 m/s²
+    dragAreaM2: 8,
     dragCoef: 0.5,
   },
 

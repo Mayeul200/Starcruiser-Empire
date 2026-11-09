@@ -27,19 +27,19 @@
     return;
   }
 
-  const M_CAM_BACK = SCALE.toSU(35);
-  const M_CAM_UP = SCALE.toSU(4);
-  const M_LOOK_AHEAD = SCALE.toSU(580);
-  const M_SWAY = SCALE.toSU(1);
-  const M_NEAR = SCALE.toSU(14.5);
-  const M_BOLT_R = SCALE.toSU(1.2);
-  const M_BOLT_LEN = SCALE.toSU(26);
+  const M_CAM_BACK = SCALE.toSU(12);
+  const M_CAM_UP = SCALE.toSU(1.5);
+  const M_LOOK_AHEAD = SCALE.toSU(200);
+  const M_SWAY = SCALE.toSU(0.4);
+  const M_NEAR = SCALE.toSU(5);
+  const M_BOLT_R = SCALE.toSU(0.5);
+  const M_BOLT_LEN = SCALE.toSU(9);
   const M_BOLT_V = SCALE.velSU(1740);
-  const M_FLASH = SCALE.toSU(43);
+  const M_FLASH = SCALE.toSU(15);
   const M_HEAT = SCALE.toSU(3000);
-  const M_LAND = SCALE.toSU(4.3);
-  const M_COL = SCALE.toSU(6);
-  const M_GGRAV = SCALE.toSU(14.5);
+  const M_LAND = SCALE.toSU(1.6);
+  const M_COL = SCALE.toSU(3);
+  const M_GGRAV = SCALE.toSU(7);
 
   const canvas = document.getElementById("scene");
   if (!canvas) {
@@ -82,7 +82,7 @@
     out.add(origin);
     return out;
   }
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 9000);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 15000);
   camera.position.set(0, 95, 300);
 
   scene.add(new THREE.AmbientLight(0x334466, 1.1));
@@ -97,16 +97,16 @@
      - orbites ELLIPTIQUES : vraies excentricités + périhélie
      ============================================================ */
 
-  const SUN_RADIUS = 20;
+  const SUN_RADIUS = 40;
   const EARTH_R_KM = 6371;
   const INC_EXAGGERATION = 3;
 
   function orbitFromAU(au) {
-    return 80 * Math.pow(au, 0.75);
+    return 150 * Math.pow(au, 0.85);
   }
 
   function radiusFromKm(rKm) {
-    return 16 * Math.sqrt(rKm / EARTH_R_KM);
+    return 32 * Math.sqrt(rKm / EARTH_R_KM);
   }
 
   const TJ = "https://threejs.org/examples/textures/planets/";
@@ -178,7 +178,7 @@
       atmo: "Azote / Oxygène", moons: "1 (la Lune)", discovered: "—",
       desc: "Seule planète connue à abriter la vie, avec de l'eau liquide couvrant 71 % de sa surface.",
       fact: "À retenir : la Lune s'éloigne de la Terre de 3,8 cm chaque année.",
-      moons3d: [{ name: "Lune", rKm: 1737, dist: 33.3, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
+      moons3d: [{ name: "Lune", rKm: 1737, dist: 66.6, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
     },
     {
       name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a, atmoPhys: { h0: 11500, rho0: 0.02, H: 11100 },
@@ -191,8 +191,8 @@
       desc: "La planète rouge, hôte du plus haut volcan du système solaire, Olympus Mons (22 km).",
       fact: "À retenir : Mars abrite aussi le plus grand canyon, Valles Marineris (4 000 km de long).",
       moons3d: [
-        { name: "Phobos", rKm: 11, dist: 18.9, color: 0x8a7f76, speed: 2.4 },
-        { name: "Deimos", rKm: 6, dist: 24.8, color: 0x7d736b, speed: 1.2 },
+        { name: "Phobos", rKm: 11, dist: 37.8, color: 0x8a7f76, speed: 2.4 },
+        { name: "Deimos", rKm: 6, dist: 49.6, color: 0x7d736b, speed: 1.2 },
       ],
     },
     {
@@ -212,10 +212,10 @@
       desc: "La plus massive des planètes, célèbre pour sa Grande Tache rouge, une tempête géante.",
       fact: "À retenir : la Grande Tache rouge souffle depuis au moins 300 ans et pourrait engloutir la Terre.",
       moons3d: [
-        { name: "Io", rKm: 1821, dist: 75.5, color: 0xe0c25a, speed: 1.8 },
-        { name: "Europe", rKm: 1560, dist: 88.8, color: 0xdfe8ee, speed: 1.3 },
-        { name: "Ganymède", rKm: 2634, dist: 106, color: 0xa89a8a, speed: 0.95 },
-        { name: "Callisto", rKm: 2410, dist: 123.7, color: 0x5f5a54, speed: 0.7 },
+        { name: "Io", rKm: 1821, dist: 151, color: 0xe0c25a, speed: 1.8 },
+        { name: "Europe", rKm: 1560, dist: 177.6, color: 0xdfe8ee, speed: 1.3 },
+        { name: "Ganymède", rKm: 2634, dist: 212, color: 0xa89a8a, speed: 0.95 },
+        { name: "Callisto", rKm: 2410, dist: 247.4, color: 0x5f5a54, speed: 0.7 },
       ],
     },
     {
@@ -230,7 +230,7 @@
       atmo: "Hydrogène / Hélium", moons: "146 connues", discovered: "Antiquité",
       desc: "Célèbre pour ses anneaux de glace spectaculaires, visibles même avec une petite lunette.",
       fact: "À retenir : Saturne est si peu dense qu'elle flotterait sur l'eau.",
-      moons3d: [{ name: "Titan", rKm: 2574, dist: 70, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
+      moons3d: [{ name: "Titan", rKm: 2574, dist: 140, color: 0xe0a83c, speed: 0.8, atmoGlow: 0xe0a83c }],
     },
     {
       name: "Uranus", au: 19.19, rKm: 25362, tilt: 97.8, e: 0.0457, omega: 170, inc: 0.773, node: 74.006, periodDays: 30687, flattening: 0.0229, color: 0x9fe3e0,
@@ -252,7 +252,7 @@
       atmo: "H₂ / Hélium / Méthane", moons: "28 connues", discovered: "1781 — W. Herschel",
       desc: "Géante de glace qui roule sur son orbite, son axe étant incliné à 98°.",
       fact: "À retenir : sur Uranus, chaque pôle connaît 42 ans de jour puis 42 ans de nuit.",
-      moons3d: [{ name: "Titania", rKm: 788, dist: 46.7, color: 0xb8c4cc, speed: 0.9 }],
+      moons3d: [{ name: "Titania", rKm: 788, dist: 93.4, color: 0xb8c4cc, speed: 0.9 }],
     },
     {
       name: "Neptune", au: 30.07, rKm: 24622, tilt: 28.4, e: 0.0099, omega: 44, inc: 1.770, node: 131.784, periodDays: 60190, flattening: 0.0171, color: 0x4f6fd8, atmoGlow: 0x4f6fd8,
@@ -269,7 +269,7 @@
       atmo: "H₂ / Hélium / Méthane", moons: "16 connues", discovered: "1846 — Le Verrier",
       desc: "La planète la plus éloignée du Soleil, balayée par les vents les plus rapides connus.",
       fact: "À retenir : les vents de Neptune atteignent 2 100 km/h, les plus rapides du système solaire.",
-      moons3d: [{ name: "Triton", rKm: 1353, dist: 45.1, color: 0xd8b8c8, speed: 1.1 }],
+      moons3d: [{ name: "Triton", rKm: 1353, dist: 90.2, color: 0xd8b8c8, speed: 1.1 }],
     },
   ];
 
@@ -693,13 +693,13 @@
   const sunGlow = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: makeGlowTexture(), blending: THREE.AdditiveBlending, depthWrite: false })
   );
-  sunGlow.scale.set(SUN_RADIUS * 2.6, SUN_RADIUS * 2.6, 1);
+  sunGlow.scale.set(SUN_RADIUS * 1.5, SUN_RADIUS * 1.5, 1);
   scene.add(sunGlow);
 
   const corona = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: makeGlowTexture(), blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.35 })
   );
-  corona.scale.set(SUN_RADIUS * 4, SUN_RADIUS * 4, 1);
+  corona.scale.set(SUN_RADIUS * 2.5, SUN_RADIUS * 2.5, 1);
   scene.add(corona);
 
   const sunLabel = makeLabel("Soleil", 9, "rgba(251,191,36,0.9)");
@@ -741,13 +741,13 @@
       }
     `,
   });
-  const skySphere = new THREE.Mesh(new THREE.SphereGeometry(2500, 32, 32), skyMat);
+  const skySphere = new THREE.Mesh(new THREE.SphereGeometry(4000, 32, 32), skyMat);
   scene.add(skySphere);
 
   tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg"), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     const texSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(2490, 48, 32),
+      new THREE.SphereGeometry(3950, 48, 32),
       new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0.5, depthWrite: false })
     );
     scene.add(texSphere);
@@ -984,21 +984,21 @@
   function makeAtmosphere(radius, colorHex, atmoColor, strength, skipOuter) {
     const group = new THREE.Group();
     const shellOuter = new THREE.Mesh(
-      new THREE.SphereGeometry(radius * 1.1, 40, 40),
-      fresnelMaterial(atmoColor, 3.2, 0.9 * strength)
+      new THREE.SphereGeometry(radius * 1.06, 40, 40),
+      fresnelMaterial(atmoColor, 3.2, 0.45 * strength)
     );
     const shellInner = new THREE.Mesh(
-      new THREE.SphereGeometry(radius * 1.045, 40, 40),
-      fresnelMaterial(0xffffff, 5.0, 0.3 * strength)
+      new THREE.SphereGeometry(radius * 1.025, 40, 40),
+      fresnelMaterial(0xffffff, 5.0, 0.15 * strength)
     );
     const halo1 = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: sharedGlowTex, color: colorHex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.22 * strength, depthWrite: false })
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: colorHex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.09 * strength, depthWrite: false })
     );
-    halo1.scale.set(radius * 2.3, radius * 2.3, 1);
+    halo1.scale.set(radius * 1.9, radius * 1.9, 1);
     const halo2 = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.1 * strength, depthWrite: false })
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.04 * strength, depthWrite: false })
     );
-    halo2.scale.set(radius * 3.1, radius * 3.1, 1);
+    halo2.scale.set(radius * 2.4, radius * 2.4, 1);
     if (!skipOuter) group.add(shellOuter);
     group.add(shellInner, halo1, halo2);
     return group;
@@ -1193,7 +1193,7 @@
           Math.random() * 2 - 1,
           Math.random() * 2 - 1,
           Math.random() * 2 - 1
-        ).normalize().multiplyScalar(900 + Math.random() * 900);
+        ).normalize().multiplyScalar(1500 + Math.random() * 1500);
         positions.set([v.x, v.y, v.z], i * 3);
         c.set(palette[Math.floor(Math.random() * palette.length)]);
         colors.set([c.r, c.g, c.b], i * 3);
@@ -1261,7 +1261,7 @@
       );
       const dir = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
         .normalize()
-        .multiplyScalar(1000 + Math.random() * 600);
+        .multiplyScalar(1600 + Math.random() * 1000);
       sprite.position.copy(dir);
       const s = 300 + Math.random() * 450;
       sprite.scale.set(s, s, 1);
@@ -1520,7 +1520,7 @@
     };
     tryLoadXwing(XWING_URLS);
   }
-  rocket.position.set(130, 10, 0);
+  rocket.position.set(280, 18, 0);
   scene.add(rocket);
   shipBounds.setFromObject(rocket);
 
@@ -1556,7 +1556,7 @@
     { zoom: 14, s: SCALE.toSU(5800), mesh: null, sample: null },
     { zoom: 12, s: SCALE.toSU(23000), mesh: null, sample: null },
     { zoom: 10, s: SCALE.toSU(87000), mesh: null, sample: null },
-    { zoom: 8, s: SCALE.toSU(290000), mesh: null, sample: null },
+    { zoom: 8, s: SCALE.toSU(600000), mesh: null, sample: null },
   ];
 
   function loadTile(z, x, y) {
@@ -1622,11 +1622,11 @@
     const d = t.data;
     const idx = (py * 256 + px) * 4;
     const h = d[idx] * 65536 + d[idx + 1] * 256 + d[idx + 2] / 256 - 32768;
-    return SCALE.toSU(Math.max(0, h)) * 3;
+    return SCALE.toSU(Math.max(0, h)) * 5;
   }
 
   function terrainBiomeColor(hSU, ny, x, z, out) {
-    const hM = (hSU * SCALE.M_PER_SU) / 3;
+    const hM = (hSU * SCALE.M_PER_SU) / 5;
     const forest = Math.abs((Math.sin(x * 123.7 + z * 317.3) * 43758.5453) % 1);
     if (hM > 2200 || (hM > 1500 && ny > 0.72)) out.setRGB(0.93, 0.95, 0.97);
     else if (ny < 0.62) out.setRGB(0.36, 0.35, 0.37);
@@ -1811,11 +1811,11 @@
 
   const orbit = {
     target: new THREE.Vector3(0, 0, 0),
-    radius: 285,
+    radius: 700,
     theta: 0,
     phi: 1.22,
     desiredTarget: new THREE.Vector3(0, 0, 0),
-    desiredRadius: 285,
+    desiredRadius: 700,
     desiredTheta: 0,
     desiredPhi: 1.22,
   };
@@ -1878,7 +1878,7 @@
     e.preventDefault();
     if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
-      orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
+      orbit.desiredRadius = Math.max(40, Math.min(2500, orbit.desiredRadius));
     }
   }, { passive: false });
 
@@ -1949,7 +1949,7 @@
   function resetView() {
     focused = null;
     orbit.desiredTarget.copy(origin).negate();
-    orbit.desiredRadius = 285;
+    orbit.desiredRadius = 700;
     document.querySelectorAll(".planet-btn").forEach((b) => b.classList.remove("active"));
     infoPanel.classList.add("hidden");
   }
@@ -2005,11 +2005,11 @@
       orbit.desiredTarget.copy(focused ? orbit.target : tmpV.copy(origin).negate());
       const off = tmpV2.copy(camera.position).sub(orbit.target);
       const len = Math.max(0.001, off.length());
-      orbit.radius = orbit.desiredRadius = Math.max(12, len);
+      orbit.radius = orbit.desiredRadius = Math.max(40, len);
       orbit.phi = orbit.desiredPhi = Math.acos(Math.max(-1, Math.min(1, off.y / len)));
       orbit.theta = orbit.desiredTheta = Math.atan2(off.x, off.z);
       if (!focused) {
-        orbit.desiredRadius = 285;
+        orbit.desiredRadius = 700;
       }
     }
   }
@@ -2045,7 +2045,7 @@
   const pointer = new THREE.Vector2();
 
   canvas.addEventListener("pointerup", (event) => {
-    if (rocketMode && dragMoved <= 6 && event.button === 0) {
+    if (rocketMode && event.button === 0) {
       fireBolt();
       return;
     }
@@ -2150,10 +2150,10 @@
       let vMax = SCALE.toSU(5000000);
       if (atmoBody && isFinite(atmoAltSU)) {
         const hM = SCALE.toM(Math.max(0, atmoAltSU));
-        if (hM < 3000) { thrustScale = 3.5e-6; vMax = SCALE.toSU(212); }
-        else if (hM < 30000) { thrustScale = 2e-5; vMax = SCALE.toSU(1000); }
-        else if (hM < 300000) { thrustScale = 1e-4; vMax = SCALE.toSU(10600); }
-        else if (hM < 3000000) { thrustScale = 1e-3; vMax = SCALE.toSU(106000); }
+        if (hM < 3000) { thrustScale = 1.7e-5; vMax = SCALE.toSU(212); }
+        else if (hM < 30000) { thrustScale = 1e-4; vMax = SCALE.toSU(1000); }
+        else if (hM < 300000) { thrustScale = 5e-4; vMax = SCALE.toSU(10600); }
+        else if (hM < 3000000) { thrustScale = 5e-3; vMax = SCALE.toSU(106000); }
       }
       const effThrust = THRUST_SU * thrustScale;
       if (keys.KeyW) rocketVel.addScaledVector(fwd, effThrust * delta);
@@ -2255,7 +2255,7 @@
 
       // Terrain local (Terre) + atterrissage
       ensureTerrain();
-      if (earthObj) earthObj.tilt.visible = !terrain || !(isFinite(atmoAltSU) && atmoAltSU < SCALE.toSU(15000));
+      if (earthObj) earthObj.tilt.visible = !terrain || !(isFinite(atmoAltSU) && atmoAltSU < SCALE.toSU(60000));
       if (terrain) {
         const ep = earthObj;
         simPos(ep.mesh, tmpC);
