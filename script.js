@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.1, -0.33);
+        f.position.set(sx * 0.17, sy * 0.1, -0.5);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1225,9 +1225,7 @@
         model.position.sub(center);
         const modelLen = box2.max.z - box2.min.z;
         model.traverse((o) => {
-          if (!o.isMesh || !o.material) return;
-          const m = Array.isArray(o.material) ? o.material[0] : o.material;
-          if (!m.color || m.color.r + m.color.g + m.color.b > 0.18) return;
+          if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
           if (sz.z < modelLen * 0.06 && mb.max.z < box2.min.z + modelLen * 0.25) o.visible = false;
@@ -1239,7 +1237,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.03);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.12);
           }
         }
         rocket.add(flame);
@@ -1290,7 +1288,7 @@
   const lookTarget = new THREE.Vector3();
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
   const camLocal = new THREE.Vector3();
-  const rocketCam = { radius: 0.07, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 0.7, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1306,11 +1304,15 @@
   };
 
   let dragging = false;
+  let rightDrag = false;
   let dragMoved = 0;
   let lastX = 0;
   let lastY = 0;
 
+  canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+
   canvas.addEventListener("pointerdown", (e) => {
+    if (e.button === 2) rightDrag = true;
     dragging = true;
     dragMoved = 0;
     lastX = e.clientX;
@@ -1324,11 +1326,11 @@
     lastX = e.clientX;
     lastY = e.clientY;
     dragMoved += Math.abs(dx) + Math.abs(dy);
-    if (rocketMode) {
+    if (rocketMode && (dragging || rightDrag)) {
       rocketCam.dTheta -= dx * 0.005;
       rocketCam.dPhi -= dy * 0.005;
       rocketCam.dPhi = Math.max(-1.2, Math.min(1.2, rocketCam.dPhi));
-    } else {
+    } else if (!rocketMode) {
       orbit.desiredTheta -= dx * 0.005;
       orbit.desiredPhi -= dy * 0.005;
       orbit.desiredPhi = Math.max(0.05, Math.min(Math.PI - 0.05, orbit.desiredPhi));
@@ -1337,11 +1339,15 @@
 
   window.addEventListener("pointerup", () => {
     dragging = false;
+    rightDrag = false;
   });
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    if (!rocketMode) {
+    if (rocketMode) {
+      rocketCam.radius *= 1 + e.deltaY * 0.001;
+      rocketCam.radius = Math.max(0.4, Math.min(3, rocketCam.radius));
+    } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
     }
@@ -1449,7 +1455,7 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 0.07;
+      rocketCam.radius = 0.7;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       camera.near = 0.005;
@@ -1650,10 +1656,18 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.14, -0.7);
+      const th = Math.PI + rocketCam.dTheta;
+      const ph = Math.PI / 2 - 0.14 + rocketCam.dPhi;
+      camLocal.set(
+        rocketCam.radius * Math.sin(ph) * Math.sin(th),
+        rocketCam.radius * Math.cos(ph),
+        rocketCam.radius * Math.sin(ph) * Math.cos(th)
+      );
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
-      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      camera.up.copy(tmpUp);
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.05));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
