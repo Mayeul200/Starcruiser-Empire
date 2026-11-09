@@ -32,6 +32,14 @@
   if (THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
+  const world = new THREE.Group();
+  const origin = new THREE.Vector3();
+  let prevCam = null;
+  function simPos(o, out) {
+    o.getWorldPosition(out);
+    out.add(origin);
+    return out;
+  }
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 9000);
   camera.position.set(0, 95, 300);
 
@@ -1596,7 +1604,7 @@
   function ensureTerrain() {
     if (!earthObj) earthObj = planetObjects.find((x) => x.data.name === "Terre");
     if (!earthObj) return;
-    earthObj.mesh.getWorldPosition(tmpC);
+    simPos(earthObj.mesh, tmpC);
     const alt = rocket.position.distanceTo(tmpC) - earthObj.data.radius;
     if (alt > 0.12) {
       if (terrain) { scene.remove(terrain); terrain = null; }
@@ -1927,7 +1935,7 @@
 
     for (const p of planetObjects) {
       if (p.data.scatterUniform && p.data.self) {
-        p.data.self.getWorldPosition(tmpV);
+        simPos(p.data.self, tmpV);
         p.data.scatterUniform.value.copy(tmpV).normalize().negate();
       }
     }
@@ -1997,7 +2005,7 @@
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
 
       for (const p of planetObjects) {
-        p.mesh.getWorldPosition(tmpV);
+        simPos(p.mesh, tmpV);
         const d2 = Math.max(0.01, rocket.position.distanceToSquared(tmpV));
         const d = Math.sqrt(d2);
         if (d > p.data.radius + 0.3) {
@@ -2005,7 +2013,7 @@
           rocketVel.addScaledVector(tmpV2, (p.data.mu / d2) * delta);
         }
         for (const m of p.moons) {
-          m.mesh.getWorldPosition(tmpC);
+          simPos(m.mesh, tmpC);
           const md2 = Math.max(0.01, rocket.position.distanceToSquared(tmpC));
           const md = Math.sqrt(md2);
           if (md > 0.3) {
@@ -2022,7 +2030,7 @@
       let atmoP = null;
       let atmoD = Infinity;
       for (const p of planetObjects) {
-        p.mesh.getWorldPosition(tmpC);
+        simPos(p.mesh, tmpC);
         const d = rocket.position.distanceTo(tmpC) - p.data.radius;
         if (d < atmoD) { atmoD = d; atmoP = p; }
       }
@@ -2068,7 +2076,7 @@
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
-        p.mesh.getWorldPosition(tmpC);
+        simPos(p.mesh, tmpC);
         collideSegment(tmpC, p.data.radius + 0.03);
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.06);
@@ -2077,7 +2085,7 @@
       ensureTerrain();
       if (terrain) {
         const ep = earthObj;
-        ep.mesh.getWorldPosition(tmpC);
+        simPos(ep.mesh, tmpC);
         const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
         tmpQ.copy(terrain.quaternion).invert();
         const lp = tmpV2.copy(rocket.position).sub(terrainCenter).applyQuaternion(tmpQ);
@@ -2113,7 +2121,7 @@
       let hit = b.mesh.position.length() < SUN_RADIUS + 0.1;
       if (!hit) {
         for (const p of planetObjects) {
-          p.mesh.getWorldPosition(tmpC);
+          simPos(p.mesh, tmpC);
           const rr = p.data.radius + 0.05;
           if (b.mesh.position.distanceToSquared(tmpC) < rr * rr) { hit = true; break; }
         }
@@ -2134,6 +2142,14 @@
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * SCALE.M_PER_SU / 1000)} km/s` + (atmoBody && isFinite(atmoAltSU) ? ` • alt ${Math.round(SCALE.toM(atmoAltSU) / 1000)} km` : "");
 
     if (!rocketMode) applyOrbit();
+
+    const dCam = tmpV.copy(camera.position).sub(prevCam);
+    prevCam.copy(camera.position);
+    origin.add(dCam);
+    world.position.copy(origin).negate();
+    orbit.target.sub(dCam);
+    orbit.desiredTarget.sub(dCam);
+
     renderer.render(scene, camera);
   }
 
@@ -2143,5 +2159,8 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  for (const c of [...scene.children]) if (c !== skySphere) world.add(c);
+  scene.add(world);
+  prevCam = camera.position.clone();
   animate();
 })();
