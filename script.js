@@ -1170,24 +1170,23 @@
     }
 
     const gimbal = new THREE.Group();
-    gimbal.position.z = -0.3;
     rocket.add(gimbal);
 
-    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.12, 14), dark);
-    nozzle.rotation.x = Math.PI / 2;
-    gimbal.add(nozzle);
-
-    const flame = new THREE.Mesh(
-      new THREE.ConeGeometry(0.04, 0.22, 14),
-      new THREE.MeshBasicMaterial({ color: 0xffa726, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.9, depthWrite: false })
-    );
-    flame.rotation.x = -Math.PI / 2;
-    flame.position.z = -0.16;
-    flame.visible = false;
-    gimbal.add(flame);
+    const engineFlames = new THREE.Group();
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0x4db8ff, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false });
+    for (const sx of [-1, 1]) {
+      for (const sy of [-1, 1]) {
+        const f = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.09, 10), flameMat);
+        f.rotation.x = -Math.PI / 2;
+        f.position.set(sx * 0.17, sy * 0.1, -0.27);
+        f.visible = false;
+        engineFlames.add(f);
+      }
+    }
+    rocket.add(engineFlames);
 
     rocket.scale.setScalar(0.25);
-    return { group: rocket, flame, gimbal };
+    return { group: rocket, flame: engineFlames, gimbal };
   }
 
   const rocketBuilt = buildRocket();
@@ -1216,7 +1215,15 @@
         model.position.sub(center);
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
-        gimbal.position.z = box2.min.z - 0.06;
+        const fx = (box2.max.x - box2.min.x) * 0.38;
+        const fy = (box2.max.y - box2.min.y) * 0.38;
+        let fi = 0;
+        for (const sxn of [-1, 1]) {
+          for (const syn of [-1, 1]) {
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.01);
+          }
+        }
+        rocket.add(flame);
         rocket.add(gimbal);
       }, undefined, () => tryLoadXwing(urls.slice(1)));
     };
@@ -1616,16 +1623,18 @@
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.04);
 
-      flame.visible = !!keys.KeyW;
-      if (flame.visible) {
-        const f = 0.9 + Math.random() * 0.3;
-        flame.scale.set(f, 0.9 + Math.random() * 0.5, f);
+      for (const c of flame.children) {
+        c.visible = !!keys.KeyW;
+        if (c.visible) {
+          const f = 0.8 + Math.random() * 0.5;
+          c.scale.set(f, f, f);
+        }
       }
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.06, -rocketCam.radius);
+      camLocal.set(0, 0.18, -rocketCam.radius);
       rocket.updateMatrixWorld();
       tmpV.copy(rocket.localToWorld(camLocal));
       camSmooth.lerp(tmpV, 0.35);
