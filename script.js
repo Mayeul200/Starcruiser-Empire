@@ -1306,6 +1306,50 @@
   const flame = rocketBuilt.flame;
   const gimbal = rocketBuilt.gimbal;
 
+  /* ---------- Tirs laser ---------- */
+
+  const bolts = [];
+  const boltGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.35, 6);
+  boltGeo.rotateX(Math.PI / 2);
+  const boltMat = new THREE.MeshBasicMaterial({ color: 0xff4455, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
+  for (let i = 0; i < 40; i++) {
+    const b = new THREE.Mesh(boltGeo, boltMat);
+    b.visible = false;
+    scene.add(b);
+    bolts.push({ mesh: b, vel: new THREE.Vector3(), life: 0 });
+  }
+  const flashes = [];
+  const flashGeo = new THREE.SphereGeometry(0.06, 10, 10);
+  for (let i = 0; i < 12; i++) {
+    const fm = new THREE.MeshBasicMaterial({ color: 0xffaa33, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false });
+    const f = new THREE.Mesh(flashGeo, fm);
+    f.visible = false;
+    scene.add(f);
+    flashes.push({ mesh: f, life: 0 });
+  }
+
+  function spawnFlash(pos) {
+    const f = flashes.find((x) => !x.mesh.visible);
+    if (!f) return;
+    f.mesh.position.copy(pos);
+    f.life = 0.35;
+    f.mesh.visible = true;
+    f.mesh.scale.setScalar(0.5);
+    f.mesh.material.opacity = 0.9;
+  }
+
+  function fireBolt() {
+    if (!rocketMode) return;
+    const b = bolts.find((x) => !x.mesh.visible);
+    if (!b) return;
+    fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
+    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.1);
+    b.vel.copy(fwd).multiplyScalar(30).add(rocketVel);
+    b.life = 3;
+    b.mesh.visible = true;
+    spawnFlash(b.mesh.position);
+  }
+
   if (THREE.GLTFLoader) {
     const gltfLoader = new THREE.GLTFLoader();
     const XWING_URLS = [
@@ -1613,6 +1657,7 @@
   function toggleRocketMode() {
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
+    document.getElementById("crosshair").classList.toggle("hidden", !rocketMode);
     if (rocketMode) {
       rocketCam.radius = 1.0;
       rocketCam.dTheta = 0;
@@ -1648,6 +1693,7 @@
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", "PageUp", "PageDown", "ControlLeft", "ControlRight"].includes(e.code)) e.preventDefault();
     keys[e.code] = true;
     if (e.code === "KeyR") toggleRocketMode();
+    if (e.code === "KeyF") fireBolt();
   });
 
   window.addEventListener("keyup", (e) => {
@@ -1668,6 +1714,10 @@
   const pointer = new THREE.Vector2();
 
   canvas.addEventListener("pointerup", (event) => {
+    if (rocketMode && dragMoved <= 6 && event.button === 0) {
+      fireBolt();
+      return;
+    }
     if (dragMoved > 6) return;
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -1830,6 +1880,31 @@
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+    }
+
+    for (const b of bolts) {
+      if (!b.mesh.visible) continue;
+      b.life -= delta;
+      b.mesh.position.addScaledVector(b.vel, delta);
+      let hit = b.mesh.position.length() < SUN_RADIUS + 0.1;
+      if (!hit) {
+        for (const p of planetObjects) {
+          p.mesh.getWorldPosition(tmpC);
+          const rr = p.data.radius + 0.05;
+          if (b.mesh.position.distanceToSquared(tmpC) < rr * rr) { hit = true; break; }
+        }
+      }
+      if (hit || b.life <= 0) {
+        if (hit) spawnFlash(b.mesh.position);
+        b.mesh.visible = false;
+      }
+    }
+    for (const f of flashes) {
+      if (!f.mesh.visible) continue;
+      f.life -= delta;
+      f.mesh.scale.setScalar(0.5 + (0.35 - f.life) * 6);
+      f.mesh.material.opacity = Math.max(0, f.life * 2.5);
+      if (f.life <= 0) f.mesh.visible = false;
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
