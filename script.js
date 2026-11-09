@@ -9,8 +9,18 @@
     fatalError.classList.remove("hidden");
   }
 
+  window.addEventListener("error", (e) => {
+    if (!fatalError.classList.contains("hidden")) return;
+    showFatal("Erreur JS : " + (e.message || "inconnue") + " — rechargez la page (Ctrl+F5).");
+  });
+
   if (!window.THREE) {
-    showFatal("La librairie Three.js n'a pas pu être chargée (CDN injoignable).");
+    showFatal("La librairie Three.js n'a pas pu être chargée (CDN injoignable). Vérifiez votre connexion Internet.");
+    return;
+  }
+
+  if (!window.SCALE) {
+    showFatal("Le module scale.js n'a pas pu être chargé. Servez le dossier en local : python3 -m http.server 8000");
     return;
   }
 
@@ -22,7 +32,7 @@
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
   } catch (err) {
     showFatal("WebGL n'est pas disponible dans ce navigateur.");
     return;
@@ -1145,9 +1155,9 @@
       );
     };
     const group = new THREE.Group();
-    group.add(mkLayer(5000, 1.4, 0.85));
-    group.add(mkLayer(700, 2.4, 0.9));
-    group.add(mkLayer(150, 3.4, 1.0));
+    group.add(mkLayer(4000, 1.4, 0.85));
+    group.add(mkLayer(600, 2.4, 0.9));
+    group.add(mkLayer(120, 3.4, 1.0));
     scene.add(group);
     return group;
   }
@@ -1187,7 +1197,7 @@
   function makeNebulae() {
     const group = new THREE.Group();
     const tints = [0x7c5cbf, 0x3b82f6, 0xd97706, 0x2dd4bf, 0xec4899, 0x6366f1, 0x8b5cf6];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 10; i++) {
       const sprite = new THREE.Sprite(
         new THREE.SpriteMaterial({
           map: makeNebulaTexture(tints[i % tints.length], 9000 + i * 131),

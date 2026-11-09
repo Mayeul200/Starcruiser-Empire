@@ -34,3 +34,10 @@ En bas à droite : **FPS + draw calls + triangles** (`renderer.info`) mis à jou
 - Relief exagéré ×2 côté rendu proche ; tuiles DEM limitées aux zooms 8/10/12.
 - Vitesse max 5 SU/s = ~14 500 km/s (plafond gameplay, documenté dans scale.js).
 - Extension navigateur = erreurs `content.js` dans la console (pas notre code).
+
+## v110 — robustesse local + perfs
+
+- `window.onerror` -> overlay d'erreur explicite (aide au diagnostic en local/file://)
+- Garde-fou `SCALE` manquant (scale.js) avec message + commande `python3 -m http.server 8000`
+- `powerPreference: "high-performance"` ; étoiles 6850 -> 4720, nébuleuses 14 -> 10 (moins de draw calls)
+- Si la page ne marche pas en local : ouvrir la console (F12), l'overlay affiche la cause ; en file://, servir via `python3 -m http.server 8000` puis http://localhost:8000
