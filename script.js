@@ -82,7 +82,7 @@
     out.add(origin);
     return out;
   }
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 15000);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 25000);
   camera.position.set(0, 95, 300);
 
   scene.add(new THREE.AmbientLight(0x334466, 1.1));
@@ -102,7 +102,7 @@
   const INC_EXAGGERATION = 3;
 
   function orbitFromAU(au) {
-    return 150 * Math.pow(au, 0.85);
+    return 400 * Math.pow(au, 0.85);
   }
 
   function radiusFromKm(rKm) {
@@ -741,13 +741,13 @@
       }
     `,
   });
-  const skySphere = new THREE.Mesh(new THREE.SphereGeometry(4000, 32, 32), skyMat);
+  const skySphere = new THREE.Mesh(new THREE.SphereGeometry(9000, 32, 32), skyMat);
   scene.add(skySphere);
 
   tryLoadTexture([UW("8/85", "Solarsystemscope_texture_8k_stars_milky_way.jpg"), ...TEX2("2k_stars_milky_way.jpg")], (tex) => {
     tex.mapping = THREE.EquirectangularReflectionMapping;
     const texSphere = new THREE.Mesh(
-      new THREE.SphereGeometry(3950, 48, 32),
+      new THREE.SphereGeometry(8900, 48, 32),
       new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, transparent: true, opacity: 0.5, depthWrite: false })
     );
     scene.add(texSphere);
@@ -1193,7 +1193,7 @@
           Math.random() * 2 - 1,
           Math.random() * 2 - 1,
           Math.random() * 2 - 1
-        ).normalize().multiplyScalar(1500 + Math.random() * 1500);
+        ).normalize().multiplyScalar(3500 + Math.random() * 3500);
         positions.set([v.x, v.y, v.z], i * 3);
         c.set(palette[Math.floor(Math.random() * palette.length)]);
         colors.set([c.r, c.g, c.b], i * 3);
@@ -1261,7 +1261,7 @@
       );
       const dir = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
         .normalize()
-        .multiplyScalar(1600 + Math.random() * 1000);
+        .multiplyScalar(3800 + Math.random() * 2200);
       sprite.position.copy(dir);
       const s = 300 + Math.random() * 450;
       sprite.scale.set(s, s, 1);
@@ -1520,7 +1520,7 @@
     };
     tryLoadXwing(XWING_URLS);
   }
-  rocket.position.set(280, 18, 0);
+  rocket.position.set(650, 40, 0);
   scene.add(rocket);
   shipBounds.setFromObject(rocket);
 
@@ -1811,11 +1811,11 @@
 
   const orbit = {
     target: new THREE.Vector3(0, 0, 0),
-    radius: 700,
+    radius: 900,
     theta: 0,
     phi: 1.22,
     desiredTarget: new THREE.Vector3(0, 0, 0),
-    desiredRadius: 700,
+    desiredRadius: 900,
     desiredTheta: 0,
     desiredPhi: 1.22,
   };
@@ -1878,7 +1878,7 @@
     e.preventDefault();
     if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
-      orbit.desiredRadius = Math.max(40, Math.min(2500, orbit.desiredRadius));
+      orbit.desiredRadius = Math.max(40, Math.min(5000, orbit.desiredRadius));
     }
   }, { passive: false });
 
@@ -1949,7 +1949,7 @@
   function resetView() {
     focused = null;
     orbit.desiredTarget.copy(origin).negate();
-    orbit.desiredRadius = 700;
+    orbit.desiredRadius = 900;
     document.querySelectorAll(".planet-btn").forEach((b) => b.classList.remove("active"));
     infoPanel.classList.add("hidden");
   }
