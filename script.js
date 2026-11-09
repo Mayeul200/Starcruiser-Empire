@@ -136,7 +136,7 @@
       fact: "À retenir : un jour solaire sur Mercure dure 176 jours terrestres.",
     },
     {
-      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, inc: 3.394, node: 76.680, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a,
+      name: "Vénus", au: 0.723, rKm: 6052, tilt: 177.4, e: 0.0068, omega: 131, inc: 3.394, node: 76.680, periodDays: 224.7, flattening: 0.0001, color: 0xe8c98a, atmoGlow: 0xe8c98a, atmoPhys: { h0: 250000, rho0: 65, H: 15900 },
       texUrls: [
         JDS("Shriisoot/Planets-texture", "main", "4k_venus_atmosphere.jpg"),
         JDS("Shriisoot/Planets-texture", "master", "4k_venus_atmosphere.jpg"),
@@ -151,7 +151,7 @@
       fact: "À retenir : Vénus tourne à l'envers (rotation rétrograde) par rapport aux autres planètes.",
     },
     {
-      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, cloudLayers: 8, atmoGlow: 0x5aa0ff,
+      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, cloudLayers: 8, atmoGlow: 0x5aa0ff, atmoPhys: { h0: 85000, rho0: 1.225, H: 8500 },
       texUrls: [...TEX8("earth_daymap"), TJ + "earth_atmos_2048.jpg", ...TEX2("2k_earth_daymap.jpg")],
       cloudUrls: [UW("7/7a", "Solarsystemscope_texture_8k_earth_clouds.jpg"), TJ + "earth_clouds_1024.png"],
       nightUrls: [...TEX8("earth_nightmap"), TJ + "earth_lights_2048.png"],
@@ -167,7 +167,7 @@
       moons3d: [{ name: "Lune", rKm: 1737, dist: 4.6, color: 0xbfbfbf, speed: 1.4, gSurface: 1.62, texUrls: [TJ + "moon_1024.jpg", ...TEX2("2k_moon.jpg")] }],
     },
     {
-      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a,
+      name: "Mars", au: 1.524, rKm: 3390, tilt: 25.2, e: 0.0934, omega: 336, inc: 1.850, node: 49.558, periodDays: 687, flattening: 0.0059, color: 0xc1552f, atmoGlow: 0xd08a5a, atmoPhys: { h0: 11500, rho0: 0.02, H: 11100 },
       texUrls: [...TEX8("mars"), ...TEX2("2k_mars.jpg")],
       proc: { type: "mars", base: "#b5502a", dark: "#7a3418", ice: "#f2f2f2" },
       type: "Tellurique", typeClass: "tellurique",
@@ -1512,6 +1512,10 @@
 
   const speedHud = document.getElementById("hud-speed");
   const perfHud = document.getElementById("hud-perf");
+  const debugHud = document.getElementById("hud-debug");
+  let terrainWire = false;
+  let dbgAcc = 0;
+  let lastFps = 0;
   let perfAcc = 0;
   const THRUST_SU = SCALE.accelSU(SCALE.SHIP.thrustN / SCALE.SHIP.massKg);
 
@@ -1532,6 +1536,8 @@
   let earthObj = null;
   const tileCache = new Map();
   const terrainLevels = [
+    { zoom: 15, s: 0.0005, mesh: null, sample: null },
+    { zoom: 14, s: 0.002, mesh: null, sample: null },
     { zoom: 12, s: 0.008, mesh: null, sample: null },
     { zoom: 10, s: 0.03, mesh: null, sample: null },
     { zoom: 8, s: 0.1, mesh: null, sample: null },
@@ -1579,7 +1585,7 @@
     const v = (z / s + 0.5) * 8;
     const n = Math.abs((Math.sin(u * 12.9898 + v * 78.233) * 43758.5453) % 1);
     const n2 = Math.abs((Math.sin(u * 3.1 + v * 7.7 + 5.2) * 24634.6345) % 1);
-    return (n * 0.75 + n2 * 0.25) * 0.0025;
+    return (n * 0.75 + n2 * 0.25) * s * 0.05;
   }
 
   function demHeight(x, z, tiles, tx, ty, zoom, lat0, lon0, patchSU) {
@@ -1603,12 +1609,43 @@
     return SCALE.toSU(Math.max(0, h)) * 2;
   }
 
+  function terrainBiomeColor(hSU, ny, x, z, out) {
+    const hM = (hSU * SCALE.M_PER_SU) / 2;
+    const forest = Math.abs((Math.sin(x * 123.7 + z * 317.3) * 43758.5453) % 1);
+    if (hM > 2200 || (hM > 1500 && ny > 0.72)) out.setRGB(0.93, 0.95, 0.97);
+    else if (ny < 0.62) out.setRGB(0.36, 0.35, 0.37);
+    else if (hM < 4) out.setRGB(0.78, 0.72, 0.5);
+    else if (hM < 900) {
+      if (forest > 0.55) out.setRGB(0.13, 0.32, 0.12);
+      else out.setRGB(0.24, 0.42, 0.18);
+    } else if (hM < 1500) out.setRGB(0.42, 0.42, 0.3);
+    else out.setRGB(0.45, 0.43, 0.42);
+    return out;
+  }
+
+  function applyTerrainColors(geo) {
+    geo.computeVertexNormals();
+    const pos = geo.attributes.position;
+    const nrm = geo.attributes.normal;
+    let col = geo.attributes.color;
+    if (!col) {
+      col = new THREE.BufferAttribute(new Float32Array(pos.count * 3), 3);
+      geo.setAttribute("color", col);
+    }
+    const c = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) {
+      terrainBiomeColor(pos.getY(i), nrm.getY(i), pos.getX(i), pos.getZ(i), c);
+      col.setXYZ(i, c.r, c.g, c.b);
+    }
+    col.needsUpdate = true;
+  }
+
   function makeTerrainGeo(s) {
     const geo = new THREE.PlaneGeometry(s, s, 64, 64);
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) pos.setY(i, procHeight(pos.getX(i), pos.getZ(i), s));
-    geo.computeVertexNormals();
+    applyTerrainColors(geo);
     return geo;
   }
 
@@ -1624,7 +1661,7 @@
       const pos = lv.mesh.geometry.attributes.position;
       for (let i = 0; i < pos.count; i++) pos.setY(i, lv.sample(pos.getX(i), pos.getZ(i)));
       pos.needsUpdate = true;
-      lv.mesh.geometry.computeVertexNormals();
+      applyTerrainColors(lv.mesh.geometry);
     });
   }
 
@@ -1636,10 +1673,17 @@
     const lon = Math.atan2(dir.x, dir.z);
     for (const lv of terrainLevels) {
       lv.sample = (x, z) => procHeight(x, z, lv.s);
-      lv.mesh = new THREE.Mesh(makeTerrainGeo(lv.s), new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      lv.mesh = new THREE.Mesh(makeTerrainGeo(lv.s), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      lv.mesh.material.wireframe = terrainWire;
       terrain.add(lv.mesh);
       loadLevel(lv, lat, lon);
     }
+    const water = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.03, 0.03, 1, 1).rotateX(-Math.PI / 2),
+      new THREE.MeshStandardMaterial({ color: 0x123f66, roughness: 0.18, metalness: 0.35, transparent: true, opacity: 0.86 })
+    );
+    water.position.y = 5e-7;
+    terrain.add(water);
     terrain.position.copy(center);
     terrain.quaternion.setFromUnitVectors(upAxis, dir);
     world.add(terrain);
@@ -1663,7 +1707,7 @@
     }
     const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
     const center = tmpC.clone().addScaledVector(dir, earthObj.data.radius);
-    if (terrain && center.distanceTo(terrainCenter) < terrainLevels[0].s * 0.3) return;
+    if (terrain && center.distanceTo(terrainCenter) < terrainLevels[2].s * 0.3) return;
     buildTerrain(center, dir);
   }
 
@@ -1922,6 +1966,10 @@
     keys[e.code] = true;
     if (e.code === "KeyR") toggleRocketMode();
     if (e.code === "KeyF") fireBolt();
+    if (e.code === "KeyN") {
+      terrainWire = !terrainWire;
+      if (terrain) for (const lv of terrainLevels) if (lv.mesh) lv.mesh.material.wireframe = terrainWire;
+    }
   });
 
   window.addEventListener("keyup", (e) => {
@@ -1968,14 +2016,15 @@
     const delta = Math.min(clock.getDelta(), 1 / 30);
 
     if (!paused) {
+      const orbitTime = rocketMode ? 1e-4 : 1;
       for (const p of planetObjects) {
-        p.angle += delta * speedMultiplier * 0.9 * (365.25 / p.data.periodDays);
+        p.angle += delta * speedMultiplier * orbitTime * 0.9 * (365.25 / p.data.periodDays);
         planetPosition(p, p.angle, tmpPos);
         p.tilt.position.copy(tmpPos);
         p.label.position.set(tmpPos.x, p.data.radius + 2.4, tmpPos.z);
         p.mesh.rotation.y += delta * speedMultiplier * 0.4;
         if (p.data.cloudMeshes) for (const cm of p.data.cloudMeshes) cm.mesh.rotation.y += delta * speedMultiplier * cm.speed;
-        for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * m.speed;
+        for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * orbitTime * m.speed;
       }
       for (const l of beltLayers) {
         l.group.rotation.y += delta * speedMultiplier * l.speed;
@@ -2042,18 +2091,27 @@
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.KeyW) rocketVel.addScaledVector(fwd, THRUST_SU * delta);
-      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -THRUST_SU * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
+      let thrustScale = 1;
+      let vMax = 1.727;
+      if (atmoBody && isFinite(atmoAltSU)) {
+        const hM = SCALE.toM(Math.max(0, atmoAltSU));
+        if (hM < 500) { thrustScale = 3.5e-6; vMax = 0.0002; }
+        else if (hM < 5000) { thrustScale = 2e-5; vMax = 0.001; }
+        else if (hM < 20000) { thrustScale = 1e-4; vMax = 0.02; }
+      }
+      const effThrust = THRUST_SU * thrustScale;
+      if (keys.KeyW) rocketVel.addScaledVector(fwd, effThrust * delta);
+      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -effThrust * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
       tmpV.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      if (keys.Space) rocketVel.addScaledVector(tmpV, THRUST_SU * delta);
-      if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -THRUST_SU * delta);
+      if (keys.Space) rocketVel.addScaledVector(tmpV, effThrust * delta);
+      if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -effThrust * delta);
       if (keys.KeyA) {
         tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, THRUST_SU * delta);
+        rocketVel.addScaledVector(tmpV, effThrust * delta);
       }
       if (keys.KeyD) {
         tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, THRUST_SU * delta);
+        rocketVel.addScaledVector(tmpV, effThrust * delta);
       }
       if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 1.2 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
@@ -2062,7 +2120,7 @@
         simPos(p.mesh, tmpV);
         const d2 = Math.max(0.01, rocket.position.distanceToSquared(tmpV));
         const d = Math.sqrt(d2);
-        if (d > p.data.radius + 0.3) {
+        if (d > p.data.radius + 0.000005) {
           tmpV2.subVectors(tmpV, rocket.position).normalize();
           rocketVel.addScaledVector(tmpV2, (p.data.mu / d2) * delta);
         }
@@ -2070,7 +2128,7 @@
           simPos(m.mesh, tmpC);
           const md2 = Math.max(0.01, rocket.position.distanceToSquared(tmpC));
           const md = Math.sqrt(md2);
-          if (md > 0.3) {
+          if (md > 0.000005) {
             tmpV2.subVectors(tmpC, rocket.position).normalize();
             rocketVel.addScaledVector(tmpV2, (m.mu / md2) * delta);
           }
@@ -2088,9 +2146,9 @@
         const d = rocket.position.distanceTo(tmpC) - p.data.radius;
         if (d < atmoD) { atmoD = d; atmoP = p; }
       }
-      if (atmoP && atmoP.data.atmo && atmoD < SCALE.toSU(atmoP.data.atmo.h0)) {
+      if (atmoP && atmoP.data.atmoPhys && atmoD < SCALE.toSU(atmoP.data.atmoPhys.h0)) {
         const hM = Math.max(0, SCALE.toM(atmoD));
-        const rho = atmoP.data.atmo.rho0 * Math.exp(-hM / atmoP.data.atmo.H);
+        const rho = atmoP.data.atmoPhys.rho0 * Math.exp(-hM / atmoP.data.atmoPhys.H);
         atmoRho = rho;
         atmoAltSU = atmoD;
         atmoBody = atmoP;
@@ -2112,7 +2170,7 @@
         const heat = Math.max(0, Math.min(1, (vM - 250) / 900)) * Math.min(1, atmoRho / 0.05);
         heatGlow.material.opacity = heat * 0.85;
         heatGlow.position.copy(rocket.position);
-        if (atmoAltSU < SCALE.toSU(atmoBody.data.atmo.h0 * 0.6)) {
+        if (atmoAltSU < SCALE.toSU(atmoBody.data.atmoPhys.h0 * 0.6)) {
           scene.fog = atmoFog;
           atmoFog.color.set(atmoAltSU < SCALE.toSU(12000) ? 0x87b5e0 : 0x0a0f1e);
           atmoFog.near = SCALE.toSU(300);
@@ -2125,13 +2183,13 @@
         scene.fog = null;
       }
 
-      if (rocketVel.length() > 1.727) rocketVel.setLength(1.727);
+      if (rocketVel.length() > vMax) rocketVel.setLength(vMax);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
       for (const p of planetObjects) {
         simPos(p.mesh, tmpC);
-        collideSegment(tmpC, p.data.radius + 0.03);
+        collideSegment(tmpC, p.data.radius + 0.000002);
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.06);
 
@@ -2143,7 +2201,7 @@
         const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
         tmpQ.copy(terrain.quaternion).invert();
         const lp = tmpV2.copy(rocket.position).sub(terrainCenter).applyQuaternion(tmpQ);
-        const hu = (terrainSample ? terrainSample(lp.x, lp.z) : 0) + 0.00002;
+        const hu = (terrainSample ? terrainSample(lp.x, lp.z) : 0) + 1.5e-6;
         if (lp.y < hu) {
           rocket.position.addScaledVector(dir, hu - lp.y);
           const vn = rocketVel.dot(dir);
@@ -2210,9 +2268,22 @@
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * SCALE.M_PER_SU / 1000)} km/s` + (atmoBody && isFinite(atmoAltSU) ? ` • alt ${Math.round(SCALE.toM(atmoAltSU) / 1000)} km` : "");
 
     perfAcc += delta;
+    dbgAcc += delta;
+    if (dbgAcc > 0.25) {
+      dbgAcc = 0;
+      if (debugHud) {
+        const altM = isFinite(atmoAltSU) ? Math.max(0, Math.round(SCALE.toM(atmoAltSU))) : null;
+        const vMs = Math.round(rocketVel.length() * SCALE.M_PER_SU);
+        const lvLoaded = terrain ? terrainLevels.filter((l) => l.mesh).length : 0;
+        debugHud.textContent = rocketMode
+          ? `alt ${altM !== null ? altM + " m" : "—"} • v ${vMs} m/s\nterrain ${lvLoaded} niv • DEM ${terrain ? "z" + terrainLevels[0].zoom : "—"} • ${terrainWire ? "WIREFRAME" : "solide"}\nfps ${lastFps} • [N] wireframe`
+          : "";
+      }
+    }
     if (perfAcc > 0.5) {
       perfAcc = 0;
       const fps = Math.round(1 / Math.max(delta, 1e-4));
+      lastFps = fps;
       perfHud.textContent = `${fps} fps • ${renderer.info.render.calls} calls • ${renderer.info.render.triangles} tri`;
     }
 

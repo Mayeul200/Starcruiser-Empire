@@ -437,3 +437,16 @@ body {
   z-index: 10;
   position: fixed;
 }
+
+.hud-debug {
+  bottom: 1rem;
+  left: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 10;
+  position: fixed;
+  white-space: pre-line;
+  line-height: 1.5;
+}
