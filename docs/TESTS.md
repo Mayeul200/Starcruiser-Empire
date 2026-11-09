@@ -74,3 +74,5 @@ Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 plan�
 - Re-test v111 (2ᵉ passage) : 0 erreur JS, 8 planètes, 0 requête échouée, 139 calls / 203k tri, pas d'overlay fatal. ✅
 
 - **v112** : fix caméra mode vaisseau (floating origin : `rocket.position - origin`), test headless OK (0 erreur, 8 planètes, 140 calls). Bump v112 unique (évite la collision de cache v111).
+
+- **v113** : fix focus planète (cible caméra en coordonnées rendu `sim − origin` après floating origin — la caméra n'atterrit plus entre deux planètes). Test headless OK : 8 planètes, 0 erreur JS (les 429 = rate-limit CDN sandbox, géré par le repli procédural).

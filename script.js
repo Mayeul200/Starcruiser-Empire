@@ -1969,7 +1969,7 @@
     if (focused && !rocketMode) {
       const pos = new THREE.Vector3();
       focused.mesh.getWorldPosition(pos);
-      orbit.desiredTarget.copy(pos);
+      orbit.desiredTarget.copy(pos).sub(origin);
     }
 
     if (rocketMode) {
@@ -2195,5 +2195,6 @@
   for (const c of [...scene.children]) if (c !== skySphere) world.add(c);
   scene.add(world);
   prevCam = camera.position.clone();
+  window.__scene = scene; window.__world = world; window.__origin = origin;
   animate();
 })();
