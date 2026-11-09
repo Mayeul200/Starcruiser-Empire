@@ -1223,6 +1223,15 @@
         const box2 = new THREE.Box3().setFromObject(model);
         const center = box2.getCenter(new THREE.Vector3());
         model.position.sub(center);
+        const modelLen = box2.max.z - box2.min.z;
+        model.traverse((o) => {
+          if (!o.isMesh || !o.material) return;
+          const m = Array.isArray(o.material) ? o.material[0] : o.material;
+          if (!m.color || m.color.r + m.color.g + m.color.b > 0.18) return;
+          const mb = new THREE.Box3().setFromObject(o);
+          const sz = mb.getSize(new THREE.Vector3());
+          if (sz.z < modelLen * 0.06 && mb.max.z < box2.min.z + modelLen * 0.25) o.visible = false;
+        });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
         const fx = (box2.max.x - box2.min.x) * 0.135;
@@ -1641,7 +1650,7 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.09, -0.7);
+      camLocal.set(0, 0.14, -0.7);
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
