@@ -1338,6 +1338,7 @@
     f.mesh.material.opacity = 0.9;
   }
 
+  const shipBounds = new THREE.Box3();
   let boltSide = 1;
   function fireBolt() {
     if (!rocketMode) return;
@@ -1345,9 +1346,10 @@
     if (!b) return;
     boltSide = -boltSide;
     fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.0004);
-    tmpV.set(boltSide * 0.00012, 0.00004, 0).applyQuaternion(rocket.quaternion);
-    b.mesh.position.add(tmpV);
+    const halfW = (shipBounds.max.x - shipBounds.min.x) / 2 * 0.95;
+    const frontZ = shipBounds.max.z - rocket.position.z;
+    tmpV.set(boltSide * halfW, 0, frontZ * 0.95).applyQuaternion(rocket.quaternion);
+    b.mesh.position.copy(rocket.position).add(tmpV).addScaledVector(fwd, 0.0004);
     b.vel.copy(fwd).multiplyScalar(30).add(rocketVel);
     b.life = 3;
     b.mesh.visible = true;
@@ -1423,6 +1425,7 @@
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
+        shipBounds.setFromObject(rocket);
         const fx = (boxF.max.x - boxF.min.x) * 0.15;
         const fy = (boxF.max.y - boxF.min.y) * 0.22;
         const outers = flame.children.filter((c) => c.userData.outer);
@@ -1443,6 +1446,7 @@
   }
   rocket.position.set(40, 4, 0);
   scene.add(rocket);
+  shipBounds.setFromObject(rocket);
 
   const speedHud = document.getElementById("hud-speed");
 
