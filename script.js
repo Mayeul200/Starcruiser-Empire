@@ -115,7 +115,7 @@
       fact: "À retenir : Vénus tourne à l'envers (rotation rétrograde) par rapport aux autres planètes.",
     },
     {
-      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, cloudLayers: 3, atmoGlow: 0x5aa0ff,
+      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, cloudLayers: 8, atmoGlow: 0x5aa0ff,
       texUrls: [...TEX8("earth_daymap"), TJ + "earth_atmos_2048.jpg", ...TEX2("2k_earth_daymap.jpg")],
       cloudUrls: [UW("7/7a", "Solarsystemscope_texture_8k_earth_clouds.jpg"), TJ + "earth_clouds_1024.png"],
       nightUrls: [...TEX8("earth_nightmap"), TJ + "earth_lights_2048.png"],
@@ -866,8 +866,8 @@
     });
   }
 
-  function makeScatterAtmosphere(radius) {
-    const uniform = { value: new THREE.Vector3(0, 0, -1) };
+  function makeScatterAtmosphere(radius, sharedUniform) {
+    const uniform = sharedUniform || { value: new THREE.Vector3(0, 0, -1) };
     const mat = new THREE.ShaderMaterial({
       uniforms: { uSunDir: uniform },
       vertexShader: `
@@ -999,6 +999,8 @@
     if (data.name === "Terre") {
       const scatter = makeScatterAtmosphere(data.radius);
       tilt.add(scatter.mesh);
+      const scatter2 = makeScatterAtmosphere(data.radius * 1.06, scatter.uniform);
+      tilt.add(scatter2.mesh);
       data.scatterUniform = scatter.uniform;
       data.self = mesh;
       data.mat = material;
@@ -1295,7 +1297,7 @@
     }
     rocket.add(engineFlames);
 
-    rocket.scale.setScalar(0.005);
+    rocket.scale.setScalar(0.0005);
     return { group: rocket, flame: engineFlames, gimbal };
   }
 
@@ -1343,8 +1345,8 @@
     if (!b) return;
     boltSide = -boltSide;
     fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.004);
-    tmpV.set(boltSide * 0.0012, 0.0004, 0).applyQuaternion(rocket.quaternion);
+    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.0004);
+    tmpV.set(boltSide * 0.00012, 0.00004, 0).applyQuaternion(rocket.quaternion);
     b.mesh.position.add(tmpV);
     b.vel.copy(fwd).multiplyScalar(30).add(rocketVel);
     b.life = 3;
@@ -1664,7 +1666,7 @@
       rocketCam.radius = 1.0;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
-      camera.near = 0.0005;
+      camera.near = 0.00005;
       camera.updateProjectionMatrix();
       camSmooth.copy(camera.position);
       if (focused) resetView();
