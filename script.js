@@ -1349,7 +1349,7 @@
     if (!rocketMode || !rightDrag) return;
     rocketCam.dTheta -= e.movementX * 0.005;
     rocketCam.dPhi -= e.movementY * 0.005;
-    rocketCam.dPhi = Math.max(-1.2, Math.min(1.2, rocketCam.dPhi));
+    rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
   });
 
   window.addEventListener("pointermove", (e) => {
@@ -1362,7 +1362,7 @@
     if (rocketMode && (dragging || rightDrag)) {
       rocketCam.dTheta -= dx * 0.005;
       rocketCam.dPhi -= dy * 0.005;
-      rocketCam.dPhi = Math.max(-1.2, Math.min(1.2, rocketCam.dPhi));
+      rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
     } else if (!rocketMode) {
       orbit.desiredTheta -= dx * 0.005;
       orbit.desiredPhi -= dy * 0.005;
@@ -1700,7 +1700,8 @@
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
       camera.up.set(0, 1, 0);
-      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+      tmpV.set(0, 0, -0.275);
+      camera.lookAt(lookTarget.copy(rocket.localToWorld(tmpV)));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
