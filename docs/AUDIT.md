@@ -75,3 +75,5 @@ Date : 2026-11-09. Portée : diagnostic avant refonte des fondations (mission «
 - Étape 4 : rentrée atmosphérique (chauffage), portance, floating origin complet (sim SI + rendu relatif caméra).
 - Étape 5 : N-corps complet, rotation planètes, sous-pas physiques fixes.
 - Étape 6 : perfs (frustum culling terrain, unload), tests de transition.
+
+- **Étape 3 faite** (commit a8dbcf7) : terrain Terre en **vraies tuiles DEM Terrarium/NASA** (`elevation-tiles-prod` S3, cache, bloc 3×3), LOD par altitude (zoom 12 < 1,5 km, 10 < 6 km, 8 < 30 km), repli procédural, collision sol échantillonnée sur le DEM.
