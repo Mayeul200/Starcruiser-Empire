@@ -32,12 +32,12 @@
   const M_LOOK_AHEAD = SCALE.toSU(200);
   const M_SWAY = SCALE.toSU(0.4);
   const M_NEAR = SCALE.toSU(5);
-  const M_BOLT_R = SCALE.toSU(1.2);
-  const M_BOLT_LEN = SCALE.toSU(30);
-  const M_BOLT_V = SCALE.velSU(3480);
+  const M_BOLT_R = SCALE.toSU(2);
+  const M_BOLT_LEN = SCALE.toSU(40);
+  const M_BOLT_V = SCALE.velSU(500);
   const M_FLASH = SCALE.toSU(25);
   const M_HEAT = SCALE.toSU(3000);
-  const M_LAND = SCALE.toSU(1.6);
+  const M_LAND = SCALE.toSU(0.3);
   const M_COL = SCALE.toSU(3);
   const M_GGRAV = SCALE.toSU(7);
 
@@ -1588,14 +1588,6 @@
     return [Math.min(x, n - 1), Math.max(0, Math.min(y, n - 1))];
   }
 
-  function zoomForAlt(altSU) {
-    const hM = SCALE.toM(Math.max(altSU, 0));
-    if (hM < 1500) return 12;
-    if (hM < 6000) return 10;
-    if (hM < 30000) return 8;
-    return -1;
-  }
-
   function procHeight(x, z, s) {
     const u = (x / s + 0.5) * 8;
     const v = (z / s + 0.5) * 8;
@@ -1622,11 +1614,11 @@
     const d = t.data;
     const idx = (py * 256 + px) * 4;
     const h = d[idx] * 65536 + d[idx + 1] * 256 + d[idx + 2] / 256 - 32768;
-    return SCALE.toSU(Math.max(0, h)) * 5;
+    return SCALE.toSU(Math.max(0, h));
   }
 
   function terrainBiomeColor(hSU, ny, x, z, out) {
-    const hM = (hSU * SCALE.M_PER_SU) / 5;
+    const hM = hSU * SCALE.M_PER_SU;
     const forest = Math.abs((Math.sin(x * 123.7 + z * 317.3) * 43758.5453) % 1);
     if (hM > 2200 || (hM > 1500 && ny > 0.72)) out.setRGB(0.93, 0.95, 0.97);
     else if (ny < 0.62) out.setRGB(0.36, 0.35, 0.37);
@@ -1639,7 +1631,7 @@
     return out;
   }
 
-  function applyTerrainColors(geo) {
+  function applyTerrainColors(geo, lighten) {
     geo.computeVertexNormals();
     const pos = geo.attributes.position;
     const nrm = geo.attributes.normal;
@@ -1652,7 +1644,7 @@
     const white = new THREE.Color(1, 1, 1);
     for (let i = 0; i < pos.count; i++) {
       terrainBiomeColor(pos.getY(i), nrm.getY(i), pos.getX(i), pos.getZ(i), c);
-      c.lerp(white, 0.4);
+      if (lighten) c.lerp(white, 0.4);
       col.setXYZ(i, c.r, c.g, c.b);
     }
     col.needsUpdate = true;
@@ -1680,7 +1672,7 @@
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) pos.setY(i, procHeight(pos.getX(i), pos.getZ(i), s));
-    applyTerrainColors(geo);
+    applyTerrainColors(geo, s >= SCALE.toSU(5800));
     return geo;
   }
 
@@ -1693,11 +1685,11 @@
     Promise.all(loads).then((tiles) => {
       if (!terrain || !lv.mesh || tiles.some((t) => !t)) return;
       const base = (x, z) => demHeight(x, z, tiles, tx, ty, lv.zoom, lat, lon, lv.s);
-      lv.sample = (x, z) => base(x, z) + procHeight(x, z, lv.s) * 0.16;
+      lv.sample = base;
       const pos = lv.mesh.geometry.attributes.position;
       for (let i = 0; i < pos.count; i++) pos.setY(i, lv.sample(pos.getX(i), pos.getZ(i)));
       pos.needsUpdate = true;
-      applyTerrainColors(lv.mesh.geometry);
+      applyTerrainColors(lv.mesh.geometry, lv.zoom <= 14);
     });
   }
 
@@ -1719,7 +1711,7 @@
       tryLoadTexture(earthObj.data.texUrls, (tex) => {
         earthSkinTex = tex;
         for (const lv of terrainLevels) {
-          if (lv.mesh) {
+          if (lv.mesh && lv.zoom <= 14) {
             lv.mesh.material.map = earthSkinTex;
             lv.mesh.material.needsUpdate = true;
           }
@@ -1727,7 +1719,7 @@
       });
     } else {
       for (const lv of terrainLevels) {
-        if (lv.mesh) {
+        if (lv.mesh && lv.zoom <= 14) {
           lv.mesh.material.map = earthSkinTex;
           lv.mesh.material.needsUpdate = true;
         }
@@ -1799,13 +1791,10 @@
   const tmpPrev = new THREE.Vector3();
   const tmpC = new THREE.Vector3();
   const ORIGIN = new THREE.Vector3(0, 0, 0);
-  const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
   const camRight = new THREE.Vector3();
   let camShake = 0;
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-  const camLocal = new THREE.Vector3();
-  const rocketCam = { radius: 1.0, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1846,9 +1835,6 @@
 
   document.addEventListener("mousemove", (e) => {
     if (!rocketMode || !rightDrag) return;
-    rocketCam.dTheta -= e.movementX * 0.005;
-    rocketCam.dPhi += e.movementY * 0.005;
-    rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
   });
 
   window.addEventListener("pointermove", (e) => {
@@ -1859,9 +1845,6 @@
     lastY = e.clientY;
     dragMoved += Math.abs(dx) + Math.abs(dy);
     if (rocketMode && (dragging || rightDrag)) {
-      rocketCam.dTheta -= dx * 0.005;
-      rocketCam.dPhi += dy * 0.005;
-      rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
     } else if (!rocketMode) {
       orbit.desiredTheta -= dx * 0.005;
       orbit.desiredPhi -= dy * 0.005;
@@ -1985,12 +1968,8 @@
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     document.getElementById("crosshair").classList.toggle("hidden", !rocketMode);
     if (rocketMode) {
-      rocketCam.radius = 1.0;
-      rocketCam.dTheta = 0;
-      rocketCam.dPhi = 0;
       camera.near = M_NEAR;
       camera.updateProjectionMatrix();
-      camSmooth.copy(camera.position);
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -2071,21 +2050,14 @@
     const delta = Math.min(clock.getDelta(), 1 / 30);
 
     if (!paused) {
-      const orbitTime = rocketMode || focused ? 1e-4 : 0.02;
       for (const p of planetObjects) {
-        p.angle += delta * speedMultiplier * orbitTime * 0.9 * (365.25 / p.data.periodDays);
         planetPosition(p, p.angle, tmpPos);
         p.tilt.position.copy(tmpPos);
         p.label.position.set(tmpPos.x, p.data.radius + 2.4, tmpPos.z);
-        p.mesh.rotation.y += delta * speedMultiplier * 0.4;
+        p.mesh.rotation.y += delta * speedMultiplier * 0.05;
         if (p.data.cloudMeshes) for (const cm of p.data.cloudMeshes) cm.mesh.rotation.y += delta * speedMultiplier * cm.speed;
-        for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * orbitTime * m.speed;
       }
-      for (const l of beltLayers) {
-        l.group.rotation.y += delta * speedMultiplier * l.speed;
-        if (l.spin) l.spin.rotation.y += delta * speedMultiplier * 0.6;
-      }
-      sun.rotation.y += delta * speedMultiplier * 0.05;
+      sun.rotation.y += delta * speedMultiplier * 0.02;
     }
 
     stars.rotation.y += delta * 0.004;
