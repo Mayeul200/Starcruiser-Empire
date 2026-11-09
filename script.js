@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.1, -0.5);
+        f.position.set(sx * 0.17, sy * 0.1, -0.7);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1228,7 +1228,7 @@
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
-          if (sz.z < modelLen * 0.06 && mb.max.z < box2.min.z + modelLen * 0.25) o.visible = false;
+          if (sz.z < modelLen * 0.15 && mb.max.z < box2.min.z + modelLen * 0.4) o.visible = false;
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
@@ -1237,7 +1237,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.12);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.2);
           }
         }
         rocket.add(flame);
@@ -1599,7 +1599,7 @@
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       if (keys.KeyW) rocketVel.addScaledVector(fwd, 2.5 * delta);
-      if (keys.KeyS) rocketVel.addScaledVector(fwd, -0.8 * delta);
+      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -2.5 * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
       if (keys.Space) rocketVel.y += 2.5 * delta;
       if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 2.5 * delta;
       if (keys.KeyA) {
@@ -1667,7 +1667,7 @@
       camera.position.copy(rocket.localToWorld(camLocal));
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, 0.05));
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, -0.1));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
