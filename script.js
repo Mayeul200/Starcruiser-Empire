@@ -1227,16 +1227,19 @@
         const box2 = new THREE.Box3().setFromObject(model);
         const center = box2.getCenter(new THREE.Vector3());
         model.position.sub(center);
-        const modelLen = box2.max.z - box2.min.z;
+        const box3 = new THREE.Box3().setFromObject(model);
+        model.position.z -= box3.max.z;
+        const boxF = new THREE.Box3().setFromObject(model);
+        const modelLen = boxF.max.z - boxF.min.z;
         model.traverse((o) => {
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
-          if (mb.max.z < box2.min.z + modelLen * 0.08) {
+          if (mb.max.z < boxF.min.z + modelLen * 0.08) {
             o.visible = false;
             return;
           }
-          const atBack = mb.max.z < box2.min.z + modelLen * 0.65;
+          const atBack = mb.max.z < boxF.min.z + modelLen * 0.65;
           const thinZ = sz.z < modelLen * 0.25;
           let purple = false;
           if (o.material) {
@@ -1247,19 +1250,19 @@
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
-        const fx = (box2.max.x - box2.min.x) * 0.15;
-        const fy = (box2.max.y - box2.min.y) * 0.22;
+        const fx = (boxF.max.x - boxF.min.x) * 0.15;
+        const fy = (boxF.max.y - boxF.min.y) * 0.22;
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.02);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.02);
           }
         }
         const coverMat = new THREE.MeshBasicMaterial({ color: 0x05080f, depthWrite: true });
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
             const disc = new THREE.Mesh(new THREE.CircleGeometry(Math.max(fx, fy) * 0.9, 16), coverMat);
-            disc.position.set(sxn * fx, syn * fy, box2.min.z - 0.004);
+            disc.position.set(sxn * fx, syn * fy, boxF.min.z - 0.004);
             disc.rotation.y = Math.PI;
             rocket.add(disc);
           }
