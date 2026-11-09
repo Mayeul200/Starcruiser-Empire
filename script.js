@@ -1699,9 +1699,8 @@
       tmpV.copy(fwd).multiplyScalar(-worldR).applyQuaternion(qYaw).applyQuaternion(qPitch);
       tmpV.y += 0.007;
       camera.position.copy(pivot).add(tmpV);
-      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(pivot));
+      camera.up.set(0, 1, 0);
+      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
