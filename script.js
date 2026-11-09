@@ -1699,7 +1699,8 @@
       tmpV.copy(fwd).multiplyScalar(-worldR).applyQuaternion(qYaw).applyQuaternion(qPitch);
       tmpV.y += 0.007;
       camera.position.copy(pivot).add(tmpV);
-      camera.up.set(0, 1, 0);
+      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      camera.up.copy(tmpUp);
       camera.lookAt(lookTarget.copy(pivot));
     }
 
