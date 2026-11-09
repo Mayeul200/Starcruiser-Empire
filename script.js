@@ -941,11 +941,17 @@
     const orbitLine = makeOrbitEllipse(data.orbit, data.b, data.omegaRad, orbitGroup);
     orbitLines.push(orbitLine);
 
-    const material = new THREE.MeshStandardMaterial({
-      map: makeProcTexture(data.proc, 1000 + index * 77),
-      roughness: 0.95,
-      metalness: 0.02,
-    });
+    const material = data.name === "Terre"
+      ? new THREE.MeshPhongMaterial({
+          map: makeProcTexture(data.proc, 1000 + index * 77),
+          shininess: 28,
+          specular: 0x88aabb,
+        })
+      : new THREE.MeshStandardMaterial({
+          map: makeProcTexture(data.proc, 1000 + index * 77),
+          roughness: 0.95,
+          metalness: 0.02,
+        });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 48, 48), material);
     mesh.scale.y = 1 - (data.flattening || 0);
     mesh.userData.planet = data;
@@ -976,8 +982,8 @@
     if (data.specUrls) {
       tryLoadTexture(data.specUrls, (tex) => {
         material.specularMap = tex;
-        material.specular = new THREE.Color(0x9fc4e8);
-        material.roughness = 0.55;
+        if ("shininess" in material) material.shininess = 60;
+        else material.specular = new THREE.Color(0x9fc4e8);
         material.needsUpdate = true;
       });
     }
