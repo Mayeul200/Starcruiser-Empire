@@ -1656,18 +1656,10 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      const th = Math.PI + rocketCam.dTheta;
-      const ph = Math.PI / 2 - 0.14 + rocketCam.dPhi;
-      camLocal.set(
-        rocketCam.radius * Math.sin(ph) * Math.sin(th),
-        rocketCam.radius * Math.cos(ph),
-        rocketCam.radius * Math.sin(ph) * Math.cos(th)
-      );
+      camLocal.set(0, 0.14, -0.7);
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
-      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, -0.1));
+      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
