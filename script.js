@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.1, -0.7);
+        f.position.set(sx * 0.17, sy * 0.05, -0.35);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1228,16 +1228,16 @@
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
-          if (sz.z < modelLen * 0.15 && mb.max.z < box2.min.z + modelLen * 0.4) o.visible = false;
+          if (sz.z < modelLen * 0.2 && mb.max.z < box2.min.z + modelLen * 0.5) o.visible = false;
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
         const fx = (box2.max.x - box2.min.x) * 0.135;
-        const fy = (box2.max.y - box2.min.y) * 0.135;
+        const fy = (box2.max.y - box2.min.y) * 0.08;
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.2);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.06);
           }
         }
         rocket.add(flame);
@@ -1347,7 +1347,7 @@
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
       rocketCam.radius = Math.max(0.4, Math.min(3, rocketCam.radius));
-    } else {
+    } else if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
     }
@@ -1600,8 +1600,9 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       if (keys.KeyW) rocketVel.addScaledVector(fwd, 2.5 * delta);
       if (keys.KeyS) { rocketVel.addScaledVector(fwd, -2.5 * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
-      if (keys.Space) rocketVel.y += 2.5 * delta;
-      if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 2.5 * delta;
+      tmpV.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      if (keys.Space) rocketVel.addScaledVector(tmpV, 2.5 * delta);
+      if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -2.5 * delta);
       if (keys.KeyA) {
         tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
         rocketVel.addScaledVector(tmpV, 2.5 * delta);
@@ -1656,10 +1657,18 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.14, -0.7);
+      const th = Math.PI + rocketCam.dTheta;
+      const ph = Math.PI / 2 - 0.14 + rocketCam.dPhi;
+      camLocal.set(
+        rocketCam.radius * Math.sin(ph) * Math.sin(th),
+        rocketCam.radius * Math.cos(ph),
+        rocketCam.radius * Math.sin(ph) * Math.cos(th)
+      );
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
-      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      camera.up.copy(tmpUp);
+      camera.lookAt(lookTarget.copy(rocket.position));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
