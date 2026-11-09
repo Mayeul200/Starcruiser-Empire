@@ -63,3 +63,9 @@ Batterie exécutée en local : serveur statique + Chromium headless 1280×720, W
 - `ReferenceError: ACCEL_SCALE is not defined` (script.js:1095, mu des lunes) : init interrompue à la 1ère lune -> planètes/labels/menu absents. Corrigé : `SCALE.accelSU(m.gSurface) * size * size`.
 - Handler `webglcontextlost`/`webglcontextrestored` ajouté (perte GPU -> overlay + reload auto).
 - Trouvé par tests headless Chromium (Playwright) : 0 erreur JS, 8 planètes + lunes OK, repli procédural OK quand CDN bloqué.
+
+## v111+ — tests headless Chromium réels (tools/headless-test.mjs)
+
+Script réutilisable : `PLAYWRIGHT_DIR=/tmp/pwtest/ LD_LIBRARY_PATH=... node tools/headless-test.mjs` (Chromium headless-shell + libs .deb extraits sur deb.debian.org).
+
+Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 planètes + labels**, 0 requête échouée, canvas OK, pas d'overlay fatal, screenshot OK (Soleil + 8 planètes + orbites + HUD). Perf headless : 142 draw calls, ~203k triangles, HUD 30 fps (limité par le rendu logiciel, pas représentatif d'un vrai GPU).
