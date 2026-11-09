@@ -1379,7 +1379,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.4, Math.min(3, rocketCam.radius));
+      rocketCam.radius = Math.max(0.6, Math.min(3, rocketCam.radius));
     } else if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1675,9 +1675,9 @@
 
       for (const p of planetObjects) {
         p.mesh.getWorldPosition(tmpC);
-        collideSegment(tmpC, p.data.radius + 0.02);
+        collideSegment(tmpC, p.data.radius + 0.03);
       }
-      collideSegment(ORIGIN, SUN_RADIUS + 0.04);
+      collideSegment(ORIGIN, SUN_RADIUS + 0.06);
 
       for (const c of flame.children) {
         c.visible = !!keys.KeyW;
