@@ -29,6 +29,22 @@ En bas à droite : **FPS + draw calls + triangles** (`renderer.info`) mis à jou
 - [ ] Gravité ressentie près des planètes ; collisions sans traversée
 - [ ] FPS stable (> 30) en vue système et au sol
 
+## v111 — tests perfs/robustesse en Chromium headless (Playwright, SwiftShader)
+
+Batterie exécutée en local : serveur statique + Chromium headless 1280×720, WebGL software (SwiftShader).
+
+| Test | Résultat |
+|---|---|
+| Chargement (`load`) | ~600 ms (CDN OK) ; 3,2 s avec repli procédural (429 CDN) |
+| Erreurs JS (`pageerror`) | ✅ 0 après correctif v111 |
+| **Bug trouvé & corrigé** : `ACCEL_SCALE is not defined` (script.js:1095) interrompait l'init à la 1ʳᵉ lune → planètes/labels/menu jamais créés. Remplacé par `SCALE.accelSU(m.gSurface)` | ✅ corrigé |
+| FPS (SwiftShader, logiciel) | 61 FPS scène vide (bug), 7–19 FPS scène complète — non représentatif d'un GPU réel |
+| Pire frame / spikes >100 ms (logiciel) | 300 ms / 26 spikes sur 4 s (logiciel) |
+| Heap JS | 10–12 Mo, stable |
+| Repli procédural (CDN 429/offline) | ✅ automatique, zéro erreur bloquante |
+| `webglcontextlost` | ✅ handler ajouté (v111) : overlay + reload auto — avant : page noire muette |
+| Rechargement x5 (headless+SwiftShader) | ⚠️ crash du thread GPU (int3) à la 2ᵉ création de contexte dans le même processus — reproductible uniquement en rendu logiciel headless, à vérifier sur GPU réel ; page témoin WebGL simple = OK |
+
 ## ⚠️ Limites connues
 
 - Relief exagéré ×2 côté rendu proche ; tuiles DEM limitées aux zooms 8/10/12.

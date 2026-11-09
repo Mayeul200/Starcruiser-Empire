@@ -39,6 +39,12 @@
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
+
+  canvas.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault();
+    showFatal("Le contexte WebGL a été perdu (GPU surchargé ou pilote réinitialisé). Rechargement automatique...");
+    setTimeout(() => location.reload(), 1500);
+  }, false);
   if (THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
@@ -1092,7 +1098,7 @@
       moonMesh.position.x = m.dist;
       tilt.add(moonPivot);
       if (m.atmoGlow) moonMesh.add(makeAtmosphere(size, m.color, m.atmoGlow, 0.8));
-      moons.push({ pivot: moonPivot, speed: m.speed, mesh: moonMesh, mu: m.gSurface ? (m.gSurface / ACCEL_SCALE) * size * size : 0.05 });
+      moons.push({ pivot: moonPivot, speed: m.speed, mesh: moonMesh, mu: m.gSurface ? SCALE.accelSU(m.gSurface) * size * size : 0.05 });
     });
 
     if (data.clouds) {
