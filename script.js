@@ -1206,6 +1206,16 @@
       if (!urls.length) return;
       gltfLoader.load(urls[0], (gltf) => {
         const model = gltf.scene;
+        model.traverse((o) => {
+          if (o.isMesh && o.material) {
+            const mats = Array.isArray(o.material) ? o.material : [o.material];
+            for (const m of mats) {
+              m.transparent = false;
+              m.opacity = 1;
+              m.depthWrite = true;
+            }
+          }
+        });
         const box = new THREE.Box3().setFromObject(model);
         const size = box.getSize(new THREE.Vector3());
         const len = Math.max(size.x, size.y, size.z) || 1;
@@ -1215,8 +1225,8 @@
         model.position.sub(center);
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
-        const fx = (box2.max.x - box2.min.x) * 0.27;
-        const fy = (box2.max.y - box2.min.y) * 0.27;
+        const fx = (box2.max.x - box2.min.x) * 0.135;
+        const fy = (box2.max.y - box2.min.y) * 0.135;
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
@@ -1637,7 +1647,7 @@
       camLocal.set(0, 0.036, -rocketCam.radius);
       rocket.updateMatrixWorld();
       tmpV.copy(rocket.localToWorld(camLocal));
-      camSmooth.lerp(tmpV, 0.35);
+      camSmooth.lerp(tmpV, 0.55);
       camera.position.copy(camSmooth);
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
