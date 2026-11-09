@@ -1176,9 +1176,9 @@
     const flameMat = new THREE.MeshBasicMaterial({ color: 0x66ccff, blending: THREE.AdditiveBlending, transparent: true, opacity: 1, depthWrite: false });
     for (const sx of [-1, 1]) {
       for (const sy of [-1, 1]) {
-        const f = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.16, 10), flameMat);
+        const f = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.16, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.16, sy * 0.18, -0.4);
+        f.position.set(sx * 0.16, sy * 0.18, -0.5);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1255,7 +1255,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.05);
           }
         }
         rocket.add(flame);
@@ -1701,7 +1701,7 @@
       camera.position.copy(rocket.localToWorld(camLocal));
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(rocket.position));
+      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, -0.275));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
