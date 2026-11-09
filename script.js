@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.32, sy * 0.18, -0.5);
+        f.position.set(sx * 0.32, sy * 0.18, -0.3);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1244,7 +1244,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.15);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.05);
           }
         }
         rocket.add(flame);
