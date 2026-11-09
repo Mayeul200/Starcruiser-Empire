@@ -36,7 +36,7 @@
   camera.position.set(0, 95, 300);
 
   scene.add(new THREE.AmbientLight(0x334466, 1.1));
-  const sunLight = new THREE.PointLight(0xfff3d6, 2.2, 0, 0);
+  const sunLight = new THREE.PointLight(0xfff3d6, 3.0, 0, 0);
   scene.add(sunLight);
 
   /* ============================================================
@@ -918,11 +918,11 @@
       fresnelMaterial(0xffffff, 5.0, 0.3 * strength)
     );
     const halo1 = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: sharedGlowTex, color: colorHex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.22, depthWrite: false })
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: colorHex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.22 * strength, depthWrite: false })
     );
     halo1.scale.set(radius * 2.3, radius * 2.3, 1);
     const halo2 = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.1, depthWrite: false })
+      new THREE.SpriteMaterial({ map: sharedGlowTex, color: atmoColor, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.1 * strength, depthWrite: false })
     );
     halo2.scale.set(radius * 3.1, radius * 3.1, 1);
     group.add(shellOuter, shellInner, halo1, halo2);
