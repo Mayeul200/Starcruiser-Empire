@@ -1120,57 +1120,73 @@
 
   function buildRocket() {
     const rocket = new THREE.Group();
-    const inner = new THREE.Group();
-    inner.rotation.x = Math.PI / 2;
-    rocket.add(inner);
-    const white = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35, metalness: 0.4 });
-    const red = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.2 });
-    const dark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6, metalness: 0.6 });
+    const hull = new THREE.MeshStandardMaterial({ color: 0xd7dde8, roughness: 0.4, metalness: 0.5 });
+    const accent = new THREE.MeshStandardMaterial({ color: 0xe8622d, roughness: 0.5, metalness: 0.3 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x2b3442, roughness: 0.6, metalness: 0.6 });
+    const glass = new THREE.MeshStandardMaterial({ color: 0x9be8ff, emissive: 0x1e6f8f, emissiveIntensity: 0.8, roughness: 0.15, metalness: 0.2 });
 
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.38, 1.8, 24), white);
-    body.position.y = 0;
-    inner.add(body);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.55, 20), hull);
+    body.rotation.x = Math.PI / 2;
+    rocket.add(body);
 
-    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 24), red);
-    nose.position.y = 1.25;
-    inner.add(nose);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.22, 20), accent);
+    nose.rotation.x = Math.PI / 2;
+    nose.position.z = 0.385;
+    rocket.add(nose);
 
-    const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.385, 0.39, 0.18, 24), red);
-    stripe.position.y = 0.45;
-    inner.add(stripe);
+    const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), glass);
+    cockpit.scale.set(0.8, 0.6, 1.4);
+    cockpit.position.set(0, 0.05, 0.12);
+    rocket.add(cockpit);
 
-    const window = new THREE.Mesh(
-      new THREE.SphereGeometry(0.13, 16, 16),
-      new THREE.MeshStandardMaterial({ color: 0x7df9ff, emissive: 0x22d3ee, emissiveIntensity: 0.9, roughness: 0.2 })
-    );
-    window.position.set(0, 0.75, 0.26);
-    inner.add(window);
+    for (const sx of [-1, 1]) {
+      for (const sy of [-1, 1]) {
+        const wing = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.34), accent);
+        wing.position.set(sx * 0.11, sy * 0.05, -0.05);
+        wing.rotation.z = sx * sy * 0.6;
+        wing.rotation.y = sx * 0.3;
+        rocket.add(wing);
 
-    for (let i = 0; i < 3; i++) {
-      const fin = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 0.45), red);
-      const a = (i / 3) * Math.PI * 2;
-      fin.position.set(Math.cos(a) * 0.38, -0.75, Math.sin(a) * 0.38);
-      fin.rotation.y = -a;
-      inner.add(fin);
+        const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.1, 12), dark);
+        engine.rotation.x = Math.PI / 2;
+        engine.position.set(sx * 0.17, sy * 0.1, -0.2);
+        rocket.add(engine);
+
+        const glow = new THREE.Mesh(
+          new THREE.CircleGeometry(0.02, 12),
+          new THREE.MeshBasicMaterial({ color: 0xff7a2a, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.9, depthWrite: false })
+        );
+        glow.position.set(sx * 0.17, sy * 0.1, -0.255);
+        glow.rotation.y = Math.PI;
+        rocket.add(glow);
+      }
+    }
+
+    for (const sx of [-1, 1]) {
+      const cannon = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.22, 8), dark);
+      cannon.rotation.x = Math.PI / 2;
+      cannon.position.set(sx * 0.17, 0.02, 0.3);
+      rocket.add(cannon);
     }
 
     const gimbal = new THREE.Group();
-    gimbal.position.y = -1.05;
-    inner.add(gimbal);
+    gimbal.position.z = -0.3;
+    rocket.add(gimbal);
 
-    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 0.3, 16), dark);
+    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.12, 14), dark);
+    nozzle.rotation.x = Math.PI / 2;
     gimbal.add(nozzle);
 
     const flame = new THREE.Mesh(
-      new THREE.ConeGeometry(0.2, 1.1, 16),
+      new THREE.ConeGeometry(0.04, 0.22, 14),
       new THREE.MeshBasicMaterial({ color: 0xffa726, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.9, depthWrite: false })
     );
-    flame.rotation.x = Math.PI;
-    flame.position.y = -0.6;
+    flame.rotation.x = -Math.PI / 2;
+    flame.position.z = -0.16;
     flame.visible = false;
     gimbal.add(flame);
 
-    rocket.scale.setScalar(0.0175);
+    rocket.scale.setScalar(0.25);
     return { group: rocket, flame, gimbal };
   }
 
@@ -1219,7 +1235,7 @@
   const lookTarget = new THREE.Vector3();
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
   const camLocal = new THREE.Vector3();
-  const rocketCam = { radius: 0.12, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 0.35, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1272,7 +1288,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.08, Math.min(1.6, rocketCam.radius));
+      rocketCam.radius = Math.max(0.3, Math.min(3, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1381,9 +1397,11 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 0.12;
+      rocketCam.radius = 0.35;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
+      camera.near = 0.01;
+      camera.updateProjectionMatrix();
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -1391,6 +1409,8 @@
       } catch (err) {}
     } else {
       camera.up.set(0, 1, 0);
+      camera.near = 0.1;
+      camera.updateProjectionMatrix();
       if (document.exitPointerLock) document.exitPointerLock();
       const off = tmpV.copy(camera.position).sub(orbit.target);
       const len = Math.max(0.001, off.length());
@@ -1575,7 +1595,7 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.018, -rocketCam.radius);
+      camLocal.set(0, 0.06, -rocketCam.radius);
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
