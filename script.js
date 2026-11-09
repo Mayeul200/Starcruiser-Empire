@@ -1370,7 +1370,7 @@
   /* ---------- Tirs laser ---------- */
 
   const bolts = [];
-  const boltGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.35, 6);
+  const boltGeo = new THREE.CylinderGeometry(8e-7, 8e-7, 9e-6, 6);
   boltGeo.rotateX(Math.PI / 2);
   const boltMat = new THREE.MeshBasicMaterial({ color: 0xff4455, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
   for (let i = 0; i < 40; i++) {
@@ -1380,7 +1380,7 @@
     bolts.push({ mesh: b, vel: new THREE.Vector3(), life: 0 });
   }
   const flashes = [];
-  const flashGeo = new THREE.SphereGeometry(0.06, 10, 10);
+  const flashGeo = new THREE.SphereGeometry(1.5e-5, 10, 10);
   for (let i = 0; i < 12; i++) {
     const fm = new THREE.MeshBasicMaterial({ color: 0xffaa33, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false });
     const f = new THREE.Mesh(flashGeo, fm);
@@ -1407,13 +1407,14 @@
     if (!b) return;
     boltSide = -boltSide;
     fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-    const halfW = (shipBounds.max.x - shipBounds.min.x) / 2 * 0.95;
-    const frontZ = shipBounds.max.z - rocket.position.z;
-    tmpV.set(boltSide * halfW, 0, frontZ * 0.95).applyQuaternion(rocket.quaternion);
-    b.mesh.position.copy(rocket.position).add(tmpV).addScaledVector(fwd, 0.00001);
-    b.vel.copy(fwd).multiplyScalar(30).add(rocketVel);
-    b.life = 3;
+    const shipLen = SCALE.shipLengthSU();
+    tmpV.set(boltSide * shipLen * 0.55, 0, shipLen * 0.5).applyQuaternion(rocket.quaternion);
+    b.mesh.position.copy(rocket.position).add(tmpV);
+    b.mesh.quaternion.copy(rocket.quaternion);
+    b.vel.copy(fwd).multiplyScalar(0.0006).add(rocketVel);
+    b.life = 8;
     b.mesh.visible = true;
+    camShake = 1;
     spawnFlash(b.mesh.position);
   }
 
@@ -1701,6 +1702,8 @@
   const ORIGIN = new THREE.Vector3(0, 0, 0);
   const camSmooth = new THREE.Vector3();
   const lookTarget = new THREE.Vector3();
+  const camRight = new THREE.Vector3();
+  let camShake = 0;
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
   const camLocal = new THREE.Vector3();
   const rocketCam = { radius: 1.0, dTheta: 0, dPhi: 0 };
@@ -2159,11 +2162,22 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
+      camRight.crossVectors(tmpUp, fwd).normalize();
       origin.copy(rocket.position);
       world.position.copy(origin).negate();
       rocket.updateMatrixWorld();
       const shipWp = rocket.getWorldPosition(tmpV2);
-      camera.position.copy(shipWp).addScaledVector(fwd, -0.000012).addScaledVector(tmpUp, 0.0000015);
+      const camT = clock.elapsedTime;
+      camShake *= Math.exp(-5 * delta);
+      const speedStretch = Math.min(rocketVel.length(), 1.727) * 5e-7;
+      const swayR = Math.sin(camT * 0.9) * 2.5e-7 + Math.sin(camT * 2.3 + 1.7) * 1.2e-7;
+      const swayU = Math.sin(camT * 1.4 + 0.6) * 1.8e-7 + Math.sin(camT * 3.1) * 0.8e-7;
+      const shakeR = camShake * Math.sin(camT * 43) * 3e-7;
+      const shakeU = camShake * Math.cos(camT * 51) * 3e-7;
+      camera.position.copy(shipWp)
+        .addScaledVector(fwd, -0.000012 - speedStretch)
+        .addScaledVector(tmpUp, 0.0000015 + swayU + shakeU)
+        .addScaledVector(camRight, swayR + shakeR);
       camera.up.copy(tmpUp);
       camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0002));
     }
