@@ -1695,7 +1695,7 @@
       camLocal.set(
         rocketCam.radius * Math.sin(ph) * Math.sin(th),
         rocketCam.radius * Math.cos(ph),
-        rocketCam.radius * Math.sin(ph) * Math.cos(th)
+        -0.275 + rocketCam.radius * Math.sin(ph) * Math.cos(th)
       );
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
