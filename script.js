@@ -54,6 +54,10 @@
     setTimeout(() => location.reload(), 1500);
   }, false);
   if (THREE.sRGBEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
+  if (THREE.ACESFilmicToneMapping !== undefined) {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+  }
 
   const scene = new THREE.Scene();
   const world = new THREE.Group();
@@ -68,7 +72,7 @@
   camera.position.set(0, 95, 300);
 
   scene.add(new THREE.AmbientLight(0x334466, 1.1));
-  const sunLight = new THREE.PointLight(0xfff3d6, 3.0, 0, 0);
+  const sunLight = new THREE.PointLight(0xfff3d6, 1.7, 0, 0);
   scene.add(sunLight);
 
   /* ============================================================
@@ -1001,8 +1005,8 @@
     const material = data.name === "Terre"
       ? new THREE.MeshPhongMaterial({
           map: makeProcTexture(data.proc, 1000 + index * 77),
-          shininess: 28,
-          specular: 0x88aabb,
+          shininess: 6,
+          specular: 0x1c2a38,
         })
       : new THREE.MeshStandardMaterial({
           map: makeProcTexture(data.proc, 1000 + index * 77),
@@ -2118,7 +2122,7 @@
         scene.fog = null;
       }
 
-      if (rocketVel.length() > 15) rocketVel.setLength(15);
+      if (rocketVel.length() > 50) rocketVel.setLength(50);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
@@ -2159,7 +2163,7 @@
       world.position.copy(origin).negate();
       rocket.updateMatrixWorld();
       const shipWp = rocket.getWorldPosition(tmpV2);
-      camera.position.copy(shipWp).addScaledVector(fwd, -0.000012).addScaledVector(tmpUp, 0.000004);
+      camera.position.copy(shipWp).addScaledVector(fwd, -0.000012).addScaledVector(tmpUp, 0.0000015);
       camera.up.copy(tmpUp);
       camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0002));
     }
