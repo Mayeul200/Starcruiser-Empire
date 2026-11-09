@@ -1348,7 +1348,7 @@
   document.addEventListener("mousemove", (e) => {
     if (!rocketMode || !rightDrag) return;
     rocketCam.dTheta -= e.movementX * 0.005;
-    rocketCam.dPhi -= e.movementY * 0.005;
+    rocketCam.dPhi += e.movementY * 0.005;
     rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
   });
 
@@ -1361,7 +1361,7 @@
     dragMoved += Math.abs(dx) + Math.abs(dy);
     if (rocketMode && (dragging || rightDrag)) {
       rocketCam.dTheta -= dx * 0.005;
-      rocketCam.dPhi -= dy * 0.005;
+      rocketCam.dPhi += dy * 0.005;
       rocketCam.dPhi = Math.max(-0.9, Math.min(0.9, rocketCam.dPhi));
     } else if (!rocketMode) {
       orbit.desiredTheta -= dx * 0.005;
