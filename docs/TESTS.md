@@ -72,3 +72,5 @@ Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 plan�
 
 - **Règle notée dans le code** (en-tête de `script.js` + README) : lancer `tools/headless-test.mjs` après chaque modification.
 - Re-test v111 (2ᵉ passage) : 0 erreur JS, 8 planètes, 0 requête échouée, 139 calls / 203k tri, pas d'overlay fatal. ✅
+
+- **v112** : fix caméra mode vaisseau (floating origin : `rocket.position - origin`), test headless OK (0 erreur, 8 planètes, 140 calls). Bump v112 unique (évite la collision de cache v111).

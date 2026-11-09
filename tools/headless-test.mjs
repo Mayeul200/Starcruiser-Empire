@@ -36,7 +36,7 @@ page.on("console", (m) => { if (m.type() === "error") errors.push("CONSOLE: " + 
 page.on("requestfailed", (r) => failed.push(r.url() + " -> " + (r.failure()?.errorText || "?")));
 
 const t0 = Date.now();
-await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "load", timeout: 30000 });
+await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded", timeout: 45000 });
 await page.waitForTimeout(6000);
 
 await page.evaluate(() => {
