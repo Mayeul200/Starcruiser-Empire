@@ -1699,9 +1699,8 @@
       );
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
-      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(rocket.position).addScaledVector(fwd, -0.275));
+      camera.up.set(0, 1, 0);
+      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
