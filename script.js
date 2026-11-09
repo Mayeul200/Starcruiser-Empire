@@ -955,19 +955,6 @@
     });
 
     if (data.nightUrls) {
-      material.onBeforeCompile = (shader) => {
-        shader.uniforms.uSunDir = { value: new THREE.Vector3(0, 0, -1) };
-        material.userData.uSun = shader.uniforms.uSunDir;
-        shader.vertexShader = shader.vertexShader
-          .replace("#include <common>", "#include <common>\nvarying vec3 vWorldN;")
-          .replace("#include <fog_vertex>", "#include <fog_vertex>\nvWorldN = normalize(mat3(modelMatrix) * objectNormal);");
-        shader.fragmentShader = shader.fragmentShader
-          .replace("#include <common>", "#include <common>\nvarying vec3 vWorldN;\nuniform vec3 uSunDir;")
-          .replace(
-            "#include <emissivemap_fragment>",
-            "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= 1.0 - smoothstep(-0.15, 0.25, dot(normalize(vWorldN), normalize(uSunDir)));"
-          );
-      };
       tryLoadTexture(data.nightUrls, (tex) => {
         material.emissiveMap = tex;
         material.emissive = new THREE.Color(0xffffff);
@@ -1763,9 +1750,6 @@
       if (p.data.scatterUniform && p.data.self) {
         p.data.self.getWorldPosition(tmpV);
         p.data.scatterUniform.value.copy(tmpV).normalize().negate();
-        if (p.data.mat && p.data.mat.userData.uSun) {
-          p.data.mat.userData.uSun.value.copy(p.data.scatterUniform.value);
-        }
       }
     }
 
