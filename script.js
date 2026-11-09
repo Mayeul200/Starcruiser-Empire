@@ -1390,10 +1390,7 @@
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    if (rocketMode) {
-      rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.6, Math.min(3, rocketCam.radius));
-    } else if (!rocketMode) {
+    if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
     }
@@ -1703,19 +1700,10 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      qYaw.setFromAxisAngle(upAxis, rocketCam.dTheta);
-      qPitch.setFromAxisAngle(xAxis, rocketCam.dPhi);
+      camLocal.set(0, 0.14, -0.9);
       rocket.updateMatrixWorld();
-      tmpV2.set(0, 0, -0.275);
-      const pivot = rocket.localToWorld(tmpV2);
-      const worldR = rocketCam.radius * 0.05;
-      tmpV.copy(fwd).multiplyScalar(-worldR).applyQuaternion(qYaw).applyQuaternion(qPitch);
-      tmpV.y += 0.007;
-      camera.position.copy(pivot).add(tmpV);
-      camera.up.set(0, 1, 0);
-      const camPitch = Math.asin(Math.max(-1, Math.min(1, fwd.y)));
-      const camYaw = Math.atan2(-fwd.x, -fwd.z);
-      camera.quaternion.setFromEuler(new THREE.Euler(camPitch, camYaw, 0, "YXZ"));
+      camera.position.copy(rocket.localToWorld(camLocal));
+      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
