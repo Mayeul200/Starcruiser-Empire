@@ -115,7 +115,7 @@
       fact: "À retenir : Vénus tourne à l'envers (rotation rétrograde) par rapport aux autres planètes.",
     },
     {
-      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, atmoGlow: 0x5aa0ff,
+      name: "Terre", au: 1.0, rKm: 6371, tilt: 23.4, e: 0.0167, omega: 102, inc: 0.0, node: 0.0, periodDays: 365.25, flattening: 0.0034, color: 0x4d8fd1, clouds: true, cloudLayers: 3, atmoGlow: 0x5aa0ff,
       texUrls: [...TEX8("earth_daymap"), TJ + "earth_atmos_2048.jpg", ...TEX2("2k_earth_daymap.jpg")],
       cloudUrls: [UW("7/7a", "Solarsystemscope_texture_8k_earth_clouds.jpg"), TJ + "earth_clouds_1024.png"],
       nightUrls: [...TEX8("earth_nightmap"), TJ + "earth_lights_2048.png"],
@@ -1071,20 +1071,24 @@
     });
 
     if (data.clouds) {
-      const cloudMat = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        transparent: true,
-        depthWrite: false,
-        shininess: 4,
-        opacity: 0.92,
-      });
-      const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * 1.015, 64, 64), cloudMat);
-      tilt.add(clouds);
-      tryLoadTexture(data.cloudUrls, (tex) => {
-        cloudMat.alphaMap = tex;
-        cloudMat.needsUpdate = true;
-      });
-      data.cloudsMesh = clouds;
+      const layerCount = data.cloudLayers || 1;
+      data.cloudMeshes = [];
+      for (let li = 0; li < layerCount; li++) {
+        const cloudMat = new THREE.MeshPhongMaterial({
+          color: 0xffffff,
+          transparent: true,
+          depthWrite: false,
+          shininess: 4,
+          opacity: li === 0 ? 0.95 : 0.4,
+        });
+        const clouds = new THREE.Mesh(new THREE.SphereGeometry(data.radius * (1.015 + li * 0.012), 64, 64), cloudMat);
+        tilt.add(clouds);
+        tryLoadTexture(data.cloudUrls, (tex) => {
+          cloudMat.alphaMap = tex;
+          cloudMat.needsUpdate = true;
+        });
+        data.cloudMeshes.push({ mesh: clouds, speed: 0.55 + li * 0.3 });
+      }
     }
 
     planetObjects.push({ data, mesh, tilt, label, moons, angle: Math.random() * Math.PI * 2 });
@@ -1332,12 +1336,16 @@
     f.mesh.material.opacity = 0.9;
   }
 
+  let boltSide = 1;
   function fireBolt() {
     if (!rocketMode) return;
     const b = bolts.find((x) => !x.mesh.visible);
     if (!b) return;
+    boltSide = -boltSide;
     fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.1);
+    b.mesh.position.copy(rocket.position).addScaledVector(fwd, 0.004);
+    tmpV.set(boltSide * 0.0012, 0.0004, 0).applyQuaternion(rocket.quaternion);
+    b.mesh.position.add(tmpV);
     b.vel.copy(fwd).multiplyScalar(30).add(rocketVel);
     b.life = 3;
     b.mesh.visible = true;
@@ -1740,7 +1748,7 @@
         p.tilt.position.copy(tmpPos);
         p.label.position.set(tmpPos.x, p.data.radius + 2.4, tmpPos.z);
         p.mesh.rotation.y += delta * speedMultiplier * 0.4;
-        if (p.data.cloudsMesh) p.data.cloudsMesh.rotation.y += delta * speedMultiplier * 0.55;
+        if (p.data.cloudMeshes) for (const cm of p.data.cloudMeshes) cm.mesh.rotation.y += delta * speedMultiplier * cm.speed;
         for (const m of p.moons) m.pivot.rotation.y += delta * speedMultiplier * m.speed;
       }
       for (const l of beltLayers) {
