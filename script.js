@@ -1202,11 +1202,13 @@
         f.rotation.x = -Math.PI / 2;
         f.position.set(sx * 0.16, sy * 0.18, -0.65);
         f.visible = false;
+        f.userData.outer = true;
         engineFlames.add(f);
         const core = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.12, 8), coreMat);
         core.rotation.x = -Math.PI / 2;
         core.position.set(sx * 0.16, sy * 0.18, -0.63);
         core.visible = false;
+        f.userData.core = core;
         engineFlames.add(core);
       }
     }
@@ -1292,10 +1294,14 @@
         rocket.add(model);
         const fx = (boxF.max.x - boxF.min.x) * 0.15;
         const fy = (boxF.max.y - boxF.min.y) * 0.22;
+        const outers = flame.children.filter((c) => c.userData.outer);
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.1);
+            const f = outers[fi];
+            f.position.set(sxn * fx, syn * fy, boxF.min.z - 0.1);
+            if (f.userData.core) f.userData.core.position.set(sxn * fx, syn * fy, boxF.min.z - 0.08);
+            fi++;
           }
         }
         rocket.add(flame);
