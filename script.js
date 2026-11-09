@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.05, -0.35);
+        f.position.set(sx * 0.32, sy * 0.18, -0.5);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1228,16 +1228,23 @@
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
-          if (sz.z < modelLen * 0.2 && mb.max.z < box2.min.z + modelLen * 0.5) o.visible = false;
+          const atBack = mb.max.z < box2.min.z + modelLen * 0.5;
+          const thinZ = sz.z < modelLen * 0.2;
+          let purple = false;
+          if (o.material) {
+            const m = Array.isArray(o.material) ? o.material[0] : o.material;
+            if (m.color) purple = m.color.b > 0.25 && m.color.b > m.color.r && m.color.b > m.color.g;
+          }
+          if (atBack && (thinZ || purple)) o.visible = false;
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
-        const fx = (box2.max.x - box2.min.x) * 0.135;
-        const fy = (box2.max.y - box2.min.y) * 0.08;
+        const fx = (box2.max.x - box2.min.x) * 0.3;
+        const fy = (box2.max.y - box2.min.y) * 0.22;
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.06);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.15);
           }
         }
         rocket.add(flame);
