@@ -77,3 +77,8 @@ Puis `http://localhost:8000`.
 - **Lumières nocturnes** : emissiveMap 8K NASA, masquées côté jour via patch `onBeforeCompile` (facteur jour/nuit selon dot(N, Soleil))
 - **Échelles inchangées** : rayon `2,2×√(r/6371)`, orbite `30×UA^0,55`, inclinaison 23,4°, rotation propre + période 365,25 j
 - **Sources** : textures NASA/Solar System Scope (CC-BY 4.0) via upload.wikimedia.org + threejs.org ; licence CC-BY 4.0
+
+## 🧪 Tests à chaque modification
+
+Avant chaque commit : `node --check script.js scale.js` puis tests headless Chromium :
+`PLAYWRIGHT_DIR=/tmp/pwtest/ LD_LIBRARY_PATH=/tmp/debs/root/usr/lib/x86_64-linux-gnu:/tmp/debs/root/lib/x86_64-linux-gnu node tools/headless-test.mjs` (résultats dans `docs/TESTS.md`).

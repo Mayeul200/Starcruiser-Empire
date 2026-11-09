@@ -1,3 +1,6 @@
+/* RÈGLE : après CHAQUE modification de ce fichier, lancer les tests headless :
+   PLAYWRIGHT_DIR=/tmp/pwtest/ LD_LIBRARY_PATH=/tmp/debs/root/usr/lib/x86_64-linux-gnu:/tmp/debs/root/lib/x86_64-linux-gnu \
+     node tools/headless-test.mjs   (voir docs/TESTS.md) */
 (() => {
   "use strict";
 

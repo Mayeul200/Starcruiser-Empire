@@ -69,3 +69,6 @@ Batterie exécutée en local : serveur statique + Chromium headless 1280×720, W
 Script réutilisable : `PLAYWRIGHT_DIR=/tmp/pwtest/ LD_LIBRARY_PATH=... node tools/headless-test.mjs` (Chromium headless-shell + libs .deb extraits sur deb.debian.org).
 
 Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 planètes + labels**, 0 requête échouée, canvas OK, pas d'overlay fatal, screenshot OK (Soleil + 8 planètes + orbites + HUD). Perf headless : 142 draw calls, ~203k triangles, HUD 30 fps (limité par le rendu logiciel, pas représentatif d'un vrai GPU).
+
+- **Règle notée dans le code** (en-tête de `script.js` + README) : lancer `tools/headless-test.mjs` après chaque modification.
+- Re-test v111 (2ᵉ passage) : 0 erreur JS, 8 planètes, 0 requête échouée, 139 calls / 203k tri, pas d'overlay fatal. ✅
