@@ -1326,6 +1326,21 @@
     lastY = e.clientY;
   });
 
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.button === 2) rightDrag = true;
+  });
+
+  window.addEventListener("mouseup", (e) => {
+    if (e.button === 2) rightDrag = false;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!rocketMode || !rightDrag) return;
+    rocketCam.dTheta -= e.movementX * 0.005;
+    rocketCam.dPhi -= e.movementY * 0.005;
+    rocketCam.dPhi = Math.max(-1.2, Math.min(1.2, rocketCam.dPhi));
+  });
+
   window.addEventListener("pointermove", (e) => {
     if (!dragging) return;
     const dx = e.clientX - lastX;
