@@ -57,3 +57,9 @@ Batterie exécutée en local : serveur statique + Chromium headless 1280×720, W
 - Garde-fou `SCALE` manquant (scale.js) avec message + commande `python3 -m http.server 8000`
 - `powerPreference: "high-performance"` ; étoiles 6850 -> 4720, nébuleuses 14 -> 10 (moins de draw calls)
 - Si la page ne marche pas en local : ouvrir la console (F12), l'overlay affiche la cause ; en file://, servir via `python3 -m http.server 8000` puis http://localhost:8000
+
+## v111 — bug critique corrigé
+
+- `ReferenceError: ACCEL_SCALE is not defined` (script.js:1095, mu des lunes) : init interrompue à la 1ère lune -> planètes/labels/menu absents. Corrigé : `SCALE.accelSU(m.gSurface) * size * size`.
+- Handler `webglcontextlost`/`webglcontextrestored` ajouté (perte GPU -> overlay + reload auto).
+- Trouvé par tests headless Chromium (Playwright) : 0 erreur JS, 8 planètes + lunes OK, repli procédural OK quand CDN bloqué.

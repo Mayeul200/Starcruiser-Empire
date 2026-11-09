@@ -33,6 +33,11 @@
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+    canvas.addEventListener("webglcontextlost", (e) => {
+      e.preventDefault();
+      showFatal("Contexte WebGL perdu (GPU). Rechargez la page (Ctrl+F5).");
+    });
+    canvas.addEventListener("webglcontextrestored", () => location.reload());
   } catch (err) {
     showFatal("WebGL n'est pas disponible dans ce navigateur.");
     return;
