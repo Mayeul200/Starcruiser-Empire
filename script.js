@@ -1185,7 +1185,7 @@
     }
     rocket.add(engineFlames);
 
-    rocket.scale.setScalar(0.25);
+    rocket.scale.setScalar(0.05);
     return { group: rocket, flame: engineFlames, gimbal };
   }
 
@@ -1215,12 +1215,12 @@
         model.position.sub(center);
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
-        const fx = (box2.max.x - box2.min.x) * 0.38;
-        const fy = (box2.max.y - box2.min.y) * 0.38;
+        const fx = (box2.max.x - box2.min.x) * 0.27;
+        const fy = (box2.max.y - box2.min.y) * 0.27;
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.01);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z + 0.015);
           }
         }
         rocket.add(flame);
@@ -1271,7 +1271,7 @@
   const lookTarget = new THREE.Vector3();
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
   const camLocal = new THREE.Vector3();
-  const rocketCam = { radius: 0.35, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 0.07, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1324,7 +1324,7 @@
     e.preventDefault();
     if (rocketMode) {
       rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.3, Math.min(3, rocketCam.radius));
+      rocketCam.radius = Math.max(0.06, Math.min(0.6, rocketCam.radius));
     } else {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
@@ -1433,10 +1433,10 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 0.35;
+      rocketCam.radius = 0.07;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
-      camera.near = 0.01;
+      camera.near = 0.005;
       camera.updateProjectionMatrix();
       camSmooth.copy(camera.position);
       if (focused) resetView();
@@ -1634,7 +1634,7 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.18, -rocketCam.radius);
+      camLocal.set(0, 0.036, -rocketCam.radius);
       rocket.updateMatrixWorld();
       tmpV.copy(rocket.localToWorld(camLocal));
       camSmooth.lerp(tmpV, 0.35);
