@@ -12,7 +12,7 @@ window.SCALE = {
   SHIP: {
     lengthM: 12.5,      // X-Wing T-65 réel
     massKg: 10000,
-    thrustN: 300000,    // ~30 m/s²
+    thrustN: 3000000,   // ~300 m/s² (30 g, moteur fusion)
     dragAreaM2: 20,
     dragCoef: 0.5,
   },

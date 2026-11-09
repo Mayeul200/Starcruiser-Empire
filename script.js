@@ -58,7 +58,7 @@
   const scene = new THREE.Scene();
   const world = new THREE.Group();
   const origin = new THREE.Vector3();
-  let prevCam = null;
+
   function simPos(o, out) {
     o.getWorldPosition(out);
     out.add(origin);
@@ -261,7 +261,7 @@
     Vénus: { h0: 90000, rho0: 65, H: 15000 },
     Mars: { h0: 11000, rho0: 0.02, H: 11000 },
   };
-  const SUN_MU = SCALE.muSU(1.989e30);
+  const SUN_MU = SCALE.muSU(1.989e30) * Math.pow((30 * SCALE.M_PER_SU) / 1.496e11, 2);
   for (const p of PLANETS) {
     p.orbit = orbitFromAU(p.au);
     p.radius = radiusFromKm(p.rKm);
@@ -1842,7 +1842,7 @@
 
   function resetView() {
     focused = null;
-    orbit.desiredTarget.set(0, 0, 0);
+    orbit.desiredTarget.copy(origin).negate();
     orbit.desiredRadius = 285;
     document.querySelectorAll(".planet-btn").forEach((b) => b.classList.remove("active"));
     infoPanel.classList.add("hidden");
@@ -1895,13 +1895,14 @@
       camera.near = 0.1;
       camera.updateProjectionMatrix();
       if (document.exitPointerLock) document.exitPointerLock();
-      const off = tmpV.copy(camera.position).sub(orbit.target);
+      orbit.target.copy(rocket.position).sub(origin);
+      orbit.desiredTarget.copy(focused ? orbit.target : tmpV.copy(origin).negate());
+      const off = tmpV2.copy(camera.position).sub(orbit.target);
       const len = Math.max(0.001, off.length());
       orbit.radius = orbit.desiredRadius = Math.max(12, len);
       orbit.phi = orbit.desiredPhi = Math.acos(Math.max(-1, Math.min(1, off.y / len)));
       orbit.theta = orbit.desiredTheta = Math.atan2(off.x, off.z);
       if (!focused) {
-        orbit.desiredTarget.set(0, 0, 0);
         orbit.desiredRadius = 285;
       }
     }
@@ -2117,7 +2118,7 @@
         scene.fog = null;
       }
 
-      if (rocketVel.length() > 5) rocketVel.setLength(5);
+      if (rocketVel.length() > 15) rocketVel.setLength(15);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
@@ -2158,9 +2159,9 @@
       world.position.copy(origin).negate();
       rocket.updateMatrixWorld();
       const shipWp = rocket.getWorldPosition(tmpV2);
-      camera.position.copy(shipWp).addScaledVector(fwd, -0.00003).addScaledVector(tmpUp, 0.000006);
+      camera.position.copy(shipWp).addScaledVector(fwd, -0.000012).addScaledVector(tmpUp, 0.000004);
       camera.up.copy(tmpUp);
-      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0003));
+      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0002));
     }
 
     for (const b of bolts) {
@@ -2199,15 +2200,6 @@
 
     if (!rocketMode) applyOrbit();
 
-    const dCam = tmpV.copy(camera.position).sub(prevCam);
-    prevCam.copy(camera.position);
-    if (!rocketMode) {
-      origin.add(dCam);
-      world.position.copy(origin).negate();
-      orbit.target.sub(dCam);
-      orbit.desiredTarget.sub(dCam);
-    }
-
     renderer.render(scene, camera);
   }
 
@@ -2219,7 +2211,6 @@
 
   for (const c of [...scene.children]) if (c !== skySphere) world.add(c);
   scene.add(world);
-  prevCam = camera.position.clone();
   window.__scene = scene; window.__world = world; window.__origin = origin; window.__cam = camera; window.__rocket = rocket;
   animate();
 })();
