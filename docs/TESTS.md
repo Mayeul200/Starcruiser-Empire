@@ -78,3 +78,5 @@ Résultats (scène complète, SwiftShader logiciel) : **0 erreur JS**, **8 plan�
 - **v113** : fix focus planète (cible caméra en coordonnées rendu `sim − origin` après floating origin — la caméra n'atterrit plus entre deux planètes). Test headless OK : 8 planètes, 0 erreur JS (les 429 = rate-limit CDN sandbox, géré par le repli procédural).
 
 - **v114** : fix oscillation « double système » en mode vaisseau — boucle de rétroaction origin<->caméra ; maintenant `origin = position du vaisseau` en mode 🚀 (0 saut mesuré sur 30 frames en headless, 0 erreur). Test headless standard OK.
+
+- **v115** : fix caméra mode vaisseau — l'offset était scalé par le vaisseau (7,8e-6) via localToWorld → caméra dans le vaisseau ; maintenant offset en unités monde + origin synchronisé AVANT la caméra. Vérifié en headless : vaisseau visible à l'écran en mode R (NDC centré), 0 erreur JS, 8 planètes.

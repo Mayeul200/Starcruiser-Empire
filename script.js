@@ -2134,10 +2134,13 @@
 
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.up.set(0, 1, 0);
-      tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.position.copy(rocket.position).sub(origin).addScaledVector(fwd, -0.00005).addScaledVector(tmpUp, 0.00001);
-      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+      origin.copy(rocket.position);
+      world.position.copy(origin).negate();
+      rocket.updateMatrixWorld();
+      const shipWp = rocket.getWorldPosition(tmpV2);
+      camera.position.copy(shipWp).addScaledVector(fwd, -0.00005).addScaledVector(tmpUp, 0.00001);
+      camera.up.copy(tmpUp);
+      camera.lookAt(lookTarget.copy(shipWp).addScaledVector(fwd, 0.0005));
     }
 
     for (const b of bolts) {
@@ -2178,10 +2181,9 @@
 
     const dCam = tmpV.copy(camera.position).sub(prevCam);
     prevCam.copy(camera.position);
-    if (rocketMode) origin.copy(rocket.position);
-    else origin.add(dCam);
-    world.position.copy(origin).negate();
     if (!rocketMode) {
+      origin.add(dCam);
+      world.position.copy(origin).negate();
       orbit.target.sub(dCam);
       orbit.desiredTarget.sub(dCam);
     }
@@ -2198,6 +2200,6 @@
   for (const c of [...scene.children]) if (c !== skySphere) world.add(c);
   scene.add(world);
   prevCam = camera.position.clone();
-  window.__scene = scene; window.__world = world; window.__origin = origin; window.__cam = camera;
+  window.__scene = scene; window.__world = world; window.__origin = origin; window.__cam = camera; window.__rocket = rocket;
   animate();
 })();
