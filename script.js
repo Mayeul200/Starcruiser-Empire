@@ -1469,13 +1469,14 @@
   const tmpQ = new THREE.Quaternion();
   let terrain = null;
   let terrainCenter = new THREE.Vector3();
-  let terrainDir = new THREE.Vector3();
   let terrainSample = null;
-  let terrainZoom = -1;
-  let terrainPatch = 0.06;
   let earthObj = null;
   const tileCache = new Map();
-  const TILE_M = { 8: 78000, 10: 19500, 12: 4900 };
+  const terrainLevels = [
+    { zoom: 12, s: 0.008, mesh: null, sample: null },
+    { zoom: 10, s: 0.03, mesh: null, sample: null },
+    { zoom: 8, s: 0.1, mesh: null, sample: null },
+  ];
 
   function loadTile(z, x, y) {
     const key = z + "/" + x + "/" + y;
@@ -1543,43 +1544,53 @@
     return SCALE.toSU(Math.max(0, h)) * 2;
   }
 
-  function buildTerrain(center, dir, zoom) {
-    if (terrain) scene.remove(terrain);
-    terrainCenter.copy(center);
-    terrainDir.copy(dir);
-    terrainZoom = zoom;
-    const tileM = TILE_M[zoom] || 78000;
-    const s = (tileM * 3) / SCALE.M_PER_SU;
-    terrainPatch = s;
-    const geo = new THREE.PlaneGeometry(s, s, 96, 96);
+  function makeTerrainGeo(s) {
+    const geo = new THREE.PlaneGeometry(s, s, 64, 64);
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) pos.setY(i, procHeight(pos.getX(i), pos.getZ(i), s));
     geo.computeVertexNormals();
-    terrain = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1 }));
+    return geo;
+  }
+
+  function loadLevel(lv, lat, lon) {
+    const [tx, ty] = tileXY(lat, lon, lv.zoom);
+    const loads = [];
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) loads.push(loadTile(lv.zoom, tx + dx, ty + dy));
+    }
+    Promise.all(loads).then((tiles) => {
+      if (!terrain || !lv.mesh || tiles.some((t) => !t)) return;
+      lv.sample = (x, z) => demHeight(x, z, tiles, tx, ty, lv.zoom, lat, lon, lv.s);
+      const pos = lv.mesh.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) pos.setY(i, lv.sample(pos.getX(i), pos.getZ(i)));
+      pos.needsUpdate = true;
+      lv.mesh.geometry.computeVertexNormals();
+    });
+  }
+
+  function buildTerrain(center, dir) {
+    if (terrain) scene.remove(terrain);
+    terrain = new THREE.Group();
+    terrainCenter.copy(center);
+    const lat = Math.asin(dir.y);
+    const lon = Math.atan2(dir.x, dir.z);
+    for (const lv of terrainLevels) {
+      lv.sample = (x, z) => procHeight(x, z, lv.s);
+      lv.mesh = new THREE.Mesh(makeTerrainGeo(lv.s), new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1 }));
+      terrain.add(lv.mesh);
+      loadLevel(lv, lat, lon);
+    }
     terrain.position.copy(center);
     terrain.quaternion.setFromUnitVectors(upAxis, dir);
     scene.add(terrain);
-    terrainSample = (x, z) => procHeight(x, z, s);
-
-    if (zoom >= 0) {
-      const lat = Math.asin(dir.y);
-      const lon = Math.atan2(dir.x, dir.z);
-      const [tx, ty] = tileXY(lat, lon, zoom);
-      const loads = [];
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) loads.push(loadTile(zoom, tx + dx, ty + dy));
+    terrainSample = (x, z) => {
+      const r = Math.hypot(x, z);
+      for (const lv of terrainLevels) {
+        if (r < lv.s * 0.5) return lv.sample(x, z);
       }
-      Promise.all(loads).then((tiles) => {
-        if (!terrain || terrainZoom !== zoom || center.distanceTo(terrainCenter) > 0.001) return;
-        if (tiles.some((t) => !t)) return;
-        terrainSample = (x, z) => demHeight(x, z, tiles, tx, ty, zoom, lat, lon, s);
-        const pos2 = terrain.geometry.attributes.position;
-        for (let i = 0; i < pos2.count; i++) pos2.setY(i, terrainSample(pos2.getX(i), pos2.getZ(i)));
-        pos2.needsUpdate = true;
-        terrain.geometry.computeVertexNormals();
-      });
-    }
+      return terrainLevels[terrainLevels.length - 1].sample(x, z);
+    };
   }
 
   function ensureTerrain() {
@@ -1587,15 +1598,14 @@
     if (!earthObj) return;
     earthObj.mesh.getWorldPosition(tmpC);
     const alt = rocket.position.distanceTo(tmpC) - earthObj.data.radius;
-    if (alt > 0.09) {
+    if (alt > 0.12) {
       if (terrain) { scene.remove(terrain); terrain = null; }
       return;
     }
     const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
     const center = tmpC.clone().addScaledVector(dir, earthObj.data.radius);
-    const zoom = zoomForAlt(alt);
-    if (terrain && center.distanceTo(terrainCenter) < terrainPatch * 0.3 && terrainZoom === zoom) return;
-    buildTerrain(center, dir, zoom);
+    if (terrain && center.distanceTo(terrainCenter) < terrainLevels[0].s * 0.3) return;
+    buildTerrain(center, dir);
   }
 
   function collideSegment(center, min) {
