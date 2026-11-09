@@ -1,0 +1,36 @@
+# Batterie de tests — Starcruiser Empire
+
+Date : 2026-11-09. Dernière version testée : v109 (`script.js?v=109`, `scale.js?v=8`).
+
+## ✅ Checks automatisés (faits en CI locale, tous OK)
+
+| Check | Résultat |
+|---|---|
+| `node --check script.js` / `scale.js` | ✅ syntaxe OK |
+| Tous les `getElementById("...")` existent dans `index.html` | ✅ 14/14 IDs trouvés |
+| Aucun `console.error` / `throw` dans le code | ✅ 0 |
+| Anti-cache cohérent (`?v=` sur style.css/script.js/scale.js) | ✅ v109 / v8 |
+| Objets 3D ajoutés (~39 ajouts) | ✅ scène ~200 objets (planètes, lunes, anneaux, ceinture, vaisseau, bolts) |
+| URLs externes : toutes en CORS `*` (jsDelivr, raw.githubusercontent, threejs.org, upload.wikimedia.org, S3 elevation-tiles, Google Fonts) | ✅ aucune source sans CORS |
+
+## 🧪 HUD perf intégré
+
+En bas à droite : **FPS + draw calls + triangles** (`renderer.info`) mis à jour 2×/s.
+
+## 📋 Checklist manuelle (à cocher en jeu)
+
+- [ ] Page charge sans erreur console (hors extensions/GitHub Pages)
+- [ ] Système solaire : 8 planètes, orbites elliptiques inclinées, anneaux Saturne
+- [ ] Clic planète → fiche + caméra qui suit
+- [ ] R → mode vaisseau : souris viser, W/S/ESPACE/CTRL/Q/E/A/D/C, clic/F = tir
+- [ ] Caméra bâton fixe derrière, compteur km/s + altitude, HUD perf visible
+- [ ] Approche Terre → terrain DEM réel apparaît, atterrissage possible, redécollage OK
+- [ ] Rentrée : halo de chauffe + ciel bleu à basse altitude
+- [ ] Gravité ressentie près des planètes ; collisions sans traversée
+- [ ] FPS stable (> 30) en vue système et au sol
+
+## ⚠️ Limites connues
+
+- Relief exagéré ×2 côté rendu proche ; tuiles DEM limitées aux zooms 8/10/12.
+- Vitesse max 5 SU/s = ~14 500 km/s (plafond gameplay, documenté dans scale.js).
+- Extension navigateur = erreurs `content.js` dans la console (pas notre code).
