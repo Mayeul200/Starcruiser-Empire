@@ -1173,19 +1173,46 @@
     rocket.add(gimbal);
 
     const engineFlames = new THREE.Group();
-    const flameMat = new THREE.MeshBasicMaterial({ color: 0x66ccff, blending: THREE.AdditiveBlending, transparent: true, opacity: 1, depthWrite: false });
+    const flameTex = (() => {
+      const c = document.createElement("canvas");
+      c.width = 64;
+      c.height = 128;
+      const g = c.getContext("2d");
+      const grad = g.createLinearGradient(0, 128, 0, 0);
+      grad.addColorStop(0, "rgba(255,255,255,1)");
+      grad.addColorStop(0.2, "rgba(190,225,255,0.95)");
+      grad.addColorStop(0.55, "rgba(90,150,255,0.5)");
+      grad.addColorStop(1, "rgba(40,80,255,0)");
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 64, 128);
+      g.globalCompositeOperation = "destination-in";
+      const rg = g.createRadialGradient(32, 64, 3, 32, 64, 34);
+      rg.addColorStop(0, "rgba(255,255,255,1)");
+      rg.addColorStop(0.7, "rgba(255,255,255,0.6)");
+      rg.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = rg;
+      g.fillRect(0, 0, 64, 128);
+      return new THREE.CanvasTexture(c);
+    })();
+    const flameMat = new THREE.MeshBasicMaterial({ map: flameTex, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false });
     for (const sx of [-1, 1]) {
       for (const sy of [-1, 1]) {
-        const f = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.16, 10), flameMat);
+        const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.22, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
         f.position.set(sx * 0.16, sy * 0.18, -0.65);
         f.visible = false;
         engineFlames.add(f);
+        const core = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.12, 8), coreMat);
+        core.rotation.x = -Math.PI / 2;
+        core.position.set(sx * 0.16, sy * 0.18, -0.63);
+        core.visible = false;
+        engineFlames.add(core);
       }
     }
     rocket.add(engineFlames);
 
-    rocket.scale.setScalar(0.05);
+    rocket.scale.setScalar(0.005);
     return { group: rocket, flame: engineFlames, gimbal };
   }
 
@@ -1257,9 +1284,9 @@
           let purple = false;
           if (o.material) {
             const m = Array.isArray(o.material) ? o.material[0] : o.material;
-            if (m.color) purple = m.color.b > 0.25 && m.color.b > m.color.r && m.color.b > m.color.g;
+            if (m.color) purple = m.color.r > 0.5 && m.color.b > 0.5 && m.color.g < 0.3;
           }
-          if (atBack && (thinZ || purple)) hideMesh(o);
+          if (purple || (atBack && thinZ)) hideMesh(o);
         });
         while (rocket.children.length) rocket.remove(rocket.children[0]);
         rocket.add(model);
@@ -1501,7 +1528,7 @@
       rocketCam.radius = 1.0;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
-      camera.near = 0.005;
+      camera.near = 0.0005;
       camera.updateProjectionMatrix();
       camSmooth.copy(camera.position);
       if (focused) resetView();
