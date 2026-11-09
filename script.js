@@ -35,7 +35,7 @@
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance", logarithmicDepthBuffer: true });
     canvas.addEventListener("webglcontextlost", (e) => {
       e.preventDefault();
       showFatal("Contexte WebGL perdu (GPU). Rechargez la page (Ctrl+F5).");
@@ -302,6 +302,7 @@
   function applyColorSpace(tex) {
     if (THREE.SRGBColorSpace !== undefined) tex.colorSpace = THREE.SRGBColorSpace;
     else tex.encoding = THREE.sRGBEncoding;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     return tex;
   }
 
@@ -691,15 +692,21 @@
     side: THREE.BackSide,
     depthWrite: false,
     vertexShader: `
+      #include <common>
+      #include <logdepthbuf_pars_vertex>
       varying vec3 vDir;
       void main() {
         vDir = position;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        #include <logdepthbuf_vertex>
       }
     `,
     fragmentShader: `
+      #include <common>
+      #include <logdepthbuf_pars_fragment>
       varying vec3 vDir;
       void main() {
+        #include <logdepthbuf_fragment>
         vec3 dir = normalize(vDir);
         vec3 col = mix(vec3(0.008, 0.008, 0.032), vec3(0.058, 0.048, 0.115), dir.y * 0.5 + 0.5);
         vec3 bandN = normalize(vec3(0.35, 0.85, 0.30));
@@ -880,18 +887,24 @@
         i: { value: intensity },
       },
       vertexShader: `
+        #include <common>
+        #include <logdepthbuf_pars_vertex>
         varying vec3 vN;
         void main() {
           vN = normalize(normalMatrix * normal);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          #include <logdepthbuf_vertex>
         }
       `,
       fragmentShader: `
+        #include <common>
+        #include <logdepthbuf_pars_fragment>
         uniform vec3 c;
         uniform float p;
         uniform float i;
         varying vec3 vN;
         void main() {
+          #include <logdepthbuf_fragment>
           float f = pow(clamp(0.72 - dot(vN, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), p);
           gl_FragColor = vec4(c, 1.0) * f * i;
         }
@@ -908,6 +921,8 @@
     const mat = new THREE.ShaderMaterial({
       uniforms: { uSunDir: uniform },
       vertexShader: `
+        #include <common>
+        #include <logdepthbuf_pars_vertex>
         varying vec3 vWorldN;
         varying vec3 vWorldPos;
         void main() {
@@ -915,13 +930,17 @@
           vec4 wp = modelMatrix * vec4(position, 1.0);
           vWorldPos = wp.xyz;
           gl_Position = projectionMatrix * viewMatrix * wp;
+          #include <logdepthbuf_vertex>
         }
       `,
       fragmentShader: `
+        #include <common>
+        #include <logdepthbuf_pars_fragment>
         uniform vec3 uSunDir;
         varying vec3 vWorldN;
         varying vec3 vWorldPos;
         void main() {
+          #include <logdepthbuf_fragment>
           vec3 N = normalize(vWorldN);
           vec3 V = normalize(cameraPosition - vWorldPos);
           float rim = pow(clamp(1.0 - dot(N, V), 0.0, 1.0), 3.2);
@@ -990,7 +1009,7 @@
           roughness: 0.95,
           metalness: 0.02,
         });
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 48, 48), material);
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(data.radius, 96, 96), material);
     mesh.scale.y = 1 - (data.flattening || 0);
     mesh.userData.planet = data;
     tryLoadTexture(data.texUrls, (tex) => {
@@ -1095,7 +1114,7 @@
     (data.moons3d || []).forEach((m) => {
       const size = Math.max(0.12, data.radius * (m.rKm / data.rKm));
       const moonMat = new THREE.MeshStandardMaterial({ color: m.color, roughness: 1 });
-      const moonMesh = new THREE.Mesh(new THREE.SphereGeometry(size, 24, 24), moonMat);
+      const moonMesh = new THREE.Mesh(new THREE.SphereGeometry(size, 48, 32), moonMat);
       if (m.texUrls) {
         tryLoadTexture(m.texUrls, (tex) => {
           moonMat.map = tex;
