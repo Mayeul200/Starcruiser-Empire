@@ -1194,6 +1194,34 @@
   const rocket = rocketBuilt.group;
   const flame = rocketBuilt.flame;
   const gimbal = rocketBuilt.gimbal;
+
+  if (THREE.GLTFLoader) {
+    const gltfLoader = new THREE.GLTFLoader();
+    const XWING_URLS = [
+      "https://cdn.jsdelivr.net/gh/dev-durgaprasad/x-wing@main/source/textured_x-wing_low_poly.glb",
+      "https://cdn.jsdelivr.net/gh/dev-durgaprasad/x-wing@master/source/textured_x-wing_low_poly.glb",
+      "https://raw.githubusercontent.com/dev-durgaprasad/x-wing/main/source/textured_x-wing_low_poly.glb",
+      "https://raw.githubusercontent.com/dev-durgaprasad/x-wing/master/source/textured_x-wing_low_poly.glb",
+    ];
+    const tryLoadXwing = (urls) => {
+      if (!urls.length) return;
+      gltfLoader.load(urls[0], (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const len = Math.max(size.x, size.y, size.z) || 1;
+        model.scale.setScalar(0.55 / len);
+        const box2 = new THREE.Box3().setFromObject(model);
+        const center = box2.getCenter(new THREE.Vector3());
+        model.position.sub(center);
+        while (rocket.children.length) rocket.remove(rocket.children[0]);
+        rocket.add(model);
+        gimbal.position.z = box2.min.z - 0.06;
+        rocket.add(gimbal);
+      }, undefined, () => tryLoadXwing(urls.slice(1)));
+    };
+    tryLoadXwing(XWING_URLS);
+  }
   rocket.position.set(40, 4, 0);
   scene.add(rocket);
 
@@ -1210,7 +1238,8 @@
       const n = closest.sub(center).normalize();
       rocket.position.copy(center).addScaledVector(n, min);
       const vn = rocketVel.dot(n);
-      if (vn < 0) rocketVel.addScaledVector(n, -vn * 1.4);
+      if (vn < 0) rocketVel.addScaledVector(n, -vn * 1.0);
+      rocketVel.multiplyScalar(0.97);
       if (rocketVel.length() < 0.6) rocketVel.set(0, 0, 0);
     }
   }
@@ -1402,6 +1431,7 @@
       rocketCam.dPhi = 0;
       camera.near = 0.01;
       camera.updateProjectionMatrix();
+      camSmooth.copy(camera.position);
       if (focused) resetView();
       try {
         const p = canvas.requestPointerLock();
@@ -1597,7 +1627,9 @@
       camera.up.set(0, 1, 0);
       camLocal.set(0, 0.06, -rocketCam.radius);
       rocket.updateMatrixWorld();
-      camera.position.copy(rocket.localToWorld(camLocal));
+      tmpV.copy(rocket.localToWorld(camLocal));
+      camSmooth.lerp(tmpV, 0.35);
+      camera.position.copy(camSmooth);
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
