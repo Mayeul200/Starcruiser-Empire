@@ -2122,7 +2122,7 @@
         scene.fog = null;
       }
 
-      if (rocketVel.length() > 50) rocketVel.setLength(50);
+      if (rocketVel.length() > 1.727) rocketVel.setLength(1.727);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
 
