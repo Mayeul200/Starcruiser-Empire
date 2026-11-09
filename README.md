@@ -68,3 +68,12 @@ python3 -m http.server 8000
 ```
 
 Puis `http://localhost:8000`.
+
+## 🌍 Terre ultra-réaliste (v90)
+
+- **Surface PBR** : albedo 8K NASA + normal map + bump (relief) + specular map (reflets océans) — `MeshStandardMaterial`
+- **Nuages** : couche sphère indépendante, texture 8K NASA, rotation propre
+- **Atmosphère** : shader custom Rayleigh + Mie (halo bleu, plus lumineux côté jour), direction du Soleil mise à jour chaque frame
+- **Lumières nocturnes** : emissiveMap 8K NASA, masquées côté jour via patch `onBeforeCompile` (facteur jour/nuit selon dot(N, Soleil))
+- **Échelles inchangées** : rayon `2,2×√(r/6371)`, orbite `30×UA^0,55`, inclinaison 23,4°, rotation propre + période 365,25 j
+- **Sources** : textures NASA/Solar System Scope (CC-BY 4.0) via upload.wikimedia.org + threejs.org ; licence CC-BY 4.0
