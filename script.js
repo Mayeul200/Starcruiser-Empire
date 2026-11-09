@@ -1878,7 +1878,7 @@
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      camera.position.copy(rocket.position).addScaledVector(fwd, -0.0045).addScaledVector(tmpUp, 0.0007);
+      camera.position.copy(rocket.position).addScaledVector(fwd, -0.0022).addScaledVector(tmpUp, 0.00035);
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
