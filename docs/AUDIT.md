@@ -63,3 +63,15 @@ Date : 2026-11-09. Portée : diagnostic avant refonte des fondations (mission «
 - Textures : NASA / Solar System Scope CC-BY 4.0 (déjà utilisées).
 - Relief : tiles Terrarium PNG (ex. `s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png`, encodage `(R·65536+G·256+B/256)−32768`), NASA SRTM / Copernicus DEM.
 - Blue Marble Next Generation (NASA, domaine public) pour l'albedo par tuile.
+
+## ✅ Avancement (2026-11-09)
+
+- **Étape 2a faite** (commit cfd446a) : `scale.js` — unités SI centralisées (1 SU = 2 895 909 m), vaisseau 12,5 m réels (X-Wing), gravité universelle réelle (`mu = G·M/M_PER_SU³`, masses SI), poussée 30 m/s², compteur km/s cohérent avec l'échelle, caméra découplée de l'échelle du vaisseau.
+- **Étape 4/5 faite** (commit c90c62b) : traînée atmosphérique `ρ(h)=ρ0·e^(−h/H)` (Terre 1,225 kg/m³/H=8,5 km, Vénus, Mars), terrain local Terre (heightmap procédural ~174 km de côté, relief exagéré ×100 documenté) avec collision sol et atterrissage/décollage.
+
+## ⏳ Reste à faire
+
+- Étape 3 complète : cube-sphere + quadtree LOD + tuiles DEM réelles (Terrarium/NASA SRTM en streaming) + Blue Marble par tuile.
+- Étape 4 : rentrée atmosphérique (chauffage), portance, floating origin complet (sim SI + rendu relatif caméra).
+- Étape 5 : N-corps complet, rotation planètes, sous-pas physiques fixes.
+- Étape 6 : perfs (frustum culling terrain, unload), tests de transition.
