@@ -1462,6 +1462,8 @@
   shipBounds.setFromObject(rocket);
 
   const speedHud = document.getElementById("hud-speed");
+  const perfHud = document.getElementById("hud-perf");
+  let perfAcc = 0;
   const THRUST_SU = SCALE.accelSU(SCALE.SHIP.thrustN / SCALE.SHIP.massKg);
 
   const heatGlow = new THREE.Sprite(
@@ -2140,6 +2142,13 @@
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * SCALE.M_PER_SU / 1000)} km/s` + (atmoBody && isFinite(atmoAltSU) ? ` • alt ${Math.round(SCALE.toM(atmoAltSU) / 1000)} km` : "");
+
+    perfAcc += delta;
+    if (perfAcc > 0.5) {
+      perfAcc = 0;
+      const fps = Math.round(1 / Math.max(delta, 1e-4));
+      perfHud.textContent = `${fps} fps • ${renderer.info.render.calls} calls • ${renderer.info.render.triangles} tri`;
+    }
 
     if (!rocketMode) applyOrbit();
 

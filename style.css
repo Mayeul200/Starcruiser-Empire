@@ -426,3 +426,14 @@ body {
   z-index: 10;
   position: fixed;
 }
+
+.hud-perf {
+  bottom: 1rem;
+  right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 10;
+  position: fixed;
+}
