@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.1, -0.28);
+        f.position.set(sx * 0.17, sy * 0.1, -0.33);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1230,7 +1230,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.008);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.03);
           }
         }
         rocket.add(flame);
@@ -1641,7 +1641,7 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.09, -0.5);
+      camLocal.set(0, 0.09, -0.7);
       rocket.updateMatrixWorld();
       camera.position.copy(rocket.localToWorld(camLocal));
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
