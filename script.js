@@ -1456,6 +1456,16 @@
   const speedHud = document.getElementById("hud-speed");
   const THRUST_SU = SCALE.accelSU(SCALE.SHIP.thrustN / SCALE.SHIP.massKg);
 
+  const heatGlow = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: makeGlowTexture(), color: 0xff5522, blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false })
+  );
+  heatGlow.scale.set(0.002, 0.002, 1);
+  scene.add(heatGlow);
+  let atmoRho = 0;
+  let atmoAltSU = Infinity;
+  let atmoBody = null;
+  const atmoFog = new THREE.Fog(0x87b5e0, 0.002, 0.03);
+
   const tmpQ = new THREE.Quaternion();
   let terrain = null;
   let terrainCenter = new THREE.Vector3();
@@ -1883,7 +1893,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    const delta = clock.getDelta();
+    const delta = Math.min(clock.getDelta(), 1 / 30);
 
     if (!paused) {
       for (const p of planetObjects) {
@@ -2009,12 +2019,38 @@
       if (atmoP && atmoP.data.atmo && atmoD < SCALE.toSU(atmoP.data.atmo.h0)) {
         const hM = Math.max(0, SCALE.toM(atmoD));
         const rho = atmoP.data.atmo.rho0 * Math.exp(-hM / atmoP.data.atmo.H);
+        atmoRho = rho;
+        atmoAltSU = atmoD;
+        atmoBody = atmoP;
         const v = rocketVel.length();
         if (v > 1e-6 && rho > 0) {
           const vM = SCALE.toM(v);
           const dragM = (0.5 * rho * vM * vM * SCALE.SHIP.dragCoef * SCALE.SHIP.dragAreaM2) / SCALE.SHIP.massKg;
           rocketVel.addScaledVector(tmpV2.copy(rocketVel).normalize(), -SCALE.accelSU(dragM) * delta);
         }
+      } else {
+        atmoRho = 0;
+        atmoAltSU = Infinity;
+        atmoBody = null;
+      }
+
+      // Rentrée atmosphérique : chauffe du vaisseau + ciel/brouillard selon l'altitude
+      if (rocketMode && atmoBody) {
+        const vM = SCALE.toM(rocketVel.length());
+        const heat = Math.max(0, Math.min(1, (vM - 250) / 900)) * Math.min(1, atmoRho / 0.05);
+        heatGlow.material.opacity = heat * 0.85;
+        heatGlow.position.copy(rocket.position);
+        if (atmoAltSU < SCALE.toSU(atmoBody.data.atmo.h0 * 0.6)) {
+          scene.fog = atmoFog;
+          atmoFog.color.set(atmoAltSU < SCALE.toSU(12000) ? 0x87b5e0 : 0x0a0f1e);
+          atmoFog.near = SCALE.toSU(300);
+          atmoFog.far = SCALE.toSU(30000) * Math.max(0.05, Math.min(1, atmoRho / 0.02));
+        } else {
+          scene.fog = null;
+        }
+      } else if (rocketMode) {
+        heatGlow.material.opacity = 0;
+        scene.fog = null;
       }
 
       if (rocketVel.length() > 5) rocketVel.setLength(5);
@@ -2085,7 +2121,7 @@
       if (f.life <= 0) f.mesh.visible = false;
     }
 
-    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * SCALE.M_PER_SU / 1000)} km/s`;
+    speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * SCALE.M_PER_SU / 1000)} km/s` + (atmoBody && isFinite(atmoAltSU) ? ` • alt ${Math.round(SCALE.toM(atmoAltSU) / 1000)} km` : "");
 
     if (!rocketMode) applyOrbit();
     renderer.render(scene, camera);
