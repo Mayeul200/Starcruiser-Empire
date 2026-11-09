@@ -1238,6 +1238,10 @@
             m.transparent = true;
             m.opacity = 0;
             m.depthWrite = false;
+            m.map = null;
+            m.aoMap = null;
+            m.emissiveMap = null;
+            if (m.color) m.color.set(0x0a0d14);
           }
         };
         model.traverse((o) => {
