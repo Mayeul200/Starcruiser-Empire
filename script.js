@@ -1173,12 +1173,12 @@
     rocket.add(gimbal);
 
     const engineFlames = new THREE.Group();
-    const flameMat = new THREE.MeshBasicMaterial({ color: 0x4db8ff, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.95, depthWrite: false });
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0x66ccff, blending: THREE.AdditiveBlending, transparent: true, opacity: 1, depthWrite: false });
     for (const sx of [-1, 1]) {
       for (const sy of [-1, 1]) {
-        const f = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.09, 10), flameMat);
+        const f = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.13, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.17, sy * 0.1, -0.27);
+        f.position.set(sx * 0.17, sy * 0.1, -0.28);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1230,7 +1230,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z + 0.015);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, box2.min.z - 0.008);
           }
         }
         rocket.add(flame);
@@ -1332,10 +1332,7 @@
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    if (rocketMode) {
-      rocketCam.radius *= 1 + e.deltaY * 0.001;
-      rocketCam.radius = Math.max(0.06, Math.min(0.6, rocketCam.radius));
-    } else {
+    if (!rocketMode) {
       orbit.desiredRadius *= 1 + e.deltaY * 0.001;
       orbit.desiredRadius = Math.max(12, Math.min(700, orbit.desiredRadius));
     }
@@ -1644,10 +1641,10 @@
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       tmpUp.set(0, 1, 0).applyQuaternion(rocket.quaternion);
       camera.up.set(0, 1, 0);
-      camLocal.set(0, 0.036, -rocketCam.radius);
+      camLocal.set(0, 0.09, -0.5);
       rocket.updateMatrixWorld();
       tmpV.copy(rocket.localToWorld(camLocal));
-      camSmooth.lerp(tmpV, 0.55);
+      camSmooth.lerp(tmpV, 0.5);
       camera.position.copy(camSmooth);
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
