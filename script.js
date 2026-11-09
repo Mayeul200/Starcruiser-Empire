@@ -1709,7 +1709,9 @@
       tmpV.y += 0.007;
       camera.position.copy(pivot).add(tmpV);
       camera.up.set(0, 1, 0);
-      camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
+      const camPitch = Math.asin(Math.max(-1, Math.min(1, fwd.y)));
+      const camYaw = Math.atan2(-fwd.x, -fwd.z);
+      camera.quaternion.setFromEuler(new THREE.Euler(camPitch, camYaw, 0, "YXZ"));
     }
 
     speedHud.textContent = `🚀 ${Math.round(rocketVel.length() * 120)} km/s`;
