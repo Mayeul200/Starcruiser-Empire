@@ -1456,6 +1456,46 @@
   const speedHud = document.getElementById("hud-speed");
   const THRUST_SU = SCALE.accelSU(SCALE.SHIP.thrustN / SCALE.SHIP.massKg);
 
+  const tmpQ = new THREE.Quaternion();
+  let terrain = null;
+  let terrainCenter = new THREE.Vector3();
+  let earthObj = null;
+
+  function terrainHeight(x, z) {
+    const s = 0.06;
+    const u = (x / s + 0.5) * 8;
+    const v = (z / s + 0.5) * 8;
+    const n = Math.abs((Math.sin(u * 12.9898 + v * 78.233) * 43758.5453) % 1);
+    const n2 = Math.abs((Math.sin(u * 3.1 + v * 7.7 + 5.2) * 24634.6345) % 1);
+    return (n * 0.75 + n2 * 0.25) * 0.0025;
+  }
+
+  function ensureTerrain() {
+    if (!earthObj) earthObj = planetObjects.find((x) => x.data.name === "Terre");
+    if (!earthObj) return;
+    earthObj.mesh.getWorldPosition(tmpC);
+    const alt = rocket.position.distanceTo(tmpC) - earthObj.data.radius;
+    if (alt > 0.05) {
+      if (terrain) { scene.remove(terrain); terrain = null; }
+      return;
+    }
+    const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
+    const center = tmpC.clone().addScaledVector(dir, earthObj.data.radius);
+    if (terrain && center.distanceTo(terrainCenter) < 0.01) return;
+    if (terrain) scene.remove(terrain);
+    terrainCenter.copy(center);
+    const s = 0.06;
+    const geo = new THREE.PlaneGeometry(s, s, 96, 96);
+    geo.rotateX(-Math.PI / 2);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) pos.setY(i, terrainHeight(pos.getX(i), pos.getZ(i)));
+    geo.computeVertexNormals();
+    terrain = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0x3f7a4f, roughness: 1 }));
+    terrain.position.copy(center);
+    terrain.quaternion.setFromUnitVectors(upAxis, dir);
+    scene.add(terrain);
+  }
+
   function collideSegment(center, min) {
     const seg = tmpV2.subVectors(rocket.position, tmpPrev);
     const segLen2 = seg.lengthSq();
@@ -1866,6 +1906,25 @@
       tmpV.copy(rocket.position).normalize();
       rocketVel.addScaledVector(tmpV, (-SUN_MU / dSun2) * delta);
 
+      // Traînée atmosphérique : ρ(h) = ρ0·e^(−h/H) sur la planète la plus proche
+      let atmoP = null;
+      let atmoD = Infinity;
+      for (const p of planetObjects) {
+        p.mesh.getWorldPosition(tmpC);
+        const d = rocket.position.distanceTo(tmpC) - p.data.radius;
+        if (d < atmoD) { atmoD = d; atmoP = p; }
+      }
+      if (atmoP && atmoP.data.atmo && atmoD < SCALE.toSU(atmoP.data.atmo.h0)) {
+        const hM = Math.max(0, SCALE.toM(atmoD));
+        const rho = atmoP.data.atmo.rho0 * Math.exp(-hM / atmoP.data.atmo.H);
+        const v = rocketVel.length();
+        if (v > 1e-6 && rho > 0) {
+          const vM = SCALE.toM(v);
+          const dragM = (0.5 * rho * vM * vM * SCALE.SHIP.dragCoef * SCALE.SHIP.dragAreaM2) / SCALE.SHIP.massKg;
+          rocketVel.addScaledVector(tmpV2.copy(rocketVel).normalize(), -SCALE.accelSU(dragM) * delta);
+        }
+      }
+
       if (rocketVel.length() > 5) rocketVel.setLength(5);
       tmpPrev.copy(rocket.position);
       rocket.position.addScaledVector(rocketVel, delta);
@@ -1875,6 +1934,23 @@
         collideSegment(tmpC, p.data.radius + 0.03);
       }
       collideSegment(ORIGIN, SUN_RADIUS + 0.06);
+
+      // Terrain local (Terre) + atterrissage
+      ensureTerrain();
+      if (terrain) {
+        const ep = earthObj;
+        ep.mesh.getWorldPosition(tmpC);
+        const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
+        tmpQ.copy(terrain.quaternion).invert();
+        const lp = tmpV2.copy(rocket.position).sub(terrainCenter).applyQuaternion(tmpQ);
+        const hu = terrainHeight(lp.x, lp.z) + 0.00002;
+        if (lp.y < hu) {
+          rocket.position.addScaledVector(dir, hu - lp.y);
+          const vn = rocketVel.dot(dir);
+          if (vn < 0) rocketVel.addScaledVector(dir, -vn);
+          if (rocketVel.length() < 0.02) rocketVel.set(0, 0, 0);
+        }
+      }
 
       for (const c of flame.children) {
         c.visible = !!keys.KeyW;
