@@ -1822,18 +1822,18 @@
       gimbal.rotation.z += (gimbalZ - gimbal.rotation.z) * Math.min(1, 8 * delta);
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
-      if (keys.KeyW) rocketVel.addScaledVector(fwd, 2.5 * delta);
-      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -2.5 * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
+      if (keys.KeyW) rocketVel.addScaledVector(fwd, 0.5 * delta);
+      if (keys.KeyS) { rocketVel.addScaledVector(fwd, -0.5 * delta); if (rocketVel.length() < 0.15) rocketVel.set(0, 0, 0); }
       tmpV.set(0, 1, 0).applyQuaternion(rocket.quaternion);
-      if (keys.Space) rocketVel.addScaledVector(tmpV, 2.5 * delta);
-      if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -2.5 * delta);
+      if (keys.Space) rocketVel.addScaledVector(tmpV, 0.5 * delta);
+      if (keys.ControlLeft || keys.ControlRight) rocketVel.addScaledVector(tmpV, -0.5 * delta);
       if (keys.KeyA) {
         tmpV.set(1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, 2.5 * delta);
+        rocketVel.addScaledVector(tmpV, 0.5 * delta);
       }
       if (keys.KeyD) {
         tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
-        rocketVel.addScaledVector(tmpV, 2.5 * delta);
+        rocketVel.addScaledVector(tmpV, 0.5 * delta);
       }
       if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 1.2 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
