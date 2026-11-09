@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.015, 0.16, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.16, sy * 0.18, -0.6);
+        f.position.set(sx * 0.16, sy * 0.18, -0.57);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1235,7 +1235,7 @@
           if (!o.isMesh) return;
           const mb = new THREE.Box3().setFromObject(o);
           const sz = mb.getSize(new THREE.Vector3());
-          if (mb.max.z < boxF.min.z + modelLen * 0.08) {
+          if (mb.max.z < boxF.min.z + modelLen * 0.12) {
             o.visible = false;
             return;
           }
@@ -1255,7 +1255,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.1);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.07);
           }
         }
         rocket.add(flame);
@@ -1695,7 +1695,9 @@
       rocket.updateMatrixWorld();
       tmpV2.set(0, 0, -0.275);
       const pivot = rocket.localToWorld(tmpV2);
-      tmpV.copy(fwd).multiplyScalar(-rocketCam.radius).applyQuaternion(qYaw).applyQuaternion(qPitch);
+      const worldR = rocketCam.radius * 0.05;
+      tmpV.copy(fwd).multiplyScalar(-worldR).applyQuaternion(qYaw).applyQuaternion(qPitch);
+      tmpV.y += 0.007;
       camera.position.copy(pivot).add(tmpV);
       camera.up.set(0, 1, 0);
       camera.lookAt(lookTarget.copy(pivot));
