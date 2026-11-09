@@ -32,8 +32,8 @@
   const M_LOOK_AHEAD = SCALE.toSU(200);
   const M_SWAY = SCALE.toSU(0.4);
   const M_NEAR = SCALE.toSU(5);
-  const M_BOLT_R = SCALE.toSU(2);
-  const M_BOLT_LEN = SCALE.toSU(40);
+  const M_BOLT_R = SCALE.toSU(0.5);
+  const M_BOLT_LEN = SCALE.toSU(20);
   const M_BOLT_V = SCALE.velSU(500);
   const M_FLASH = SCALE.toSU(25);
   const M_HEAT = SCALE.toSU(3000);
@@ -1425,7 +1425,7 @@
     tmpV.set(boltSide * shipLen * 0.55, 0, shipLen * 0.5).applyQuaternion(rocket.quaternion);
     b.mesh.position.copy(rocket.position).add(tmpV);
     b.mesh.quaternion.copy(rocket.quaternion);
-    b.vel.copy(fwd).multiplyScalar(M_BOLT_V + Math.max(0, rocketVel.dot(fwd)));
+    b.vel.copy(fwd).multiplyScalar(M_BOLT_V).add(rocketVel);
     b.life = 8;
     b.mesh.visible = true;
     camShake = 1;
@@ -1551,12 +1551,7 @@
   let earthObj = null;
   const tileCache = new Map();
   const terrainLevels = [
-    { zoom: 15, s: SCALE.toSU(160), mesh: null, sample: null },
-    { zoom: 15, s: SCALE.toSU(1450), mesh: null, sample: null },
-    { zoom: 14, s: SCALE.toSU(5800), mesh: null, sample: null },
-    { zoom: 12, s: SCALE.toSU(23000), mesh: null, sample: null },
-    { zoom: 10, s: SCALE.toSU(87000), mesh: null, sample: null },
-    { zoom: 8, s: SCALE.toSU(600000), mesh: null, sample: null },
+    { zoom: 14, s: SCALE.toSU(10000), mesh: null, sample: null },
   ];
 
   function loadTile(z, x, y) {
@@ -1588,12 +1583,8 @@
     return [Math.min(x, n - 1), Math.max(0, Math.min(y, n - 1))];
   }
 
-  function procHeight(x, z, s) {
-    const u = (x / s + 0.5) * 8;
-    const v = (z / s + 0.5) * 8;
-    const n = Math.abs((Math.sin(u * 12.9898 + v * 78.233) * 43758.5453) % 1);
-    const n2 = Math.abs((Math.sin(u * 3.1 + v * 7.7 + 5.2) * 24634.6345) % 1);
-    return (n * 0.75 + n2 * 0.25) * s * 0.05;
+  function procHeight() {
+    return 0;
   }
 
   function demHeight(x, z, tiles, tx, ty, zoom, lat0, lon0, patchSU) {
@@ -1605,9 +1596,9 @@
     const n = Math.pow(2, zoom);
     const fx = ((lo + 180) / 360) * n;
     const fy = ((1 - Math.log(Math.tan((la * Math.PI) / 180) + 1 / Math.cos((la * Math.PI) / 180)) / Math.PI) / 2) * n;
-    const xi = Math.max(0, Math.min(2, Math.floor(fx) - (tx - 1)));
-    const yi = Math.max(0, Math.min(2, Math.floor(fy) - (ty - 1)));
-    const t = tiles[yi * 3 + xi];
+    const xi = Math.max(0, Math.min(4, Math.floor(fx) - (tx - 2)));
+    const yi = Math.max(0, Math.min(4, Math.floor(fy) - (ty - 2)));
+    const t = tiles[yi * 5 + xi];
     if (!t) return 0;
     const px = Math.max(0, Math.min(255, Math.floor((fx - Math.floor(fx)) * 256)));
     const py = Math.max(0, Math.min(255, Math.floor((fy - Math.floor(fy)) * 256)));
@@ -1668,7 +1659,7 @@
   }
 
   function makeTerrainGeo(s) {
-    const geo = new THREE.PlaneGeometry(s, s, 64, 64);
+    const geo = new THREE.PlaneGeometry(s, s, 128, 128);
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) pos.setY(i, procHeight(pos.getX(i), pos.getZ(i), s));
@@ -1679,8 +1670,8 @@
   function loadLevel(lv, lat, lon) {
     const [tx, ty] = tileXY(lat, lon, lv.zoom);
     const loads = [];
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) loads.push(loadTile(lv.zoom, tx + dx, ty + dy));
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dy = -2; dy <= 2; dy++) loads.push(loadTile(lv.zoom, tx + dx, ty + dy));
     }
     Promise.all(loads).then((tiles) => {
       if (!terrain || !lv.mesh || tiles.some((t) => !t)) return;
@@ -1726,7 +1717,7 @@
       }
     }
     const water = new THREE.Mesh(
-      new THREE.PlaneGeometry(SCALE.toSU(87000), SCALE.toSU(87000), 1, 1).rotateX(-Math.PI / 2),
+      new THREE.PlaneGeometry(terrainLevels[0].s, terrainLevels[0].s, 1, 1).rotateX(-Math.PI / 2),
       new THREE.MeshStandardMaterial({ color: 0x123f66, roughness: 0.18, metalness: 0.35, transparent: true, opacity: 0.86 })
     );
     water.position.y = SCALE.toSU(1.5);
@@ -1754,7 +1745,7 @@
     }
     const dir = tmpV.copy(rocket.position).sub(tmpC).normalize();
     const center = tmpC.clone().addScaledVector(dir, earthObj.data.radius);
-    if (terrain && center.distanceTo(terrainCenter) < terrainLevels[3].s * 0.3) return;
+    if (terrain && center.distanceTo(terrainCenter) < terrainLevels[0].s * 0.2) return;
     buildTerrain(center, dir);
   }
 
@@ -2227,7 +2218,6 @@
 
       // Terrain local (Terre) + atterrissage
       ensureTerrain();
-      if (earthObj) earthObj.tilt.visible = !terrain || !(isFinite(atmoAltSU) && atmoAltSU < SCALE.toSU(60000));
       if (terrain) {
         const ep = earthObj;
         simPos(ep.mesh, tmpC);
@@ -2323,7 +2313,6 @@
 
     if (!rocketMode) {
       applyOrbit();
-      if (earthObj) earthObj.tilt.visible = true;
     }
 
     renderer.render(scene, camera);
