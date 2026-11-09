@@ -1584,7 +1584,7 @@
       gimbal.rotation.x += (gimbalX - gimbal.rotation.x) * Math.min(1, 8 * delta);
       fwd.set(0, 0, 1).applyQuaternion(rocket.quaternion);
       if (keys.KeyW) rocketVel.addScaledVector(fwd, 2.5 * delta);
-      if (keys.KeyS) rocketVel.addScaledVector(fwd, -2 * delta);
+      if (keys.KeyS) rocketVel.addScaledVector(fwd, -0.8 * delta);
       if (keys.Space) rocketVel.y += 2.5 * delta;
       if (keys.ControlLeft || keys.ControlRight) rocketVel.y -= 2.5 * delta;
       if (keys.KeyA) {
@@ -1595,7 +1595,7 @@
         tmpV.set(-1, 0, 0).applyQuaternion(rocket.quaternion);
         rocketVel.addScaledVector(tmpV, 2.5 * delta);
       }
-      if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 4 * delta));
+      if (keys.KeyC) rocketVel.multiplyScalar(Math.max(0, 1 - 1.2 * delta));
       rocketVel.multiplyScalar(Math.max(0, 1 - 0.01 * delta));
 
       for (const p of planetObjects) {
@@ -1643,9 +1643,7 @@
       camera.up.set(0, 1, 0);
       camLocal.set(0, 0.09, -0.5);
       rocket.updateMatrixWorld();
-      tmpV.copy(rocket.localToWorld(camLocal));
-      camSmooth.lerp(tmpV, 0.5);
-      camera.position.copy(camSmooth);
+      camera.position.copy(rocket.localToWorld(camLocal));
       camera.quaternion.copy(rocket.quaternion).multiply(qCamOffset);
     }
 
