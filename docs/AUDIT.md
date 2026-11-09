@@ -81,3 +81,5 @@ Date : 2026-11-09. Portée : diagnostic avant refonte des fondations (mission «
 - **Étape 4 faite** (commit 0fc64ef) : rentrée atmosphérique (halo de chauffe = f(vitesse × ρ), brouillard/ciel bleu selon altitude via scène.fog), HUD altitude (km), delta physique plafonné à 1/30 s.
 
 - **Quadtree-lite 3 niveaux** (commit 5c3466f) : anneaux de terrain 0,008 / 0,03 / 0,1 SU tous en tuiles DEM NASA, sampler par distance au vaisseau → sol continu jusqu'à ~290 km (horizon), repli procédural si tuiles indisponibles.
+
+- **Floating origin complet** (commit 4af84df) : groupe `world` décalé de −origine chaque frame (origine = position caméra), physique en coordonnées sim (double précision) via `simPos()`, cible caméra réajustée ; précision float32 ramenée autour de la caméra à toute distance.
