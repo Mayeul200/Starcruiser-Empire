@@ -1178,7 +1178,7 @@
       for (const sy of [-1, 1]) {
         const f = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.16, 10), flameMat);
         f.rotation.x = -Math.PI / 2;
-        f.position.set(sx * 0.16, sy * 0.18, -0.28);
+        f.position.set(sx * 0.16, sy * 0.18, -0.4);
         f.visible = false;
         engineFlames.add(f);
       }
@@ -1255,16 +1255,7 @@
         let fi = 0;
         for (const sxn of [-1, 1]) {
           for (const syn of [-1, 1]) {
-            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z - 0.02);
-          }
-        }
-        const coverMat = new THREE.MeshBasicMaterial({ color: 0x05080f, depthWrite: true });
-        for (const sxn of [-1, 1]) {
-          for (const syn of [-1, 1]) {
-            const disc = new THREE.Mesh(new THREE.CircleGeometry(Math.max(fx, fy) * 0.9, 16), coverMat);
-            disc.position.set(sxn * fx, syn * fy, boxF.min.z - 0.004);
-            disc.rotation.y = Math.PI;
-            rocket.add(disc);
+            flame.children[fi++].position.set(sxn * fx, syn * fy, boxF.min.z);
           }
         }
         rocket.add(flame);
@@ -1315,7 +1306,7 @@
   const lookTarget = new THREE.Vector3();
   const qCamOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
   const camLocal = new THREE.Vector3();
-  const rocketCam = { radius: 0.7, dTheta: 0, dPhi: 0 };
+  const rocketCam = { radius: 1.0, dTheta: 0, dPhi: 0 };
 
   /* ---------- Contrôles caméra maison ---------- */
 
@@ -1497,7 +1488,7 @@
     rocketMode = !rocketMode;
     document.getElementById("btn-rocket").textContent = rocketMode ? "🛰 VUE LIBRE" : "🚀 PILOTER LA FUSÉE";
     if (rocketMode) {
-      rocketCam.radius = 0.7;
+      rocketCam.radius = 1.0;
       rocketCam.dTheta = 0;
       rocketCam.dPhi = 0;
       camera.near = 0.005;
